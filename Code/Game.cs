@@ -71,7 +71,20 @@ public static class Game
         Things.Clear();
         UpdateThings.Clear();
         DrawThings.Clear();
-        Game.Root = new Root();
+        Root = new Root();
+    }
+
+    public static void Process()
+    {
+        Start();
+
+        while (!Raylib.WindowShouldClose())
+        {
+            Update();
+            Draw();
+        }
+
+        Raylib.CloseWindow();
     }
 
     public static void Update()
@@ -150,7 +163,7 @@ public static class Game
 
     public static void PlaySound(string name, float volume = 1f, float pitch = 1f, float pan = 0.5f)
     {
-        if (Game.Mute) return;
+        if (Mute) return;
         Sound sound = Library.SoundEffects[name];
         Raylib.SetSoundVolume(sound, volume);
         Raylib.SetSoundPitch(sound, pitch);
