@@ -13,7 +13,7 @@ public class CONSTANTS
         public int? VIRTUAL_HEIGHT;
         public int? DEFAULT_SCREEN_MULTIPLIER;
         public int? TILE_SIZE;
-        public Color? PRIMARY_COLOR;
+        public string? PRIMARY_COLOR;
     }
 
     public static readonly string TITLE = "Thingus Game";
@@ -37,5 +37,6 @@ public class CONSTANTS
         if (c.VIRTUAL_HEIGHT != null) VIRTUAL_HEIGHT = c.VIRTUAL_HEIGHT.Value;
         if (c.DEFAULT_SCREEN_MULTIPLIER != null) DEFAULT_SCREEN_MULTIPLIER = c.DEFAULT_SCREEN_MULTIPLIER.Value;
         if (c.TILE_SIZE != null) TILE_SIZE = c.TILE_SIZE.Value;
+        if (c.PRIMARY_COLOR != null) PRIMARY_COLOR = Utility.HexToColor(c.PRIMARY_COLOR);
     }
 }

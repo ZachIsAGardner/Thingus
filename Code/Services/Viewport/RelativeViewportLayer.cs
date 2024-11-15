@@ -12,7 +12,8 @@ public class RelativeViewportLayer : ViewportLayer
     {
         base.Update();
         Camera.Target = Viewport.CameraPosition;
-        Camera.Zoom = Viewport.VirtualRatio.Value * Viewport.Zoom;
+        if (Viewport.ScalePixels) Camera.Zoom = Viewport.VirtualRatio.Value * Viewport.Zoom;
+        else Camera.Zoom = 1f;
     }
 
     public override void DrawToTexture()
