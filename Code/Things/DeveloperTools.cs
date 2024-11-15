@@ -71,7 +71,7 @@ public class DeveloperTools : Thing
 
         Game.Mode = GameMode.Play;
         if (playTarget != null) Viewport.Target = playTarget;
-        Viewport.RelativeLayer.Camera.Zoom = Viewport.VirtualRatio.Value;
+        Viewport.Zoom = 1;
         Viewport.RelativeLayer.Camera.Offset = Vector2.Zero;
         Editor.CameraTarget.Position = Viewport.Target.Position;
         Viewport.LightLayer.Visible = true;
