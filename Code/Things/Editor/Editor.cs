@@ -464,7 +464,7 @@ public class Editor : Thing
             Holdup = false;
         }
 
-        MousePosition = Input.MousePosition();
+        MousePosition = Input.MousePositionRelative();
         Mouse.Position = Input.MousePositionAbsolute() + new Vector2(8);
         Mouse.SetVisible(Input.IsMouseInsideWindow());
 

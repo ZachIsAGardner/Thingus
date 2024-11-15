@@ -43,8 +43,8 @@ public class Room : Thing
         if (Game.Root.Room != this)
         {
             Hovered = Utility.CheckRectangleOverlap(
-                Input.MousePosition() - new Vector2(8, 8),
-                Input.MousePosition() + new Vector2(8, 8),
+                Input.MousePositionRelative() - new Vector2(8, 8),
+                Input.MousePositionRelative() + new Vector2(8, 8),
                 TopLeft,
                 BottomRight
             );

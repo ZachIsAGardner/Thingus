@@ -33,9 +33,8 @@ public static class Input
     public static bool MiddleMouseButtonIsHeld => Raylib.IsMouseButtonDown(MouseButton.Middle);
     public static bool MiddleMouseButtonIsReleased => Raylib.IsMouseButtonReleased(MouseButton.Middle);
 
-    public static Vector2 MousePosition()
+    public static Vector2 MousePositionRelative()
     {
-        // :D
         return Raylib.GetScreenToWorld2D(
             Viewport.ScalePixels
                 ? Raylib.GetMousePosition() - ((Viewport.Margin * Viewport.VirtualRatio.Value) * (1 + Viewport.RelativeLayer.Camera.Zoom))
