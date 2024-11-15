@@ -52,7 +52,7 @@ dotnet new console
 
 3) Get Thingus.
 ```
-git submodule https://github.com/ZachIsAGardner/Thingus.git --path _Thingus
+git submodule https://github.com/ZachIsAGardner/Thingus.git _Thingus
 ```
 
 4) Make your Program.cs look something like this.
