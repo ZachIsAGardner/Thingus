@@ -83,6 +83,7 @@ public static class Library
                 string contents = File.ReadAllText(file);
                 Maps[name] = JsonConvert.DeserializeObject<Map>(contents);
                 Maps[name].Name = name;
+                Maps[name].Path = file.Split("/").Reverse().Skip(1).Reverse().Join("/");
                 Maps[name].Cells.ForEach(c => c.Map = Maps[name]);
             }
             else if (file.EndsWith(".fs"))

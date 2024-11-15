@@ -56,7 +56,7 @@ public static class Log
             font: font,
             text: "LOG",
             position: new Vector2(4, 4) + Viewport.AdjustFromTopLeft,
-            color: Colors.Red
+            color: CONSTANTS.PRIMARY_COLOR
         );
         logs.Reversed().ForEach(l =>
         {

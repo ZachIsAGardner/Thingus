@@ -72,6 +72,7 @@ public class Sprite : Thing
     public int TileSize = 0;
     public bool FlipHorizontally = false;
     public bool FlipVertically = false;
+    public bool AdjustWithMargin = true;
 
     // Shake
     float shakeXOffset;
@@ -109,7 +110,7 @@ public class Sprite : Thing
     // Create from code
     public Sprite(
         string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
-        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f
+        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, bool adjustWithMargin = true
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {
         Texture = Library.Textures[name];
@@ -119,6 +120,7 @@ public class Sprite : Thing
         if (color != null) Color = color.Value;
         if (scale != null) Scale = scale.Value;
         Rotation = rotation;
+        AdjustWithMargin = adjustWithMargin;
     }
 
     public void ShakeX(float magnitude = 2, float duration = 0.25f)
@@ -229,7 +231,8 @@ public class Sprite : Thing
             color: Color,
             drawMode: DrawMode,
             flipHorizontally: FlipHorizontally,
-            flipVertically: FlipVertically
+            flipVertically: FlipVertically,
+            adjustWithMargin: AdjustWithMargin
         );
     }
 }

@@ -46,7 +46,11 @@ public static class Input
 
     public static Vector2 MousePositionAbsolute()
     {
-        return (Raylib.GetMousePosition() / Viewport.RelativeLayer.Camera.Zoom);
+        return (Raylib.GetMousePosition() / Viewport.VirtualRatio.Value) 
+            - new Vector2(
+                Viewport.Margin.X, 
+                Viewport.Margin.Y
+            );
     }
 
     public static bool IsPressed(KeyboardKey key)
@@ -62,6 +66,17 @@ public static class Input
     public static bool IsReleased(KeyboardKey key)
     {
         return Raylib.IsKeyReleased((Raylib_cs.KeyboardKey)key);
+    }
+
+    public static void ToggleCursor(bool show)
+    {
+        if (show) Raylib.ShowCursor();
+        else Raylib.HideCursor();
+    }
+
+    public static bool IsMouseInsideWindow()
+    {
+        return Raylib.IsCursorOnScreen();
     }
 }
 

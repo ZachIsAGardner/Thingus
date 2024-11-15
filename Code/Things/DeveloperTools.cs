@@ -56,7 +56,7 @@ public class DeveloperTools : Thing
         Editor.SetVisible(true);
 
         Game.Mode = GameMode.Edit;
-        Editor.CameraTarget.Position = Viewport.Target.Position;
+        if (Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
         playTarget = Viewport.Target;
         Viewport.Target = Editor.CameraTarget;
         Viewport.LightLayer.Visible = false;
@@ -92,18 +92,16 @@ public class DeveloperTools : Thing
 
         if (Input.IsPressed(KeyboardKey.One))
         {
-            Viewport.VirtualRatio--;
-            if (Viewport.VirtualRatio < 1) Viewport.VirtualRatio = 1;
-            Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * Viewport.VirtualRatio.Value, CONSTANTS.VIRTUAL_HEIGHT * Viewport.VirtualRatio.Value);
-            Viewport.RefreshProjection();
+            int ratio = Viewport.VirtualRatio.Value - 1;
+            if (ratio < 1) ratio = 1;
+            Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * ratio, CONSTANTS.VIRTUAL_HEIGHT * ratio);
         }
 
         if (Input.IsPressed(KeyboardKey.Two))
         {
-            Viewport.VirtualRatio++;
-            if (Viewport.VirtualRatio > 7) Viewport.VirtualRatio = 7;
-            Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * Viewport.VirtualRatio.Value, CONSTANTS.VIRTUAL_HEIGHT * Viewport.VirtualRatio.Value);
-            Viewport.RefreshProjection();
+            int ratio = Viewport.VirtualRatio.Value + 1;
+            if (ratio > 7) ratio = 7;
+            Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * ratio, CONSTANTS.VIRTUAL_HEIGHT * ratio);
         }
 
         if (Input.IsPressed(KeyboardKey.Three))
@@ -129,7 +127,7 @@ public class DeveloperTools : Thing
             Log.Clear();
             Library.Refresh();
             Play();
-            Game.Root.Load("Test");
+            Game.Root.Load(CONSTANTS.START_ROOM);
         }
     }
 
@@ -163,7 +161,7 @@ public class DeveloperTools : Thing
             font: font,
             text: "TREE",
             position: new Vector2(4, 4) + Viewport.AdjustFromTopLeft,
-            color: Colors.Red
+            color: CONSTANTS.PRIMARY_COLOR
         );
 
         int height = 1;

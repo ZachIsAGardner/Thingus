@@ -29,7 +29,7 @@ public static class Shapes
         return new Vector2(tileNumber * tileSize, row * tileSize);
     }
 
-    public static void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, DrawMode drawMode = DrawMode.Relative, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false)
+    public static void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, DrawMode drawMode = DrawMode.Relative, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, bool adjustWithMargin = true)
     {
         if (scale == null) scale = new Vector2(1);
 
@@ -47,22 +47,27 @@ public static class Shapes
 
 
         Vector2 p = position ?? Vector2.Zero;
+        // Relative
         if (drawMode == DrawMode.Relative)
         {
             p += Viewport.Position;
         }
+        // Absolute
         else
         {
-            if (Viewport.Margin.X < 0)
+            if (adjustWithMargin)
             {
-                if (p.X < CONSTANTS.VIRTUAL_WIDTH / 2f) p.X -= Viewport.Margin.X;
-                else p.X += Viewport.Margin.X;
-            }
+                if (Viewport.Margin.X < 0)
+                {
+                    if (p.X < CONSTANTS.VIRTUAL_WIDTH / 2f) p.X -= Viewport.Margin.X;
+                    else p.X += Viewport.Margin.X;
+                }
 
-            if (Viewport.Margin.Y < 0)
-            {
-                if (p.Y < CONSTANTS.VIRTUAL_WIDTH / 2f) p.Y -= Viewport.Margin.Y;
-                else p.Y += Viewport.Margin.Y;
+                if (Viewport.Margin.Y < 0)
+                {
+                    if (p.Y < CONSTANTS.VIRTUAL_HEIGHT / 2f) p.Y -= Viewport.Margin.Y;
+                    else p.Y += Viewport.Margin.Y;
+                }
             }
         }
 
@@ -78,27 +83,32 @@ public static class Shapes
         );
     }
 
-    public static void DrawText(string text, Vector2? position = null, Font? font = null, Color? color = null, DrawMode drawMode = DrawMode.Relative, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full)
+    public static void DrawText(string text, Vector2? position = null, Font? font = null, Color? color = null, DrawMode drawMode = DrawMode.Relative, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full, bool adjustWithMargin = true)
     {
         if (font == null) font = Library.Font;
 
         Vector2 p = position ?? Vector2.Zero;
+        // Relative
         if (drawMode == DrawMode.Relative)
         {
             p += Viewport.Position;
         }
+        // Absolute
         else
         {
-            if (Viewport.Margin.X < 0)
+            if (adjustWithMargin)
             {
-                if (p.X < CONSTANTS.VIRTUAL_WIDTH / 2f) p.X -= Viewport.Margin.X;
-                else p.X += Viewport.Margin.X;
-            }
+                if (Viewport.Margin.X < 0)
+                {
+                    if (p.X < CONSTANTS.VIRTUAL_WIDTH / 2f) p.X -= Viewport.Margin.X;
+                    else p.X += Viewport.Margin.X;
+                }
 
-            if (Viewport.Margin.Y < 0)
-            {
-                if (p.Y < CONSTANTS.VIRTUAL_WIDTH / 2f) p.Y -= Viewport.Margin.Y;
-                else p.Y += Viewport.Margin.Y;
+                if (Viewport.Margin.Y < 0)
+                {
+                    if (p.Y < CONSTANTS.VIRTUAL_HEIGHT / 2f) p.Y -= Viewport.Margin.Y;
+                    else p.Y += Viewport.Margin.Y;
+                }
             }
         }
 

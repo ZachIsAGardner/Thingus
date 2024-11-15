@@ -51,6 +51,8 @@ public static class Viewport
     public static float Allowance = 0.9f;
 
     public static int? VirtualRatio = 1;
+    public static int? LastVirtualRatio = 1;
+    public static float Zoom = 1;
     public static Rectangle Rectangle = new Rectangle();
 
     public static Shader Shader = null;
@@ -122,6 +124,8 @@ public static class Viewport
     {
         Scale.X = Raylib.GetScreenWidth();
         Scale.Y = Raylib.GetScreenHeight();
+
+        LastVirtualRatio = VirtualRatio.Value;
 
         if (Mode == ViewportMode.FitToScreen)
         {

@@ -57,7 +57,6 @@ git submodule add https://github.com/ZachIsAGardner/Thingus.git _Thingus
 
 4) Make your Program.cs look something like this.
 ```
-using Raylib_cs;
 using Thingus;
 
 namespace MyCoolGame;
@@ -75,7 +74,7 @@ class Program
 ```
 {
     "NAMESPACE": "MyCoolGame",
-    "START_ROOM": "Test",
+    "START_ROOM": "Init",
     "VIRTUAL_WIDTH": 320,
     "VIRTUAL_HEIGHT": 180,
     "DEFAULT_SCREEN_MULTIPLIER": 3,

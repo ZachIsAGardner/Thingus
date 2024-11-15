@@ -31,7 +31,7 @@ public class Root : Thing
     public override void Start()
     {
         base.Start();
-        Load(CONSTANTS.START_ROOM);
+        if (CONSTANTS.START_ROOM != null) Load(CONSTANTS.START_ROOM);
     }
 
     public override void Update()

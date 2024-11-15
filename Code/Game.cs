@@ -50,7 +50,7 @@ public static class Game
     {
         Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
         Raylib.SetConfigFlags(ConfigFlags.VSyncHint);
-        Raylib.InitWindow(CONSTANTS.VIRTUAL_WIDTH * CONSTANTS.DEFAULT_SCREEN_MULTIPLIER, CONSTANTS.VIRTUAL_HEIGHT * CONSTANTS.DEFAULT_SCREEN_MULTIPLIER, "Super Debt!");
+        Raylib.InitWindow(CONSTANTS.VIRTUAL_WIDTH * CONSTANTS.DEFAULT_SCREEN_MULTIPLIER, CONSTANTS.VIRTUAL_HEIGHT * CONSTANTS.DEFAULT_SCREEN_MULTIPLIER, CONSTANTS.TITLE);
         Raylib.SetWindowIcon(Raylib.LoadImage("Icon.png"));
         Raylib.SetTargetFPS(60);
         Raylib.InitAudioDevice();
@@ -153,12 +153,6 @@ public static class Game
     public static void QueueUpdateReorder()
     {
         queueUpdateReorder = true;
-    }
-
-    public static void ToggleCursor(bool show)
-    {
-        if (show) Raylib.ShowCursor();
-        else Raylib.HideCursor();
     }
 
     public static void PlaySound(string name, float volume = 1f, float pitch = 1f, float pan = 0.5f)

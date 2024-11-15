@@ -1,3 +1,4 @@
+using System.Numerics;
 using Raylib_cs;
 
 namespace Thingus;
@@ -11,6 +12,7 @@ public class RelativeViewportLayer : ViewportLayer
     {
         base.Update();
         Camera.Target = Viewport.CameraPosition;
+        Camera.Zoom = Viewport.VirtualRatio.Value * Viewport.Zoom;
     }
 
     public override void DrawToTexture()

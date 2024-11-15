@@ -68,12 +68,12 @@ public class Tool
 
         if (dragMousePosition == null)
         {
-            dragMousePosition = Input.MousePositionAbsolute();
+            dragMousePosition = (Raylib.GetMousePosition() / Viewport.RelativeLayer.Camera.Zoom);
             dragCameraPosition = editor.CameraTarget.Position;
         }
         else
         {
-            Vector2 difference = dragMousePosition.Value - Input.MousePositionAbsolute();
+            Vector2 difference = dragMousePosition.Value - (Raylib.GetMousePosition() / Viewport.RelativeLayer.Camera.Zoom);
             editor.CameraTarget.Position = dragCameraPosition.Value + difference;
         }
     }
@@ -93,8 +93,6 @@ public class BrushTool : Tool
 
     public override void Update()
     {
-        editor.TogglePreview(true);
-
         if (Input.AltIsHeld)
         {
             Picker();
@@ -107,10 +105,18 @@ public class BrushTool : Tool
             return;
         }
 
-        editor.Mouse.TileNumber = 0;
+        editor.Mouse.TileNumber = 3;
 
         dragMousePosition = null;
         dragCameraPosition = null;
+
+        if (Game.Root.Room == null)
+        {
+            editor.TogglePreview(false);
+            return;
+        }
+
+        editor.TogglePreview(true);
 
         if (editor.InteractDisabled) return;
 
@@ -163,6 +169,14 @@ public class RectangleTool : Tool
         dragCameraPosition = null;
 
         editor.Mouse.TileNumber = 12;
+
+        if (Game.Root.Room == null)
+        {
+            editor.TogglePreview(false);
+            return;
+        }
+
+        editor.TogglePreview(true);
 
         if (editor.InteractDisabled) return;
 
@@ -228,7 +242,7 @@ public class RectangleTool : Tool
         {
             positions.ForEach(p =>
             {
-                Shapes.DrawSprite(texture: square, position: p, color: new Color(erase ? 0 : 255, 0, 0, 150));
+                Shapes.DrawSprite(texture: square, position: p, color: erase ? new Color(0, 0, 0, 150) : CONSTANTS.PRIMARY_COLOR);
             });
         }
     }
@@ -252,7 +266,17 @@ public class PickerTool : Tool
         dragMousePosition = null;
         dragCameraPosition = null;
 
+        editor.Mouse.TileNumber = 2;
+
+        if (Game.Root.Room == null)
+        {
+            editor.TogglePreview(false);
+            return;
+        }
+
         Picker();
+
+        editor.TogglePreview(true);
 
         base.Update();
     }
@@ -292,11 +316,13 @@ public class RoomTool : Tool
         dragMousePosition = null;
         dragCameraPosition = null;
 
+        editor.Mouse.TileNumber = 7;
 
         if (editor.InteractDisabled) return;
 
         if (Input.RightMouseButtonIsPressed)
         {
+            if (Game.Root.Room == null) return;
             Game.Root.Zone.Map.RemoveCell(Game.Root.Room.Cell);
             Game.Root.Room.Destroy();
             Game.Root.Room = null;
@@ -312,10 +338,11 @@ public class RoomTool : Tool
             if (Input.LeftMouseButtonIsPressed)
             {
                 Thing child = Game.Root.Zone.Children.OrderByDescending(c => c.Name).FirstOrDefault();
-                string index = (child.Name.Split("_").Last().ToInt() + 1).ToString().PadLeft(3, '0');
+                string index = child == null ? "000" : (child.Name.Split("_").Last().ToInt() + 1).ToString().PadLeft(3, '0');
                 string name = $"{Game.Root.Zone.Name}_{index}";
                 Room room = new Room(name, editor.GridPosition);
                 room.Map = new Map(name);
+                room.Map.Path = Game.Root.Zone.Map.Path;
                 Game.Root.Zone.AddChild(room);
                 Game.Root.Zone.Map.AddCell(new MapCell($"={room.Name}", room.Position));
                 Game.Root.Zone.Map.Save();
@@ -325,8 +352,8 @@ public class RoomTool : Tool
         }
         else
         {
-            editor.Mouse.TileNumber = 7;
-
+            if (Game.Root.Room == null) return;
+            
             if (Input.LeftMouseButtonIsPressed)
             {
                 moveRoomStart = Game.Root.Room.Position;
@@ -376,22 +403,7 @@ public class Editor : Thing
     public Vector2? LastGridInteractPosition;
     HashSet<Vector2> recentGridInteractionPositions = new HashSet<Vector2>() { };
 
-    List<Stamp> stamps = new List<Stamp>()
-    {
-        new Stamp("DevCeiling"),
-        new Stamp("DevGround"),
-        new Stamp("DevWalls"),
-        new Stamp("WallShadow"),
-        // new Stamp("Grass"),
-        // new Stamp("Slab"),
-        // new Stamp("Spikes"),
-        // new Stamp("Tombstone"),
-        // new Stamp("Skull"),
-        // new Stamp("Pumpkin"),
-        // new Stamp("MoneyPickup"),
-        new Stamp("MoneyBag"),
-        // new Stamp("Tree"),
-    };
+    List<Stamp> stamps = new List<Stamp>() { };
 
     Tool tool = null;
     Stamp stamp = null;
@@ -399,6 +411,8 @@ public class Editor : Thing
     public override void Init()
     {
         base.Init();
+
+        stamps = Library.ThingImports.Select(t => new Stamp(t.Key)).ToList();
 
         stamp = stamps.First();
         tool = new BrushTool(this);
@@ -408,15 +422,14 @@ public class Editor : Thing
         DrawMode = DrawMode.Relative;
         DrawOrder = 99;
 
-        Mouse = AddChild(new Sprite("Mouse", tileSize: 16, tileNumber: 0, drawOrder: 110)) as Sprite;
-        Mouse.AddChild(new Light());
-
         gridMouse = AddChild(new Sprite("16White", drawOrder: 100)) as Sprite;
         gridMouse.Color = new Color(255, 0, 0, 50);
 
-        previewBackground = AddChild(new Sprite("Pixel", drawOrder: 108, color: Colors.Black, scale: new Vector2(18))) as Sprite;
-        preview = AddChild(new Sprite(stamp.Name, drawOrder: 109, tileSize: 16, color: Colors.Red)) as Sprite;
-        previewText = AddChild(new Text(stamp.Name, position: new Vector2(0), Library.Font, color: Colors.Red, outlineColor: Colors.Black, order: 111)) as Text;
+        Mouse = AddChild(new Sprite("Mouse", tileSize: 16, tileNumber: 0, drawOrder: 110, drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Sprite;
+
+        previewBackground = AddChild(new Sprite("Pixel", drawOrder: 108, color: Colors.Black, scale: new Vector2(18), drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Sprite;
+        preview = AddChild(new Sprite(stamp.Name, drawOrder: 109, tileSize: 16, color: CONSTANTS.PRIMARY_COLOR, drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Sprite;
+        previewText = AddChild(new Text(stamp.Name, position: new Vector2(0), Library.Font, color: CONSTANTS.PRIMARY_COLOR, outlineColor: Colors.Black, order: 111, drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Text;
 
         CameraTarget = AddChild(new Thing("CameraTarget"));
     }
@@ -424,6 +437,8 @@ public class Editor : Thing
     public override void Update()
     {
         base.Update();
+
+        // Log.Write(Viewport.RelativeLayer.Camera.Zoom);
 
         if (Input.IsPressed(KeyboardKey.B))
         {
@@ -450,16 +465,20 @@ public class Editor : Thing
         }
 
         MousePosition = Input.MousePosition();
-        Mouse.Position = MousePosition + new Vector2(8);
+        Mouse.Position = Input.MousePositionAbsolute() + new Vector2(8);
+        Mouse.SetVisible(Input.IsMouseInsideWindow());
 
         GridPosition = MousePosition.ToNearest(16);
         gridMouse.Position = GridPosition;
+        gridMouse.SetVisible(Input.IsMouseInsideWindow());
 
-        preview.Position = preview.Position.MoveOverTime(MousePosition + new Vector2((previewBackground.Scale.X / 2f) + 8, -4), 0.00001f);
+        preview.Position = preview.Position.MoveOverTime(Mouse.Position + new Vector2((previewBackground.Scale.X / 2f) + 8, -4), 0.00001f);
         previewText.Position = preview.Position + new Vector2(-7, preview.TileSize / 2f);
         previewBackground.Position = preview.Position;
+        TogglePreview(Input.IsMouseInsideWindow());
 
         float speed = 1200f / Viewport.RelativeLayer.Camera.Zoom;
+        // float speed = 1200f / Viewport.Zoom;
         Vector2 input = Vector2.Zero;
         if (Input.IsHeld(KeyboardKey.W)) input.Y--;
         if (Input.IsHeld(KeyboardKey.S)) input.Y++;
@@ -483,17 +502,15 @@ public class Editor : Thing
             // Zoom in/out
             else
             {
-                Viewport.RelativeLayer.Camera.Offset = Raylib.GetMousePosition() - ((Viewport.Margin * Viewport.VirtualRatio.Value));
-                // Viewport.RelativeLayer.Camera.Offset = Raylib.GetMousePosition();
-                // Viewport.RelativeLayer.Camera.Target = MousePosition;
+                Viewport.RelativeLayer.Camera.Offset = Raylib.GetMousePosition() - (Viewport.Margin * Viewport.VirtualRatio.Value);
                 CameraTarget.Position = MousePosition + new Vector2(
-                        CONSTANTS.VIRTUAL_WIDTH / 2f,
-                        CONSTANTS.VIRTUAL_HEIGHT / 2f
-                    ); ;
+                    CONSTANTS.VIRTUAL_WIDTH / 2f,
+                    CONSTANTS.VIRTUAL_HEIGHT / 2f
+                );
 
                 float scaleFactor = 1.0f + (0.25f * scroll.Abs());
                 if (scroll < 0) scaleFactor = 1.0f / scaleFactor;
-                Viewport.RelativeLayer.Camera.Zoom = Math.Clamp(Viewport.RelativeLayer.Camera.Zoom * scaleFactor, 0.25f, 64.0f);
+                Viewport.Zoom = Math.Clamp(Viewport.Zoom * scaleFactor, 0.25f, 64.0f);
             }
 
         }
@@ -511,9 +528,9 @@ public class Editor : Thing
 
     public void TogglePreview(bool show)
     {
-        preview.SetActive(show);
-        previewBackground.SetActive(show);
-        previewText.SetActive(show);
+        preview.SetVisible(show);
+        previewBackground.SetVisible(show);
+        previewText.SetVisible(show);
     }
 
     public int GetTileNumber(MapCell cell)
@@ -543,6 +560,8 @@ public class Editor : Thing
     }
     public void RefreshAutoTilemaps(List<Vector2> positions)
     {
+        if (Game.Root.Room == null) return;
+        
         Game.Root.Room.Map.Cells.ToList().ForEach(c =>
         {
             if (positions != null && !positions.Contains(c.Position)) return;

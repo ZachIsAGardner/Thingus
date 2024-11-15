@@ -26,6 +26,12 @@ public class ViewportLayer
             Rectangle = new Rectangle(0, 0, (float)Texture.Texture.Width, -(float)Texture.Texture.Height);
 
             Camera.Zoom = Viewport.VirtualRatio.Value;
+            if (Camera.Offset != Vector2.Zero)
+            {
+                float change = (float)Viewport.VirtualRatio.Value / (float)Viewport.LastVirtualRatio.Value;
+                Camera.Offset *= change;
+            }
+
             Raylib.SetTextureFilter(Texture.Texture, TextureFilter.Point);
         }
         else
@@ -34,6 +40,7 @@ public class ViewportLayer
             Rectangle = new Rectangle(0, 0, (float)Texture.Texture.Width, -(float)Texture.Texture.Height);
 
             Camera.Zoom = 1f;
+            Camera.Offset = Vector2.Zero;
             Raylib.SetTextureFilter(Texture.Texture, TextureFilter.Point);
         }
     }

@@ -8,9 +8,14 @@ public class Map
 {
     public const string PATH = "Content/Maps";
     
+    [JsonIgnore]
     public string Name;
+
     public string Type = "Room";
     public List<MapCell> Cells = new List<MapCell>() { };
+
+    [JsonIgnore]
+    public string Path;
 
     public Map() { }
     public Map(string name)
@@ -45,7 +50,7 @@ public class Map
     public void Save()
     {
         string content = JsonConvert.SerializeObject(this);
-        File.WriteAllText($"{PATH}/{Name}.map", content);
+        File.WriteAllText($"{Path}/{Name}.map", content);
     }
 
     public Room Load(Thing root, Vector2? position = null, MapCell mapCell = null)
