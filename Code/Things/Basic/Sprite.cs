@@ -102,7 +102,7 @@ public class Sprite : Thing
             name: model.Name,
             position: model.Position,
             drawMode: DrawMode.Relative,
-            tileSize: 16,
+            tileSize: CONSTANTS.TILE_SIZE,
             tileNumber: model.TileNumber,
             color: Colors.White
         );

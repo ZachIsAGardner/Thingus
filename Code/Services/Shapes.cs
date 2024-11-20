@@ -72,7 +72,7 @@ public static class Shapes
         }
 
         Vector2 coord = CoordinatesFromNumber(tileNumber, texture, tileSize);
-
+        
         Raylib.DrawTexturePro(
             texture: texture,
             source: new Rectangle(coord.X, coord.Y, width * (flipHorizontally ? -1 : 1), height * (flipVertically ? -1 : 1)),

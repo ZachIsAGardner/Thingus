@@ -65,7 +65,7 @@ public class Collider : Thing
 
     public CollisionInfo Info = new CollisionInfo() { };
 
-    public Collider() : this(new Vector2(16)) { }
+    public Collider() : this(new Vector2(CONSTANTS.TILE_SIZE)) { }
     public Collider(Vector2 bounds)
     {
         Bounds = bounds;

@@ -272,4 +272,14 @@ public class Thing
 
         Game.PlaySound(name, volume.Value, pitch.Value, pan.Value);
     }
+
+    public void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, bool adjustWithMargin = true)
+    {
+        Shapes.DrawSprite(texture, position ?? Position, tileNumber, tileSize, rotation, color, scale, DrawMode, origin, flipHorizontally, flipVertically, adjustWithMargin);
+    }
+
+    public void DrawText(string text, Vector2? position = null, Font? font = null, Color? color = null, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full, bool adjustWithMargin = true)
+    {
+        Shapes.DrawText(text, position ?? Position, font, color, DrawMode, outlineColor, outlineStyle, adjustWithMargin);
+    }
 }

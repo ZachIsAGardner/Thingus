@@ -23,6 +23,9 @@ public class CONSTANTS
     public static readonly int VIRTUAL_HEIGHT = 180;
     public static readonly int DEFAULT_SCREEN_MULTIPLIER = 3;
     public static readonly int TILE_SIZE = 16;
+    public static int TILE_SIZE_HALF => TILE_SIZE / 2;
+    public static int TILE_SIZE_THIRD => TILE_SIZE / 3;
+    public static int TILE_SIZE_QUARTER => TILE_SIZE / 4;
     public static readonly Color PRIMARY_COLOR = Colors.Gray3;
 
     static CONSTANTS()

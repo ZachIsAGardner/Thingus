@@ -412,9 +412,8 @@ public class Editor : Thing
     {
         base.Init();
 
-        stamps = Library.ThingImports.Select(t => new Stamp(t.Key)).ToList();
+        RefreshStamps();
 
-        stamp = stamps.First();
         tool = new BrushTool(this);
 
         Raylib.HideCursor();
@@ -427,9 +426,11 @@ public class Editor : Thing
 
         Mouse = AddChild(new Sprite("Mouse", tileSize: 16, tileNumber: 0, drawOrder: 110, drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Sprite;
 
+        stamp = stamps.First();
         previewBackground = AddChild(new Sprite("Pixel", drawOrder: 108, color: Colors.Black, scale: new Vector2(18), drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Sprite;
-        preview = AddChild(new Sprite(stamp.Name, drawOrder: 109, tileSize: 16, color: CONSTANTS.PRIMARY_COLOR, drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Sprite;
+        preview = AddChild(new Sprite(stamp.Name, drawOrder: 109, tileSize: CONSTANTS.TILE_SIZE, color: CONSTANTS.PRIMARY_COLOR, drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Sprite;
         previewText = AddChild(new Text(stamp.Name, position: new Vector2(0), Library.Font, color: CONSTANTS.PRIMARY_COLOR, outlineColor: Colors.Black, order: 111, drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Text;
+        SelectStamp(stamp);
 
         CameraTarget = AddChild(new Thing("CameraTarget"));
     }
@@ -532,6 +533,10 @@ public class Editor : Thing
         previewBackground.SetVisible(show);
         previewText.SetVisible(show);
     }
+    public void RefreshStamps()
+    {
+        stamps = Library.ThingImports.Select(t => new Stamp(t.Key)).ToList();
+    }
 
     public int GetTileNumber(MapCell cell)
     {
@@ -545,7 +550,7 @@ public class Editor : Thing
         }
         else
         {
-            return Chance.Range(0, (stamp.Texture.Width / 16));
+            return Chance.Range(0, (stamp.Texture.Width / CONSTANTS.TILE_SIZE));
         }
     }
 
@@ -633,7 +638,7 @@ public class Editor : Thing
         preview.Texture = stamp.Texture;
         previewText.Content = stamp.Name;
 
-        preview.TileSize = Library.ThingImports[stamp.Name].TileSize ?? 16;
+        preview.TileSize = Library.ThingImports[stamp.Name].TileSize ?? stamp.Texture.Height;
         previewBackground.Scale = new Vector2(preview.TileSize + 2);
     }
 

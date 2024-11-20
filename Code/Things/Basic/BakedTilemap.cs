@@ -26,6 +26,8 @@ public class BakedTilemap : Thing
     public int Layer;
     public BlendMode? BlendMode = null;
 
+    bool queueReorder = false;
+
     public static BakedTilemap Create(Thing root, ThingModel model)
     {
         BakedTilemap bakedTilemap = root.GetThings<BakedTilemap>().Find(b => b.Layer == model.Layer && b.BlendMode == model.BlendMode);
@@ -58,6 +60,8 @@ public class BakedTilemap : Thing
         if (r < 0 || c < 0 || r >= BakedTilemap.COLLISION_GRID_SIZE || c >= BakedTilemap.COLLISION_GRID_SIZE) return;
 
         CollisionGrid[r][c] = 0;
+
+        queueReorder = true;
     }
 
     public void AddTile(ThingModel model)
@@ -71,6 +75,8 @@ public class BakedTilemap : Thing
         if (r < 0 || c < 0 || r >= COLLISION_GRID_SIZE || c >= COLLISION_GRID_SIZE) return;
 
         CollisionGrid[r][c] = model.Tags.Contains("Collision") ? 1 : 0;
+
+        queueReorder = true;
     }
 
     public override void AfterCreatedFromMap()
@@ -87,6 +93,12 @@ public class BakedTilemap : Thing
     public override void Update()
     {
         base.Update();
+
+        if (queueReorder)
+        {
+            queueReorder = false;
+            Tiles = Tiles.ToList().OrderBy(t => t.Position.Y).ThenByDescending(t => t.Position.X).ToList();
+        }
     }
 
     public override void Draw()

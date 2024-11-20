@@ -126,6 +126,7 @@ public class DeveloperTools : Thing
         {
             Log.Clear();
             Library.Refresh();
+            Editor.RefreshStamps();
             Play();
             Game.Root.Load(CONSTANTS.START_ROOM);
         }
@@ -182,7 +183,8 @@ public class DeveloperTools : Thing
     {
         base.Draw();
 
-        Shapes.DrawText($"{Game.Root?.Zone?.Name}, {Game.Root?.Room?.Name}", new Vector2(4, 2), drawMode: DrawMode.Absolute, color: Colors.White, outlineColor: Colors.Black);
+        DrawText($"{Game.Root?.Zone?.Name}, {Game.Root?.Room?.Name}", new Vector2(4, 2), color: Colors.White, outlineColor: Colors.Black);
+        DrawText($"{Editor?.GridPosition}", new Vector2(4, CONSTANTS.VIRTUAL_HEIGHT - Library.FontSmall.BaseSize - 4), color: Colors.White, outlineColor: Colors.Black, font: Library.FontSmall);
 
         if (display == DeveloperDisplay.Tree) DrawThingTree();
         else if (display == DeveloperDisplay.Log) Log.Draw();
