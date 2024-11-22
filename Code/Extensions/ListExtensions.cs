@@ -2,14 +2,23 @@ namespace Thingus;
 
 public static class ListExtensions
 {
-    public static string Join(this List<string> str, string seperator)
+
+    public static T Next<T>(this List<T> list, T current) 
     {
-        return String.Join(seperator, str);
+        if (list == null || list.Count <= 0 || !list.Contains(current)) return default(T);
+        int index = list.IndexOf(current);
+        index++;
+        if (index >= list.Count) index = 0;
+        return list[index];
+    }
+    public static string Join(this List<string> list, string seperator)
+    {
+        return String.Join(seperator, list);
     }
 
-    public static string Join(this IEnumerable<string> str, string seperator)
+    public static string Join(this IEnumerable<string> list, string seperator)
     {
-        return String.Join(seperator, str);
+        return String.Join(seperator, list);
     }
 
     public static T Random<T>(this List<T> list)

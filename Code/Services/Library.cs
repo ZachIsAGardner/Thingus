@@ -8,13 +8,13 @@ public static class Library
     public static Font Font;
     public static Font FontSmall;
 
-    public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>() { };
-    public static Dictionary<string, Font> Fonts = new Dictionary<string, Font>() { };
-    public static Dictionary<string, Music> Songs = new Dictionary<string, Music>() { };
-    public static Dictionary<string, Sound> SoundEffects = new Dictionary<string, Sound>() { };
-    public static Dictionary<string, Shader> Shaders = new Dictionary<string, Shader>() { };
-    public static Dictionary<string, Map> Maps = new Dictionary<string, Map>() { };
-    public static Dictionary<string, ThingImport> ThingImports = new Dictionary<string, ThingImport>() { };
+    public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase) { };
+    public static Dictionary<string, Font> Fonts = new Dictionary<string, Font>(StringComparer.OrdinalIgnoreCase) { };
+    public static Dictionary<string, Music> Songs = new Dictionary<string, Music>(StringComparer.OrdinalIgnoreCase) { };
+    public static Dictionary<string, Sound> SoundEffects = new Dictionary<string, Sound>(StringComparer.OrdinalIgnoreCase) { };
+    public static Dictionary<string, Shader> Shaders = new Dictionary<string, Shader>(StringComparer.OrdinalIgnoreCase) { };
+    public static Dictionary<string, Map> Maps = new Dictionary<string, Map>(StringComparer.OrdinalIgnoreCase) { };
+    public static Dictionary<string, ThingImport> ThingImports = new Dictionary<string, ThingImport>(StringComparer.OrdinalIgnoreCase) { };
 
     static List<string> ParseDirectory(string path, List<string> result = null)
     {

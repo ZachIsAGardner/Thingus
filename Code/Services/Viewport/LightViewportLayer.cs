@@ -10,7 +10,7 @@ public class LightViewportLayer : ViewportLayer
 
     List<Light> lights = new List<Light>() { };
     RenderTexture2D lightTextureSheet;
-    float Darkness = 255;
+    public float Darkness = 0;
     int tileSize = 256;
 
     public override void Update()
@@ -18,7 +18,7 @@ public class LightViewportLayer : ViewportLayer
         base.Update();
 
         lights = Game.GetThings<Light>().Where(l => l.GlobalVisible).ToList();
-        Darkness = Darkness.MoveOverTime(255 - lights.Count * 5, 0.01f);
+        // darkness = darkness.MoveOverTime(255 - lights.Count * 5, 0.01f);
     }
 
     public override void RefreshProjection()
@@ -53,7 +53,7 @@ public class LightViewportLayer : ViewportLayer
         });
         Raylib.EndTextureMode();
 
-        int lightness = 255 - (int)Darkness;
+        int lightness = 255 - (int)(Darkness);
 
         Raylib.BeginTextureMode(Texture);
         // Raylib.ClearBackground(new Color(
@@ -62,10 +62,10 @@ public class LightViewportLayer : ViewportLayer
         //     255 - (int)Darkness,
         //     255
         // ));
-        Raylib.ClearBackground(Colors.Black.ToRaylib());
+        Raylib.ClearBackground(new Raylib_cs.Color(lightness, lightness, lightness, 255));
         Raylib.BeginMode2D(Camera);
 
-        Shapes.DrawSprite(Library.Textures["Vignette"], origin: new Vector2(0), position: new Vector2(-32), scale: new Vector2(1), color: new Color(255, 255, 255, lightness));
+        // Shapes.DrawSprite(Library.Textures["Vignette"], origin: new Vector2(0), position: new Vector2(-32), scale: new Vector2(1), color: new Color(255, 255, 255, lightness));
         i = 0;
         lights.ForEach(l =>
         {

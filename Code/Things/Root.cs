@@ -11,13 +11,22 @@ public class Root : Thing
     public SongManager SongManager;
     public DeveloperTools DeveloperTools;
 
-    public Room Zone;
     public Room Room;
 
     public Root()
     {
         DrawMode = DrawMode.Absolute;
+    }
 
+    public override void Init()
+    {
+        base.Init();
+    }
+
+    public override void Start()
+    {
+        base.Start();
+        
         Dynamic = AddChild(new Thing());
         Dynamic.Name = "Dynamic";
 
@@ -26,12 +35,7 @@ public class Root : Thing
 
         SongManager = AddChild(new SongManager()) as SongManager;
         DeveloperTools = AddChild(new DeveloperTools()) as DeveloperTools;
-    }
-
-    public override void Start()
-    {
-        base.Start();
-        if (CONSTANTS.START_ROOM != null) Load(CONSTANTS.START_ROOM);
+        if (CONSTANTS.START_MAP != null) Load(CONSTANTS.START_MAP);
     }
 
     public override void Update()
@@ -52,15 +56,23 @@ public class Root : Thing
 
     public void Load(string name)
     {
+        Map map = Library.Maps[name];
+        Load(map);
+    }
+
+    public void Load(Map map)
+    {
         if (DeveloperTools.Editor?.Active == true) DeveloperTools.Editor.SetActive(false);
         Dynamic.Children.ToList().ForEach(c => c.Destroy());
         Dynamic.Children = new List<Thing>() { };
-        Room = Library.Maps[name].Load(Dynamic);
+        Thing thing = map.Load(Dynamic);
         Game.Mode = GameMode.Play;
-        if (Room.Type == "Zone")
-        {
-            Zone = Room;
-            Room = Zone.GetThings<Room>().FirstOrDefault(r => r.Type != "Zone");
-        }
+        
+        // Room = Library.Maps[name].Load(Dynamic);
+        // if (Room.Type == "Zone")
+        // {
+        //     Zone = Room;
+        //     Room = Zone.GetThings<Room>().FirstOrDefault(r => r.Type != "Zone");
+        // }
     }
 }

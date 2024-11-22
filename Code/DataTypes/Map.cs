@@ -10,8 +10,6 @@ public class Map
     
     [JsonIgnore]
     public string Name;
-
-    public string Type = "Room";
     public List<MapCell> Cells = new List<MapCell>() { };
 
     [JsonIgnore]
@@ -35,7 +33,7 @@ public class Map
 
     public void AddCell(MapCell cell)
     {
-        Cells = Cells.Where(c => !(c.Position == cell.Position && c.Import.Layer == cell.Import.Layer)).ToList();
+        Cells = Cells.Where(c => !(c.Position == cell.Position && c.Import?.Layer == cell.Import?.Layer)).ToList();
         Cells.Add(cell);
         cell.Map = this;
     }
@@ -44,7 +42,12 @@ public class Map
     {
         return layer != null
             ? Cells.Find(c => c.Position == position && c.Import.Layer == layer)
-            : Cells.Where(c => c.Position == position).OrderByDescending(c => c.Import.Layer).FirstOrDefault();
+            : Cells.Where(c => c.Position == position).OrderByDescending(c => c.Import?.Layer).FirstOrDefault();
+    }
+
+    public MapCell GetCell(Thing thing)
+    {
+        return Cells.Where(c => c.Position == thing.Position).OrderByDescending(c => c.Import?.Layer).FirstOrDefault();
     }
 
     public void Save()
@@ -53,40 +56,22 @@ public class Map
         File.WriteAllText($"{Path}/{Name}.map", content);
     }
 
-    public Room Load(Thing root, Vector2? position = null, MapCell mapCell = null)
+    public Thing Load(Thing root, MapCell mapCell = null)
     {
-        // Code Behind
-        MethodInfo method = Utility.FindCreateMethod(Name);
-        Room room = null;
-        if (method != null)
-        {
-            room = method.Invoke(null, new object?[] { root, new ThingModel(Name, position ?? Vector2.Zero) }) as Room;
-        }
-        else
-        {
-            room = new Room(Name, position ?? Vector2.Zero);
-        }
-
-        root.AddChild(room);
-        root = room;
-        room.Map = this;
-        room.Cell = mapCell;
-        room.Type = Type;
-
+        Thing mapRoot = null;   
         // Cells
-        foreach (MapCell cell in Cells)
+        foreach (MapCell cell in Cells.Where(c => c?.Name != null))
         {
-            Thing thing = null;
-            if (cell.Name.StartsWith("="))
+            Thing parent = root;
+            if (cell.Parent != null) parent = root.Children.Find(c => c.Name == cell.Parent);
+            Thing thing = cell.Create(parent);
+            if (cell.Parent == null)
             {
-                thing = Library.Maps[cell.Name.Replace("=", "")].Load(root, cell.Position, cell);
-            }
-            else
-            {
-                thing = cell.Create(root);
+                mapRoot = thing;
+                if (mapCell != null) mapRoot.Position += mapCell.Position;
             }
         }
 
-        return room;
+        return mapRoot;
     }
 }

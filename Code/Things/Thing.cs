@@ -87,6 +87,7 @@ public class Thing
         Game.QueueReorder();
     }
 
+    public static Thing Create(Thing root, ThingModel model) => new Thing(model.Name, model.Position, model.DrawMode, model.DrawOrder, model.UpdateOrder);
     public Thing() : this(null) { }
     public Thing(string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0)
     {
@@ -228,14 +229,14 @@ public class Thing
         Game.QueueReorder();
     }
 
-    public void SetActive(bool active)
+    public virtual void SetActive(bool active)
     {
         bool oldActive = Active;
         Active = active;
         if (oldActive != Active) Game.QueueUpdateReorder();
     }
 
-    public void SetVisible(bool visible)
+    public virtual void SetVisible(bool visible)
     {
         bool oldVisible = Visible;
         Visible = visible;
@@ -278,8 +279,8 @@ public class Thing
         Shapes.DrawSprite(texture, position ?? Position, tileNumber, tileSize, rotation, color, scale, DrawMode, origin, flipHorizontally, flipVertically, adjustWithMargin);
     }
 
-    public void DrawText(string text, Vector2? position = null, Font? font = null, Color? color = null, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full, bool adjustWithMargin = true)
+    public void DrawText(object text, Vector2? position = null, Font? font = null, Color? color = null, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full, bool adjustWithMargin = true)
     {
-        Shapes.DrawText(text, position ?? Position, font, color, DrawMode, outlineColor, outlineStyle, adjustWithMargin);
+        Shapes.DrawText(text?.ToString() ?? "null", position ?? Position, font, color, DrawMode, outlineColor, outlineStyle, adjustWithMargin);
     }
 }
