@@ -24,3 +24,6 @@ WAY LATER
 - export
 - remove Vignette
 - better lighting code
+
+CONSIDER
+- should Maps just be Rooms?
