@@ -2,6 +2,12 @@ namespace Thingus;
 
 public static class StringExtensions
 {
+    public static bool HasValue(this string str)
+    {
+        if (str == null) return false;
+        return str.Trim().Count() > 0;
+    }
+
     public static int? ToInt(this string str)
     {
         int? result = null;

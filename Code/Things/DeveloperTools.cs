@@ -16,6 +16,7 @@ public class DeveloperTools : Thing
     int fontOffset = 1;
  
     public Editor Editor;
+    public Cli Cli;
     Thing playTarget;
 
     DeveloperDisplay display = DeveloperDisplay.None;
@@ -26,13 +27,19 @@ public class DeveloperTools : Thing
     public override void Init()
     {
         base.Init();
-
-        DrawMode = DrawMode.Absolute;
     }
 
     public override void Start()
     {
         base.Start();
+
+        DrawMode = DrawMode.Absolute;
+        Editor = AddChild(new Editor()) as Editor;
+        Editor.SetActive(false);
+        Editor.SetVisible(false);
+        Cli = AddChild(new Cli()) as Cli;
+        Cli.SetActive(false);
+        Cli.SetVisible(false);
     }
 
     public override void Update()
@@ -44,36 +51,51 @@ public class DeveloperTools : Thing
 
     void ToggleEditor(bool show)
     {
-        if (Editor == null) Editor = AddChild(new Editor()) as Editor;
-        if (show) Edit();
-        else Play();
+        if (show)
+        {
+            Editor.SetActive(true);
+            Editor.SetVisible(true);
+
+            Game.Mode = GameMode.Edit;
+            if (Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
+            playTarget = Viewport.Target;
+            Viewport.Target = Editor.CameraTarget;
+            Viewport.LightLayer.Visible = false;
+            Viewport.SetScalePixels(true);
+        }
+        else
+        {
+            Play();
+        }
     }
 
-    void Edit()
+    void ToggleCli(bool show)
     {
-        if (Editor == null) Editor = AddChild(new Editor()) as Editor;
-        Editor.SetActive(true);
-        Editor.SetVisible(true);
+        if (show)
+        {
+            Cli.SetActive(true);
+            Cli.SetVisible(true);
 
-        Game.Mode = GameMode.Edit;
-        if (Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
-        playTarget = Viewport.Target;
-        Viewport.Target = Editor.CameraTarget;
-        Viewport.LightLayer.Visible = false;
-        Viewport.SetScalePixels(true);
+            // Game.Mode = GameMode.Edit;
+        }
+        else
+        {
+            Cli.SetActive(false);
+            Cli.SetVisible(false);
+        }
     }
 
     void Play()
     {
-        if (Editor == null) Editor = AddChild(new Editor()) as Editor;
         Editor.SetActive(false);
         Editor.SetVisible(false);
-
+        Cli.SetActive(false);
+        Cli.SetVisible(false);
         Game.Mode = GameMode.Play;
         if (playTarget != null) Viewport.Target = playTarget;
         Viewport.Zoom = 1;
         Viewport.RelativeLayer.Camera.Offset = Vector2.Zero;
-        Editor.CameraTarget.Position = Viewport.Target.Position;
+        if (Editor.CameraTarget != null && Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
         Viewport.LightLayer.Visible = true;
         Viewport.SetScalePixels(false);
     }
@@ -82,7 +104,21 @@ public class DeveloperTools : Thing
     {
         if (Input.IsPressed(KeyboardKey.Grave))
         {
-            ToggleEditor(Editor?.Active != true);
+            ToggleCli(!Cli.Active);
+        }
+
+        if (Cli.Active) return;
+
+        if (Input.IsPressed(KeyboardKey.One))
+        {
+            ToggleEditor(!Editor.Active);
+        }
+
+        if (Input.IsPressed(KeyboardKey.Two))
+        {
+            if (display == DeveloperDisplay.None) display = DeveloperDisplay.Tree;
+            else if (display == DeveloperDisplay.Tree) display = DeveloperDisplay.Log;
+            else if (display == DeveloperDisplay.Log) display = DeveloperDisplay.None;
         }
 
         if (Input.IsPressed(KeyboardKey.M))
@@ -90,44 +126,38 @@ public class DeveloperTools : Thing
             Game.Mute = !Game.Mute;
         }
 
-        if (Input.IsPressed(KeyboardKey.One))
-        {
-            int ratio = Viewport.VirtualRatio.Value - 1;
-            if (ratio < 1) ratio = 1;
-            Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * ratio, CONSTANTS.VIRTUAL_HEIGHT * ratio);
-        }
+        // if (Input.CtrlIsHeld && Input.IsPressed(KeyboardKey.One))
+        // {
+        //     int ratio = Viewport.VirtualRatio.Value - 1;
+        //     if (ratio < 1) ratio = 1;
+        //     Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * ratio, CONSTANTS.VIRTUAL_HEIGHT * ratio);
+        // }
 
-        if (Input.IsPressed(KeyboardKey.Two))
-        {
-            int ratio = Viewport.VirtualRatio.Value + 1;
-            if (ratio > 7) ratio = 7;
-            Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * ratio, CONSTANTS.VIRTUAL_HEIGHT * ratio);
-        }
+        // if (Input.CtrlIsHeld && Input.IsPressed(KeyboardKey.Two))
+        // {
+        //     int ratio = Viewport.VirtualRatio.Value + 1;
+        //     if (ratio > 7) ratio = 7;
+        //     Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * ratio, CONSTANTS.VIRTUAL_HEIGHT * ratio);
+        // }
 
-        if (Input.IsPressed(KeyboardKey.Three))
-        {
-            Viewport.SetScalePixels(!Viewport.ScalePixels);
-        }
+        // if (Input.CtrlIsHeld && Input.IsPressed(KeyboardKey.Three))
+        // {
+        //     Viewport.SetScalePixels(!Viewport.ScalePixels);
+        // }
 
-        if (Input.IsPressed(KeyboardKey.Four))
-        {
-            Viewport.LightLayer.Visible = !Viewport.LightLayer.Visible;
-            Log.Write("Lights: " + Viewport.LightLayer.Visible);
-        }
-
-        if (Input.IsPressed(KeyboardKey.Five))
-        {
-            if (display == DeveloperDisplay.None) display = DeveloperDisplay.Tree;
-            else if (display == DeveloperDisplay.Tree) display = DeveloperDisplay.Log;
-            else if (display == DeveloperDisplay.Log) display = DeveloperDisplay.None;
-        }
+        // if (Input.CtrlIsHeld && Input.IsPressed(KeyboardKey.Four))
+        // {
+        //     Viewport.LightLayer.Visible = !Viewport.LightLayer.Visible;
+        //     Log.Write("Lights: " + Viewport.LightLayer.Visible);
+        // }
 
         if (Input.IsPressed(KeyboardKey.L))
         {
             Log.Clear();
             Library.Refresh();
+            Editor?.RefreshStamps();
             Play();
-            Game.Root.Load(CONSTANTS.START_ROOM);
+            Game.Root.Load(CONSTANTS.START_MAP);
         }
     }
 
@@ -140,8 +170,8 @@ public class DeveloperTools : Thing
             Shapes.DrawText(
                 font: font,
                 text: $"{c.Id}: {c.Name} ({c.TypeName})",
-                position: new Vector2(4 + (depth * 6), 4 + (height * (font.BaseSize + fontOffset))) + Viewport.AdjustFromTopLeft,
-                color: depth % 2 == 0 ? Colors.White : Colors.Gray2
+                position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth) + (depth * 6), 4 + (height * (font.BaseSize + fontOffset))) + Viewport.AdjustFromTopRight,
+                color: depth % 2 == 0 ? Colors.White : Utility.HexToColor("#a5ffa5")
             );
             height++;
             CrawlTree(c, depth, ref height);
@@ -152,16 +182,16 @@ public class DeveloperTools : Thing
     {
         Shapes.DrawSprite(
             texture: Library.Textures["Pixel"],
-            position: new Vector2((interfaceWidth / 2f) + 2, CONSTANTS.VIRTUAL_HEIGHT / 2f) + Viewport.AdjustFromTopLeft,
+            position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth / 2f) - 4, CONSTANTS.VIRTUAL_HEIGHT / 2f) + Viewport.AdjustFromTopRight,
             scale: new Vector2(interfaceWidth, interfaceHeight),
-            color: new Color(0, 0, 0, 200)
+            color: new Color(0, 50, 0, 245)
         );
 
         Shapes.DrawText(
             font: font,
             text: "TREE",
-            position: new Vector2(4, 4) + Viewport.AdjustFromTopLeft,
-            color: CONSTANTS.PRIMARY_COLOR
+            position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth), 4) + Viewport.AdjustFromTopRight,
+            color: Colors.Green
         );
 
         int height = 1;
@@ -170,7 +200,7 @@ public class DeveloperTools : Thing
             Shapes.DrawText(
                 font: font,
                 text: $"{c.Id}: {c.Name}",
-                position: new Vector2(4, 4 + (height * (font.BaseSize + fontOffset))) + Viewport.AdjustFromTopLeft,
+                position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth), 4 + (height * (font.BaseSize + fontOffset))) + Viewport.AdjustFromTopRight,
                 color: Colors.White
             );
             height++;
@@ -181,8 +211,6 @@ public class DeveloperTools : Thing
     public override void Draw()
     {
         base.Draw();
-
-        Shapes.DrawText($"{Game.Root?.Zone?.Name}, {Game.Root?.Room?.Name}", new Vector2(4, 2), drawMode: DrawMode.Absolute, color: Colors.White, outlineColor: Colors.Black);
 
         if (display == DeveloperDisplay.Tree) DrawThingTree();
         else if (display == DeveloperDisplay.Log) Log.Draw();

@@ -9,6 +9,13 @@ public enum GameMode
     Edit
 }
 
+public enum ProjectionType
+{
+    Grid,
+    Isometric,
+    Oblique
+}
+
 public static class Game
 {
     public static Root Root;
@@ -30,6 +37,8 @@ public static class Game
     public static bool FrameStep = false;
 
     public static bool Mute = true;
+
+    public static ProjectionType ProjectionType = ProjectionType.Oblique;
 
     public static List<T> GetThings<T>() where T : Thing
     {
@@ -78,6 +87,7 @@ public static class Game
     {
         Start();
 
+        Raylib.SetExitKey(Raylib_cs.KeyboardKey.Null);
         while (!Raylib.WindowShouldClose())
         {
             Update();
@@ -99,6 +109,7 @@ public static class Game
         }
 
         Time.Update();
+        Input.Update();
 
         UpdateThings.ForEach(t =>
         {

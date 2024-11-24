@@ -33,7 +33,7 @@ dotnet new console
   </PropertyGroup>
 
   <!-- Icons -->
-  <PropertyGroup>
+  <!-- <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
@@ -45,13 +45,14 @@ dotnet new console
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
     <EmbeddedResource Include="Icon.bmp" />
-  </ItemGroup>
+  </ItemGroup> -->
 
 </Project>
 ```
 
 3) Get Thingus.
 ```
+git init
 git submodule add https://github.com/ZachIsAGardner/Thingus.git _Thingus
 ```
 

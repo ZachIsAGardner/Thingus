@@ -8,7 +8,7 @@ public class CONSTANTS
     {
         public string TITLE;
         public string NAMESPACE;
-        public string START_ROOM;
+        public string START_MAP;
         public int? VIRTUAL_WIDTH;
         public int? VIRTUAL_HEIGHT;
         public int? DEFAULT_SCREEN_MULTIPLIER;
@@ -18,11 +18,15 @@ public class CONSTANTS
 
     public static readonly string TITLE = "Thingus Game";
     public static readonly string NAMESPACE = null;
-    public static readonly string START_ROOM = "Init";
+    public static readonly string START_MAP = "Init";
     public static readonly int VIRTUAL_WIDTH = 320;
     public static readonly int VIRTUAL_HEIGHT = 180;
     public static readonly int DEFAULT_SCREEN_MULTIPLIER = 3;
     public static readonly int TILE_SIZE = 16;
+    public static int TILE_SIZE_HALF => TILE_SIZE / 2;
+    public static int TILE_SIZE_THIRD => TILE_SIZE / 3;
+    public static int TILE_SIZE_QUARTER => TILE_SIZE / 4;
+    public static int TILE_SIZE_OBLIQUE => TILE_SIZE - TILE_SIZE_THIRD;
     public static readonly Color PRIMARY_COLOR = Colors.Gray3;
 
     static CONSTANTS()
@@ -32,7 +36,7 @@ public class CONSTANTS
 
         if (c.TITLE != null) TITLE = c.TITLE;
         if (c.NAMESPACE != null) NAMESPACE = c.NAMESPACE;
-        if (c.START_ROOM != null) START_ROOM = c.START_ROOM;
+        if (c.START_MAP != null) START_MAP = c.START_MAP;
         if (c.VIRTUAL_WIDTH != null) VIRTUAL_WIDTH = c.VIRTUAL_WIDTH.Value;
         if (c.VIRTUAL_HEIGHT != null) VIRTUAL_HEIGHT = c.VIRTUAL_HEIGHT.Value;
         if (c.DEFAULT_SCREEN_MULTIPLIER != null) DEFAULT_SCREEN_MULTIPLIER = c.DEFAULT_SCREEN_MULTIPLIER.Value;

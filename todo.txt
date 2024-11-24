@@ -1,0 +1,31 @@
+TODO
+- fix draw with offset
+- room name wrong in display above room in editor
+- editor guides
+- manually resize rooms
+- make new map in game
+
+LATER
+- particle effects
+- editor
+    - tool buttons
+    - tile buttons
+    - action buttons
+- move multiple rooms
+- undo/redo
+- contiguous fill
+- non-contiguous fill
+- combine Root and Game, convert Game into a Thing
+- convert Viewport into a Thing
+- convert everything all Services into Things?
+
+WAY LATER
+- tilesize by map
+- projection type by map
+- toast
+- palette swap
+- translation support
+- fix lighting with zoom
+- export
+- remove Vignette
+- better lighting code

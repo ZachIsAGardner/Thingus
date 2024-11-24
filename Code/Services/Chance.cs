@@ -6,7 +6,8 @@ public static class Chance
 
     static Random GetRandom()
     {
-        Random r = new Random(Seed);
+        Random r = new Random();
+        // Random r = new Random(Seed);
         Seed++;
         return r;
     }
