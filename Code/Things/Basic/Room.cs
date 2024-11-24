@@ -52,27 +52,47 @@ public class Room : Thing
                     ? new Vector2(0)
                     : new Vector2(CONSTANTS.TILE_SIZE_HALF, CONSTANTS.TILE_SIZE_QUARTER)
             );
+            // Shapes.DrawSprite(
+            //     texture: Library.Textures["Pixel"],
+            //     position: TopLeft - new Vector2(4),
+            //     origin: new Vector2(0),
+            //     scale: bounds + new Vector2(8),
+            //     color: Focused 
+            //         ? PaletteBasic.White 
+            //         : Hovered 
+            //             ? PaletteBasic.White 
+            //             : PaletteBasic.DarkGray 
+            // );
+            // Drop Shadow
+            if (Focused)
+            {
+                Shapes.DrawSprite(
+                    texture: Library.Textures["Pixel"],
+                    position: TopLeft + new Vector2(4),
+                    origin: new Vector2(0),
+                    scale: bounds + new Vector2(4),
+                    color: new Color(0, 0, 0, 32)
+                );
+            }
+            // Outline
             Shapes.DrawSprite(
                 texture: Library.Textures["Pixel"],
-                position: TopLeft - new Vector2(4),
+                position: TopLeft - new Vector2(1),
                 origin: new Vector2(0),
-                scale: bounds + new Vector2(8),
-                color: Focused 
-                    ? Colors.White 
-                    : Hovered 
-                        ? Colors.White 
-                        : Colors.Gray5 
+                scale: bounds + new Vector2(2),
+                color: PaletteBasic.Black
             );
+            // Background
             Shapes.DrawSprite(
                 texture: Library.Textures["Pixel"],
                 position: TopLeft,
                 origin: new Vector2(0),
                 scale: bounds,
                 color: Focused 
-                    ? Colors.Gray2 
+                    ? PaletteBasic.Gray 
                     : Hovered 
-                        ? Colors.White 
-                        : Colors.Gray5 
+                        ? PaletteBasic.LightGray 
+                        : PaletteBasic.DarkGray 
             );
         }));
     }
@@ -80,6 +100,8 @@ public class Room : Thing
     public override void Update()
     {
         base.Update();
+
+        if (Game.Root.DeveloperTools.Cli.Active) return;
 
         Hovered = Utility.CheckRectangleOverlap(
             Input.MousePositionRelative() - new Vector2(8, 8),
@@ -125,7 +147,7 @@ public class Room : Thing
                     Shapes.DrawSprite(
                         texture: Library.Textures[$"{CONSTANTS.TILE_SIZE}Grid"],
                         origin: Vector2.Zero,
-                        color: new Color(255, 255, 255, 50),
+                        color: new Color(255, 255, 255, Focused ? 128 : 16),
                         position: TopLeft + new Vector2(r * CONSTANTS.TILE_SIZE, c * CONSTANTS.TILE_SIZE)
                     );
                 }
@@ -140,7 +162,7 @@ public class Room : Thing
                     Shapes.DrawSprite(
                         texture: Library.Textures[$"{(CONSTANTS.TILE_SIZE)}ObliqueGrid"],
                         origin: Vector2.Zero,
-                        color: new Color(255, 255, 255, 50),
+                        color: new Color(255, 255, 255, Focused ? 128 : 16),
                         position: TopLeft + new Vector2(
                             r * (CONSTANTS.TILE_SIZE_OBLIQUE), 
                             c * (CONSTANTS.TILE_SIZE_OBLIQUE)
@@ -158,7 +180,7 @@ public class Room : Thing
                     Shapes.DrawSprite(
                         texture: Library.Textures[$"{CONSTANTS.TILE_SIZE_HALF}x{CONSTANTS.TILE_SIZE_QUARTER}Grid"],
                         origin: Vector2.Zero,
-                        color: new Color(255, 255, 255, 50),
+                        color: new Color(255, 255, 255, Focused ? 128 : 16),
                         position: TopLeft + new Vector2(r * CONSTANTS.TILE_SIZE_HALF, c * CONSTANTS.TILE_SIZE_QUARTER)
                     );
                 }
@@ -177,17 +199,17 @@ public class Room : Thing
         string message = $"{Name} {Map?.Name}.map";
         Shapes.DrawText(
             text: message,
-            position: new Vector2(Center.X, TopLeft.Y) - new Vector2(Raylib.MeasureText(message, Library.Font.BaseSize) / 2f, Library.Font.BaseSize * 3),
-            color: Colors.White,
-            outlineColor: Colors.Black
+            position: new Vector2(Center.X, TopLeft.Y) - new Vector2(Raylib.MeasureText(message, Library.Font.BaseSize) / 2f, Library.Font.BaseSize * 2.25f),
+            color: PaletteBasic.White,
+            outlineColor: PaletteBasic.Black
         );
 
         message = $"{Position.X}x,{Position.Y}y {Bounds.X}w,{Bounds.Y}h";
         Shapes.DrawText(
             text: message,
-            position: new Vector2(Center.X, TopLeft.Y) - new Vector2(Raylib.MeasureText(message, Library.Font.BaseSize) / 2f, Library.Font.BaseSize * 2),
-            color: Colors.Gray2,
-            outlineColor: Colors.Black
+            position: new Vector2(Center.X, TopLeft.Y) - new Vector2(Raylib.MeasureText(message, Library.Font.BaseSize) / 2f, Library.Font.BaseSize * 1.25f),
+            color: PaletteBasic.LightGray,
+            outlineColor: PaletteBasic.Black
         );
     }
 }

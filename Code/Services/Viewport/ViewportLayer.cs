@@ -11,7 +11,7 @@ public class ViewportLayer
     public Camera2D Camera = new Camera2D() { Zoom = 1f };
     public RenderTexture2D Texture;
     public bool FollowsTarget = false;
-    public Color ClearColor = Colors.Black;
+    public Color ClearColor = PaletteBasic.Black;
 
     public ViewportLayer() { }
     public ViewportLayer(int index)
@@ -64,7 +64,7 @@ public class ViewportLayer
             dest: Viewport.Rectangle,
             origin: new Vector2(0f, 0f),
             rotation: Viewport.Rotation,
-            tint: Colors.White.ToRaylib()
+            tint: PaletteBasic.White.ToRaylib()
         );
     }
 }

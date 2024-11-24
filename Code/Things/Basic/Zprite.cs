@@ -30,6 +30,6 @@ public class Zprite : Sprite
     {
         base.Draw();
 
-        // Shapes.DrawText($"{Name}: {DrawOrder + DrawOrderOffset}", position: GlobalPosition, color: Colors.White, outlineColor: Colors.Black);
+        // Shapes.DrawText($"{Name}: {DrawOrder + DrawOrderOffset}", position: GlobalPosition, color: PaletteBasic.White, outlineColor: PaletteBasic.Black);
     }
 }

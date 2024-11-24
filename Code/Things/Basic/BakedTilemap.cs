@@ -123,7 +123,7 @@ public class BakedTilemap : Thing
         //     for (int c = 0; c < row.Count(); c++)
         //     {
         //         int column = CollisionGrid[r][c];
-        //         Shapes.DrawText(column.ToString(), new Vector2(c * 16, r * 16) - new Vector2(0, 8), outlineColor: Colors.Black, color: Colors.White);
+        //         Shapes.DrawText(column.ToString(), new Vector2(c * 16, r * 16) - new Vector2(0, 8), outlineColor: PaletteBasic.Black, color: PaletteBasic.White);
         //     }
         // }
     }

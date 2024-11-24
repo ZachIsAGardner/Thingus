@@ -14,11 +14,11 @@ public class AbsoluteViewportLayer : ViewportLayer
 
         Raylib.BeginTextureMode(Texture);
 
-        Raylib.ClearBackground(Colors.Blank.ToRaylib());
+        Raylib.ClearBackground(PaletteBasic.Blank.ToRaylib());
 
         Raylib.BeginMode2D(Camera);
         Game.DrawThings.Where(x => x.DrawMode == DrawMode.Absolute).ToList().ForEach(x => x.Draw());
-        if (Game.FrameAdvance) Shapes.DrawText("FRAME ADVANCE", position: new Vector2(CONSTANTS.VIRTUAL_WIDTH / 2f, 16), color: CONSTANTS.PRIMARY_COLOR, outlineColor: Colors.Black);
+        if (Game.FrameAdvance) Shapes.DrawText("FRAME ADVANCE", position: new Vector2(CONSTANTS.VIRTUAL_WIDTH / 2f, 16), color: CONSTANTS.PRIMARY_COLOR, outlineColor: PaletteBasic.Black);
         Raylib.EndMode2D();
 
         Raylib.EndTextureMode();

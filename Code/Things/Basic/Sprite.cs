@@ -65,14 +65,14 @@ public class Sprite : Thing
     // Relative Scale
     public Vector2 Scale = new Vector2(1, 1);
     // public Vector2 GlobalScale => ((Parent?.GlobalScale ?? new Vector2(1)) - new Vector2(1)) + Scale;
-    public Color Color = Colors.White;
+    public Color Color = PaletteBasic.White;
     public Texture2D Texture;
     public float TileNumber = 0;
     public float TileNumberOffset = 0;
     public int TileSize = 0;
     public bool FlipHorizontally = false;
     public bool FlipVertically = false;
-    public bool AdjustWithMargin = true;
+    public AdjustFrom AdjustFrom = AdjustFrom.Auto;
 
     // Shake
     float shakeXOffset;
@@ -104,13 +104,13 @@ public class Sprite : Thing
             drawMode: DrawMode.Relative,
             tileSize: CONSTANTS.TILE_SIZE,
             tileNumber: model.TileNumber,
-            color: Colors.White
+            color: PaletteBasic.White
         );
     public Sprite() { }
     // Create from code
     public Sprite(
         string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
-        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, bool adjustWithMargin = true
+        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, AdjustFrom adjustFrom = AdjustFrom.Auto
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {
         Texture = Library.Textures[name];
@@ -120,7 +120,7 @@ public class Sprite : Thing
         if (color != null) Color = color.Value;
         if (scale != null) Scale = scale.Value;
         Rotation = rotation;
-        AdjustWithMargin = adjustWithMargin;
+        AdjustFrom = adjustFrom;
     }
 
     public void ShakeX(float magnitude = 2, float duration = 0.25f)
@@ -232,7 +232,10 @@ public class Sprite : Thing
             drawMode: DrawMode,
             flipHorizontally: FlipHorizontally,
             flipVertically: FlipVertically,
-            adjustWithMargin: AdjustWithMargin
+            adjustFrom: AdjustFrom
         );
+
+        // DrawText(GlobalPosition, outlineColor: PaletteBasic.Black, color: PaletteBasic.White, position: GlobalPosition);
+        // DrawText(Position, outlineColor: PaletteBasic.Black, color: PaletteBasic.White, position: GlobalPosition + new Vector2(0, 16));
     }
 }

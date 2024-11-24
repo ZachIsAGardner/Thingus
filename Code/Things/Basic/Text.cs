@@ -8,7 +8,7 @@ public class Text : Thing
     public Font Font;
     public Color Color;
     public Color? OutlineColor;
-    public bool AdjustWithMargin = true;
+    public AdjustFrom AdjustFrom = AdjustFrom.Auto;
 
     RenderTexture2D? texture;
     Rectangle rectangle;
@@ -32,16 +32,16 @@ public class Text : Thing
     float shakeStepDuration = 0.01f;
 
     public Text() { }
-    public Text(string content, Vector2 position, Font? font = null, DrawMode drawMode = DrawMode.Relative, Color? color = null, Color? outlineColor = null, int order = 0, bool adjustWithMargin = true)
+    public Text(string content, Vector2 position, Font? font = null, DrawMode drawMode = DrawMode.Relative, Color? color = null, Color? outlineColor = null, int order = 0, AdjustFrom adjustFrom = AdjustFrom.Auto)
     {
         this.Content = content;
         Position = position;
-        Color = color ?? Colors.Black;
+        Color = color ?? PaletteBasic.Black;
         OutlineColor = outlineColor;
         Font = font ?? Library.Font;
         DrawMode = drawMode;
         DrawOrder = order;
-        AdjustWithMargin = adjustWithMargin;
+        AdjustFrom = adjustFrom;
     }
 
     public override void Start()
@@ -68,7 +68,7 @@ public class Text : Thing
             color: Color,
             outlineColor: OutlineColor,
             drawMode: DrawMode,
-            adjustWithMargin: AdjustWithMargin
+            adjustFrom: AdjustFrom
         );
     }
 

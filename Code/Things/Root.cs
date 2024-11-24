@@ -62,11 +62,18 @@ public class Root : Thing
 
     public void Load(Map map)
     {
-        if (DeveloperTools.Editor?.Active == true) DeveloperTools.Editor.SetActive(false);
+        if (DeveloperTools.Editor != null)
+        {
+            DeveloperTools.Editor.Room = null;
+        }
+
         Dynamic.Children.ToList().ForEach(c => c.Destroy());
         Dynamic.Children = new List<Thing>() { };
         Thing thing = map.Load(Dynamic);
+        Game.LastMap = map;
         Game.Mode = GameMode.Play;
+
+        Room = Game.GetThing<Room>();
         
         // Room = Library.Maps[name].Load(Dynamic);
         // if (Room.Type == "Zone")

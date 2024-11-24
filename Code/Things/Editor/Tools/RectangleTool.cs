@@ -154,7 +154,7 @@ public class RectangleTool : Tool
         {
             positions.ForEach(p =>
             {
-                Shapes.DrawSprite(texture: square, position: p, color: erase ? new Color(0, 0, 0, 150) : CONSTANTS.PRIMARY_COLOR);
+                Shapes.DrawSprite(texture: square, position: p, color: erase ? new Color(0, 0, 0, 64) : new Color(0, 255, 0, 64));
             });
         }
     }

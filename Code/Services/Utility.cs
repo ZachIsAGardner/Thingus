@@ -79,7 +79,7 @@ public static class Utility
 
     public static Color HexToColor(string hex)
     {
-        if (String.IsNullOrWhiteSpace(hex)) return Colors.White;
+        if (String.IsNullOrWhiteSpace(hex)) return PaletteBasic.White;
 
         if (cacheHex.ContainsKey(hex)) return cacheHex[hex];
 
@@ -92,7 +92,7 @@ public static class Utility
         }
         catch (Exception error)
         {
-            return Colors.White;
+            return PaletteBasic.White;
         }
     }
 

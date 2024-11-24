@@ -14,10 +14,10 @@ public class MapCell
     public Vector2 Bounds;
 
     public MapCell() { }
-    public MapCell(string name, Vector2 position, int? tileNumber = null, Vector2? bounds = null, string parent = null)
+    public MapCell(string name, Vector2? position = null, int? tileNumber = null, Vector2? bounds = null, string parent = null)
     {
         Name = name;
-        Position = position;
+        Position = position ?? Vector2.Zero;
         Parent = parent;
         TileNumber = tileNumber;
         if (bounds != null) Bounds = bounds.Value;
@@ -39,8 +39,10 @@ public class MapCell
         {
             Map map = Library.Maps[Name.Remove(0, 1)];
             thing = map.Load(root, this);
+            thing.ParentMap = Map;
+            thing.ParentCell = this;
             thing.Map = map;
-            thing.Cell = map.GetCell(thing);
+            thing.Cell = map.Cells[0];
         }
         // Import
         else if (Import != null)

@@ -56,12 +56,12 @@ public static class Log
             font: font,
             text: "LOG",
             position: new Vector2(CONSTANTS.VIRTUAL_WIDTH - (width), 4) + Viewport.AdjustFromTopRight,
-            color: Colors.Green
+            color: PaletteBasic.Green
         );
         logs.Reversed().ForEach(l =>
         {
             Vector2 p = new Vector2(CONSTANTS.VIRTUAL_WIDTH - (width), 4 + (font.BaseSize + 1) * (i + 1)) + Viewport.AdjustFromTopRight;
-            Shapes.DrawText(font: font, text: l.Index + ": " + l.Message, position: p, color: l.Index % 2 == 0 ? Colors.White : Utility.HexToColor("#a5ffa5"));
+            Shapes.DrawText(font: font, text: l.Index + ": " + l.Message, position: p, color: l.Index % 2 == 0 ? PaletteBasic.White : PaletteAapSplendor128.NightlyAurora);
             i++;
         });
     }

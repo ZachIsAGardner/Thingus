@@ -5,7 +5,7 @@ namespace Thingus;
 
 public class Editor : Thing
 {
-    public Thing Target => Game.Root.Dynamic.Children?.First();
+    public Thing Target => Game.Root.Dynamic.Children?.FirstOrDefault();
     public Room Room;
 
     public Sprite Mouse;
@@ -46,8 +46,16 @@ public class Editor : Thing
 
         AddChild(new Drawer("Background", drawOrder: -200, action: d =>
         {
-            d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-5), scale: new Vector2(1, 1000), color: Colors.Green, origin: new Vector2(0));
-            d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-5), scale: new Vector2(1000, 1), color: Colors.Red, origin: new Vector2(0));
+            d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-2), scale: new Vector2(1, 1080 * 4), color: PaletteBasic.Green, origin: new Vector2(0));
+            d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-2), scale: new Vector2(1920 * 4, 1), color: PaletteBasic.Red, origin: new Vector2(0));
+            d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-2), scale: new Vector2(1, 1), color: PaletteBasic.Yellow, origin: new Vector2(0));
+            for (int x = 0; x < 4; x++)
+            {
+                for (int y = 0; y < 4; y++)
+                {
+                    d.DrawSprite(Library.Textures["EditorBackground"], origin: new Vector2(0), position: new Vector2(x * 1920, y * 1080));
+                }
+            }
         }));
         AddChild(new Drawer("Tool", action: d =>
         {
@@ -66,14 +74,14 @@ public class Editor : Thing
         {
             // TODO
         }
-        gridMouse.Color = new Color(255, 0, 0, 50);
+        gridMouse.Color = new Color(0, 255, 0, 50);
 
-        Mouse = AddChild(new Sprite("Mouse", tileSize: 16, tileNumber: 0, drawOrder: 110, drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Sprite;
+        Mouse = AddChild(new Sprite("Mouse", tileSize: 16, tileNumber: 0, drawOrder: 110, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Sprite;
 
         stamp = stamps.First();
-        previewBackground = AddChild(new Sprite("Pixel", drawOrder: 108, color: Colors.Black, scale: new Vector2(18), drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Sprite;
-        preview = AddChild(new Sprite(stamp.Name, drawOrder: 109, tileSize: CONSTANTS.TILE_SIZE, color: CONSTANTS.PRIMARY_COLOR, drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Sprite;
-        previewText = AddChild(new Text(stamp.Name, position: new Vector2(0), Library.Font, color: CONSTANTS.PRIMARY_COLOR, outlineColor: Colors.Black, order: 111, drawMode: DrawMode.Absolute, adjustWithMargin: false)) as Text;
+        previewBackground = AddChild(new Sprite("Pixel", drawOrder: 108, color: PaletteBasic.Black, scale: new Vector2(18), drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Sprite;
+        preview = AddChild(new Sprite(stamp.Name, drawOrder: 109, tileSize: CONSTANTS.TILE_SIZE, color: CONSTANTS.PRIMARY_COLOR, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Sprite;
+        previewText = AddChild(new Text(stamp.Name, position: new Vector2(0), Library.Font, color: CONSTANTS.PRIMARY_COLOR, outlineColor: PaletteBasic.Black, order: 111, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Text;
         SelectStamp(stamp);
 
         CameraTarget = AddChild(new Thing("CameraTarget"));
@@ -82,6 +90,8 @@ public class Editor : Thing
     public override void Update()
     {
         base.Update();
+
+        if (Game.Root.DeveloperTools.Cli.Active) return;
 
         // Log.Write(Viewport.RelativeLayer.Camera.Zoom);
         TogglePreview(Input.IsMouseInsideWindow() && Room != null);
@@ -323,8 +333,8 @@ public class Editor : Thing
     {
         base.Draw();
 
-        if (Target?.Map != null)DrawText($"Map: {Target?.Map?.Name}.map", new Vector2(4, 2), color: Colors.White, outlineColor: Colors.Black, font: Library.FontSmall);
-        if (Room?.Map != null) DrawText($"Room: {Room?.Map?.Name}.map", new Vector2(4, 2 + Library.FontSmall.BaseSize * 2), color: Colors.White, outlineColor: Colors.Black, font: Library.FontSmall);
-        DrawText($"{GridPosition}", new Vector2(4, CONSTANTS.VIRTUAL_HEIGHT - Library.FontSmall.BaseSize - 4), color: Colors.White, outlineColor: Colors.Black, font: Library.FontSmall);
+        if (Target?.Map != null) DrawText($"Map: {Target?.Map?.Name}.map", new Vector2(4, 2), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
+        if (Room?.Map != null) DrawText($"Room: {Room?.Map?.Name}.map", new Vector2(4, 2 + Library.FontSmall.BaseSize * 2), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
+        DrawText($"{GridPosition}", new Vector2(4, CONSTANTS.VIRTUAL_HEIGHT - Library.FontSmall.BaseSize - 4), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
     }
 }

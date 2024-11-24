@@ -27,7 +27,7 @@ public class CONSTANTS
     public static int TILE_SIZE_THIRD => TILE_SIZE / 3;
     public static int TILE_SIZE_QUARTER => TILE_SIZE / 4;
     public static int TILE_SIZE_OBLIQUE => TILE_SIZE - TILE_SIZE_THIRD;
-    public static readonly Color PRIMARY_COLOR = Colors.Gray3;
+    public static readonly Color PRIMARY_COLOR = PaletteBasic.Gray;
 
     static CONSTANTS()
     {

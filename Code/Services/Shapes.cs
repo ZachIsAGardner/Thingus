@@ -29,7 +29,7 @@ public static class Shapes
         return new Vector2(tileNumber * tileSize, row * tileSize);
     }
 
-    public static void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, DrawMode drawMode = DrawMode.Relative, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, bool adjustWithMargin = true)
+    public static void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, DrawMode drawMode = DrawMode.Relative, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, AdjustFrom adjustFrom = AdjustFrom.Auto)
     {
         if (scale == null) scale = new Vector2(1);
 
@@ -55,18 +55,46 @@ public static class Shapes
         // Absolute
         else
         {
-            if (adjustWithMargin)
+            if (adjustFrom != AdjustFrom.None)
             {
                 if (Viewport.Margin.X < 0)
                 {
-                    if (p.X < CONSTANTS.VIRTUAL_WIDTH / 2f) p.X -= Viewport.Margin.X;
-                    else p.X += Viewport.Margin.X;
+                    // Left
+                    if ((adjustFrom == AdjustFrom.Auto && p.X < CONSTANTS.VIRTUAL_WIDTH / 2f)
+                        || adjustFrom == AdjustFrom.TopLeft
+                        || adjustFrom == AdjustFrom.Left
+                        || adjustFrom == AdjustFrom.BottomLeft)
+                    {
+                        p.X -= Viewport.Margin.X;
+                    }
+                    // Right
+                    else if ((adjustFrom == AdjustFrom.Auto && p.X >= CONSTANTS.VIRTUAL_WIDTH / 2f) 
+                        || adjustFrom == AdjustFrom.TopRight 
+                        || adjustFrom == AdjustFrom.Right 
+                        || adjustFrom == AdjustFrom.BottomRight)
+                    {
+                        p.X += Viewport.Margin.X;
+                    } 
                 }
 
                 if (Viewport.Margin.Y < 0)
                 {
-                    if (p.Y < CONSTANTS.VIRTUAL_HEIGHT / 2f) p.Y -= Viewport.Margin.Y;
-                    else p.Y += Viewport.Margin.Y;
+                    // Top
+                    if ((adjustFrom == AdjustFrom.Auto && p.Y < CONSTANTS.VIRTUAL_HEIGHT / 2f)
+                        || adjustFrom == AdjustFrom.TopLeft
+                        || adjustFrom == AdjustFrom.Top
+                        || adjustFrom == AdjustFrom.TopRight)
+                    {
+                        p.Y -= Viewport.Margin.Y;
+                    }
+                    // Bottom
+                    else if ((adjustFrom == AdjustFrom.Auto && p.Y >= CONSTANTS.VIRTUAL_HEIGHT / 2f) 
+                        || adjustFrom == AdjustFrom.BottomLeft 
+                        || adjustFrom == AdjustFrom.Bottom 
+                        || adjustFrom == AdjustFrom.BottomRight)
+                    {
+                        p.Y += Viewport.Margin.Y;
+                    } 
                 }
             }
         }
@@ -79,11 +107,11 @@ public static class Shapes
             dest: new Rectangle(p.X, p.Y, width * scale.Value.X, height * scale.Value.Y),
             origin: origin ?? new Vector2((width * scale.Value.X) / 2, (height * scale.Value.Y) / 2),
             rotation: rotation,
-            tint: (color ?? Colors.White).ToRaylib()
+            tint: (color ?? PaletteBasic.White).ToRaylib()
         );
     }
 
-    public static void DrawText(string text, Vector2? position = null, Font? font = null, Color? color = null, DrawMode drawMode = DrawMode.Relative, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full, bool adjustWithMargin = true)
+    public static void DrawText(string text, Vector2? position = null, Font? font = null, Color? color = null, DrawMode drawMode = DrawMode.Relative, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full, AdjustFrom adjustFrom = AdjustFrom.Auto)
     {
         if (font == null) font = Library.Font;
 
@@ -96,18 +124,46 @@ public static class Shapes
         // Absolute
         else
         {
-            if (adjustWithMargin)
+            if (adjustFrom != AdjustFrom.None)
             {
                 if (Viewport.Margin.X < 0)
                 {
-                    if (p.X < CONSTANTS.VIRTUAL_WIDTH / 2f) p.X -= Viewport.Margin.X;
-                    else p.X += Viewport.Margin.X;
+                    // Left
+                    if ((adjustFrom == AdjustFrom.Auto && p.X < CONSTANTS.VIRTUAL_WIDTH / 2f)
+                        || adjustFrom == AdjustFrom.TopLeft
+                        || adjustFrom == AdjustFrom.Left
+                        || adjustFrom == AdjustFrom.BottomLeft)
+                    {
+                        p.X -= Viewport.Margin.X;
+                    }
+                    // Right
+                    else if ((adjustFrom == AdjustFrom.Auto && p.X >= CONSTANTS.VIRTUAL_WIDTH / 2f) 
+                        || adjustFrom == AdjustFrom.TopRight 
+                        || adjustFrom == AdjustFrom.Right 
+                        || adjustFrom == AdjustFrom.BottomRight)
+                    {
+                        p.X += Viewport.Margin.X;
+                    } 
                 }
 
                 if (Viewport.Margin.Y < 0)
                 {
-                    if (p.Y < CONSTANTS.VIRTUAL_HEIGHT / 2f) p.Y -= Viewport.Margin.Y;
-                    else p.Y += Viewport.Margin.Y;
+                    // Top
+                    if ((adjustFrom == AdjustFrom.Auto && p.Y < CONSTANTS.VIRTUAL_HEIGHT / 2f)
+                        || adjustFrom == AdjustFrom.TopLeft
+                        || adjustFrom == AdjustFrom.Top
+                        || adjustFrom == AdjustFrom.TopRight)
+                    {
+                        p.Y -= Viewport.Margin.Y;
+                    }
+                    // Bottom
+                    else if ((adjustFrom == AdjustFrom.Auto && p.Y >= CONSTANTS.VIRTUAL_HEIGHT / 2f) 
+                        || adjustFrom == AdjustFrom.BottomLeft 
+                        || adjustFrom == AdjustFrom.Bottom 
+                        || adjustFrom == AdjustFrom.BottomRight)
+                    {
+                        p.Y += Viewport.Margin.Y;
+                    } 
                 }
             }
         }
@@ -153,7 +209,7 @@ public static class Shapes
             rotation: 0,
             fontSize: font.Value.BaseSize,
             spacing: 0,
-            tint: (color ?? Colors.Black).ToRaylib()
+            tint: (color ?? PaletteBasic.Black).ToRaylib()
         );
     }
 }

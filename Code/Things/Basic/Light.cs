@@ -7,7 +7,7 @@ public class Light : Thing
 {
     public float Radius = 80;
     public float Flicker = 0;
-    public Color Color = Utility.HexToColor("#ffffff");
+    public Color Color = PaletteBasic.White;
     float flickerOffset = 0;
 
     float decay = 2f;
@@ -35,7 +35,7 @@ public class Light : Thing
         if (decaying)
         {
             Flicker = Flicker.MoveOverTime(-Radius, 0.1f);
-            Color = Color.MoveOverTime(Colors.Blank, 0.1f);
+            Color = Color.MoveOverTime(PaletteBasic.Blank, 0.1f);
             if (Flicker <= -Radius)
             {
                 Flicker = -Radius;

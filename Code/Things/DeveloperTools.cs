@@ -56,7 +56,7 @@ public class DeveloperTools : Thing
             Editor.SetActive(true);
             Editor.SetVisible(true);
 
-            Viewport.RelativeLayer.ClearColor = Colors.Black;
+            Viewport.RelativeLayer.ClearColor = PaletteBasic.VeryDarkGray;
 
             Game.Mode = GameMode.Edit;
             if (Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
@@ -89,7 +89,7 @@ public class DeveloperTools : Thing
 
     void Play()
     {
-        Viewport.RelativeLayer.ClearColor = Colors.Black;
+        Viewport.RelativeLayer.ClearColor = PaletteBasic.Black;
         Editor.SetActive(false);
         Editor.SetVisible(false);
         Cli.SetActive(false);
@@ -160,7 +160,7 @@ public class DeveloperTools : Thing
             Library.Refresh();
             Editor?.RefreshStamps();
             Play();
-            Game.Root.Load(CONSTANTS.START_MAP);
+            Game.Root.Load(Game.LastMap);
         }
     }
 
@@ -174,7 +174,7 @@ public class DeveloperTools : Thing
                 font: font,
                 text: $"{c.Id}: {c.Name} ({c.TypeName})",
                 position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth) + (depth * 6), 4 + (height * (font.BaseSize + fontOffset))) + Viewport.AdjustFromTopRight,
-                color: depth % 2 == 0 ? Colors.White : Utility.HexToColor("#a5ffa5")
+                color: depth % 2 == 0 ? PaletteBasic.White : PaletteAapSplendor128.NightlyAurora
             );
             height++;
             CrawlTree(c, depth, ref height);
@@ -194,7 +194,7 @@ public class DeveloperTools : Thing
             font: font,
             text: "TREE",
             position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth), 4) + Viewport.AdjustFromTopRight,
-            color: Colors.Green
+            color: PaletteBasic.Green
         );
 
         int height = 1;
@@ -204,7 +204,7 @@ public class DeveloperTools : Thing
                 font: font,
                 text: $"{c.Id}: {c.Name}",
                 position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth), 4 + (height * (font.BaseSize + fontOffset))) + Viewport.AdjustFromTopRight,
-                color: Colors.White
+                color: PaletteBasic.White
             );
             height++;
         });

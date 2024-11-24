@@ -38,6 +38,8 @@ public static class Game
 
     public static bool Mute = true;
 
+    public static Map LastMap = null;
+
     public static ProjectionType ProjectionType = ProjectionType.Oblique;
 
     public static List<T> GetThings<T>() where T : Thing

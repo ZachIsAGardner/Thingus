@@ -33,7 +33,7 @@ public class LightViewportLayer : ViewportLayer
         base.DrawToTexture();
 
         Raylib.BeginTextureMode(lightTextureSheet);
-        Raylib.ClearBackground(Colors.Blank.ToRaylib());
+        Raylib.ClearBackground(PaletteBasic.Blank.ToRaylib());
         int i = 0;
         lights.ForEach(l =>
         {
@@ -47,7 +47,7 @@ public class LightViewportLayer : ViewportLayer
                 centerY: tileSize / 2,
                 radius: radius,
                 color1: l.Color.ToRaylib(),
-                color2: Colors.Blank.ToRaylib()
+                color2: PaletteBasic.Blank.ToRaylib()
             );
             i++;
         });
@@ -94,7 +94,7 @@ public class LightViewportLayer : ViewportLayer
             dest: Viewport.Rectangle,
             origin: new Vector2(0f, 0f),
             rotation: Viewport.Rotation,
-            tint: Colors.White.ToRaylib()
+            tint: PaletteBasic.White.ToRaylib()
         );
         Raylib.EndBlendMode();
     }

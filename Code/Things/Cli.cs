@@ -5,6 +5,8 @@ using Thingus;
 public class Cli : Thing
 {
     List<string> lines = new List<string>() { };
+    List<string> pastCommands = new List<string>() { };
+    int pastCommandIndex = -1;
     string current = "";
 
     bool caret;
@@ -45,7 +47,47 @@ public class Cli : Thing
             caret = !caret;
             caretTime = 0.5f;
         }
+        if (Input.IsPressed(KeyboardKey.Up))
+        {
+            if (pastCommands.Count > 0)
+            {
+                if (pastCommandIndex == -1)
+                {
+                    pastCommandIndex = pastCommands.Count - 1;
+                }
+                else
+                {
+                    pastCommandIndex--;
+                    if (pastCommandIndex < 0) pastCommandIndex = 0;
+                }
+                current = pastCommands[pastCommandIndex];
+            }
+        }
+        if (Input.IsPressed(KeyboardKey.Down))
+        {
+            if (pastCommands.Count > 0)
+            {
+                if (pastCommandIndex == -1) 
+                {
 
+                }
+                else
+                {
+                    pastCommandIndex++;
+                    if (pastCommandIndex >= pastCommands.Count)
+                    {
+                        pastCommandIndex = -1;
+                        current = "";
+                    }
+                    else
+                    {
+                        current = pastCommands[pastCommandIndex];
+                    }
+                }
+            }
+        }
+
+        string lastCurrent = current;
         current += Input.GetKeyboardString();
         if (Input.IsRepeating(KeyboardKey.Backspace) && current.Count() > 0)
         {
@@ -56,7 +98,12 @@ public class Cli : Thing
         {
             lines.Add(current);
             Command(current);
+            pastCommands.Add(current);
             current = "";
+        }
+        if (lastCurrent != current)
+        {
+            pastCommandIndex = -1;
         }
 
         while (lines.Count >= (CONSTANTS.VIRTUAL_HEIGHT - 8) / Library.Font.BaseSize)
@@ -82,7 +129,8 @@ public class Cli : Thing
             DrawText(
                 text: $"* {line}",
                 position: new Vector2(6, 4 + (Library.Font.BaseSize * i)),
-                color: Utility.HexToColor("#a5ffa5")
+                color: PaletteAapSplendor128.NightlyAurora,
+                adjustFrom: AdjustFrom.Top
             );
             i++;
         }
@@ -90,7 +138,8 @@ public class Cli : Thing
         DrawText(
             text: $"$ {current}{(caret ? "|" : "")}",
             position: new Vector2(6, 4 + (Library.Font.BaseSize * i)),
-            color: Colors.Green
+            color: PaletteBasic.Green,
+            adjustFrom: AdjustFrom.Top
         );
     }
 
@@ -101,11 +150,12 @@ public class Cli : Thing
             return;
         }
 
-        List<string> words = line.Split(" ").Select(w => w.ToLower()).ToList();
+        List<string> words = line.Split(" ").ToList();
         string command = words[0];
         List<string> arguments = words.Slice(1, words.Count - 1);
 
         if (command == "load") Load(arguments);
+        else if (command == "newm") NewMap(arguments);
         else if (command == "help") Help();
         else if (command == "clear") Clear();
         else NoCommand();
@@ -128,13 +178,33 @@ public class Cli : Thing
         else
         {
             Game.Root.Load(map);
-            lines.Add($"loaded {mapName}");
+            lines.Add($"loaded {mapName}.map");
         }
+    }
+
+    void NewMap(List<string> arguments)
+    {
+        if (arguments.Count <= 0)
+        {
+            lines.Add("error: provide the name of a map.");
+            return;
+        }
+
+        string mapName = arguments[0];
+        Map map = new Map(mapName);
+        map.Path = $"Content/Maps/{mapName}";
+        MapCell root = new MapCell("Thing");
+        root.Map = map;
+        map.Cells.Add(root);
+        map.Save();
+        Library.Maps[mapName] = map;
+        Game.Root.Load(map);
+        lines.Add($"created {mapName}.map");
     }
 
     void Help()
     {
-        lines.Add("valid commands: load, help, clear.");
+        lines.Add("valid commands: load, newm, help, clear.");
         lines.Add("");
         lines.Add("`: Toggle CLI");
         lines.Add("1: Toggle Editor");

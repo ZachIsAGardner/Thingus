@@ -53,7 +53,13 @@ public class Map
     public void Save()
     {
         string content = JsonConvert.SerializeObject(this);
+        Directory.CreateDirectory(Path);
         File.WriteAllText($"{Path}/{Name}.map", content);
+    }
+
+    public void Delete()
+    {
+        File.Delete($"{Path}/{Name}.map");
     }
 
     public Thing Load(Thing root, MapCell mapCell = null)

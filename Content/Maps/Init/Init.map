@@ -1,1 +1,1 @@
-{"Type":"Zone","Cells":[{"Name":"=Init_000","Position":{"X":0.0,"Y":0.0},"TileNumber":null}]}
+{"Cells":[{"Name":"Thing","Position":{"X":0.0,"Y":0.0},"Parent":null,"TileNumber":null,"Bounds":{"X":0.0,"Y":0.0}}]}

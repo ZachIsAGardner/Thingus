@@ -1,27 +1,24 @@
 TODO
-- editor guides
-- manually resize rooms
-- make new map in game
+- contiguous fill
+- non-contiguous fill
+- particle effects
 
 LATER
-- particle effects
 - editor
     - tool buttons
     - tile buttons
     - action buttons
 - move multiple rooms
 - undo/redo
-- contiguous fill
-- non-contiguous fill
+
+WAY LATER
+- toast
+- palette swap
 - combine Root and Game, convert Game into a Thing
 - convert Viewport into a Thing
 - convert everything all Services into Things?
-
-WAY LATER
 - tilesize by map
 - projection type by map
-- toast
-- palette swap
 - translation support
 - fix lighting with zoom
 - export
