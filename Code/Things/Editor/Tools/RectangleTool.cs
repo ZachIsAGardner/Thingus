@@ -8,11 +8,22 @@ public class RectangleTool : Tool
     Vector2? start = null;
     bool erase = false;
     List<Vector2> positions = new List<Vector2>() { };
-    Texture2D square = Library.Textures[$"{CONSTANTS.TILE_SIZE}White"];
+    Texture2D square;
 
     public RectangleTool(Editor editor) : base(editor)
     {
-
+        if (Game.ProjectionType == ProjectionType.Grid)
+        {
+            square = Library.Textures[$"{CONSTANTS.TILE_SIZE}Square"];
+        }
+        else if (Game.ProjectionType == ProjectionType.Oblique)
+        {
+            square = Library.Textures[$"{CONSTANTS.TILE_SIZE}ObliqueBox"];
+        }
+        else if (Game.ProjectionType == ProjectionType.Isometric)
+        {
+            // TODO
+        }
     }
 
     public override void Update()
@@ -59,13 +70,52 @@ public class RectangleTool : Tool
         {
             positions.Clear();
             Vector2 distance = editor.GridPosition - start.Value;
-            int row = (int)(distance.X / CONSTANTS.TILE_SIZE).Abs();
-            int column = (int)(distance.Y / CONSTANTS.TILE_SIZE).Abs();
+            int row = 1;
+            int column = 1;
+            if (Game.ProjectionType == ProjectionType.Grid)
+            {
+                row = (int)(distance.X / CONSTANTS.TILE_SIZE).Abs();
+                column = (int)(distance.Y / CONSTANTS.TILE_SIZE).Abs();
+            }
+            else if (Game.ProjectionType == ProjectionType.Oblique)
+            {
+                row = (int)(distance.X / CONSTANTS.TILE_SIZE_OBLIQUE).Abs();
+                column = (int)(distance.Y / CONSTANTS.TILE_SIZE_THIRD).Abs();
+            }
+            else if (Game.ProjectionType == ProjectionType.Isometric)
+            {
+                // TODO
+            }
+
             for (int r = 0; r <= row; r++)
             {
                 for (int c = 0; c <= column; c++)
                 {
-                    positions.Add(start.Value + new Vector2(r * CONSTANTS.TILE_SIZE * distance.X.Sign(), c * CONSTANTS.TILE_SIZE * distance.Y.Sign()));
+                    Vector2 position = start.Value;
+                    if (Game.ProjectionType == ProjectionType.Grid)
+                    { 
+                        position += new Vector2(
+                            r * CONSTANTS.TILE_SIZE * distance.X.Sign(),
+                            c * CONSTANTS.TILE_SIZE * distance.Y.Sign()
+                        );
+                    }
+                    else if (Game.ProjectionType == ProjectionType.Oblique)
+                    { 
+                        position += new Vector2(
+                            r * CONSTANTS.TILE_SIZE_OBLIQUE * distance.X.Sign(),
+                            c * CONSTANTS.TILE_SIZE_THIRD * distance.Y.Sign()
+                        );
+                        if (c % 2 != 0)
+                        {
+                            position.X += CONSTANTS.TILE_SIZE_THIRD;
+                        }
+                    }
+                    else if (Game.ProjectionType == ProjectionType.Isometric)
+                    { 
+                        // TODO
+                    }
+
+                    positions.Add(position);
                 }
             }
         }
@@ -88,7 +138,6 @@ public class RectangleTool : Tool
 
         if (Input.LeftMouseButtonIsReleased || Input.RightMouseButtonIsReleased)
         {
-            editor.LastGridInteractPosition = null;
             start = null;
             erase = false;
             positions.Clear();

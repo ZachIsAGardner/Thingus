@@ -15,7 +15,7 @@ public static class Viewport
     public static float Rotation;
 
     public static ViewportMode Mode = ViewportMode.FitToScreen;
-    public static Color ClearColor = Colors.White;
+    public static Color ClearColor = Colors.Black;
     public static bool ScalePixels = false;
     public static Thing Target = null;
     public static Vector2 CameraPosition { get; private set; }

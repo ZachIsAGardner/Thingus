@@ -4,12 +4,12 @@ public static class Colors
 {
     public static Color Blank = new Color(0, 0, 0, 0);
     public static Color Black = new Color("#050403");
-    public static Color Gray6 = new Color("#282c3c");
-    public static Color Gray5 = new Color("#464762");
-    public static Color Gray4 = new Color("#696682");
-    public static Color Gray3 = new Color("#9a97b9");
-    public static Color Gray2 = new Color("#c5c7dd");
-    public static Color Gray1 = new Color("#e6e7f0");
+    public static Color Gray6 = new Color("#323232");
+    public static Color Gray5 = new Color("#595757");
+    public static Color Gray4 = new Color("#807b7a");
+    public static Color Gray3 = new Color("#a69e9a");
+    public static Color Gray2 = new Color("#cbc6c1");
+    public static Color Gray1 = new Color("#ecebe7"); 
     public static Color White = new Color("#ffffff");
     public static Color Blue = new Color("#0000ff");
     public static Color Red = new Color("#ff0000");

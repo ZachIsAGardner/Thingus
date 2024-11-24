@@ -103,26 +103,30 @@ public class RoomTool : Tool
                 if (Input.LeftMouseButtonIsPressed)
                 {
                     Thing child = editor.Target.Children.OrderByDescending(c => c.Name).FirstOrDefault();
-                    string index = child == null ? "000" : (child.Name.Split("_").Last().ToInt() + 1).ToString().PadLeft(3, '0');
+                    string index = child == null ? "000" : (child.Map.Name.Split("_").Last().ToInt() + 1).ToString().PadLeft(3, '0');
                     string mapName = $"{editor.Target.Name}_{index}";
                     string roomName = "Room";
                     int width = CONSTANTS.VIRTUAL_WIDTH;
                     int height = CONSTANTS.VIRTUAL_HEIGHT;
+                    Vector2 position = editor.GridPosition;
                     if (Game.ProjectionType == ProjectionType.Grid)
                     {
                         while (width % CONSTANTS.TILE_SIZE != 0) width++;
                         while (height % CONSTANTS.TILE_SIZE != 0) height++;
+                        position = editor.GridPosition;
                     }
                     else if (Game.ProjectionType == ProjectionType.Oblique)
                     {
                         while (width % CONSTANTS.TILE_SIZE_OBLIQUE != 0) width++;
                         while (height % CONSTANTS.TILE_SIZE_OBLIQUE / 2 != 0) height++;
+                        position = editor.GridPosition - new Vector2(CONSTANTS.TILE_SIZE_THIRD / 2);
                     }
                     else if (Game.ProjectionType == ProjectionType.Isometric)
                     {
-                        // ...
+                        // TODO
                     }
-                    Room room = new Room(roomName, Vector2.Zero, new Vector2(width, height));
+        
+                    Room room = new Room(roomName, position, new Vector2(width, height));
                     room.Map = new Map(mapName);
                     room.Map.AddCell(new MapCell(roomName, room.Position, bounds: room.Bounds));
                     room.Map.Path = editor.Target.Map.Path;

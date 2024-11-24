@@ -11,6 +11,7 @@ public class ViewportLayer
     public Camera2D Camera = new Camera2D() { Zoom = 1f };
     public RenderTexture2D Texture;
     public bool FollowsTarget = false;
+    public Color ClearColor = Colors.Black;
 
     public ViewportLayer() { }
     public ViewportLayer(int index)

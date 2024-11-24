@@ -1,6 +1,4 @@
 TODO
-- fix draw with offset
-- room name wrong in display above room in editor
 - editor guides
 - manually resize rooms
 - make new map in game

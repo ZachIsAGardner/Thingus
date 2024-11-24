@@ -38,8 +38,8 @@ public class DeveloperTools : Thing
         Editor.SetActive(false);
         Editor.SetVisible(false);
         Cli = AddChild(new Cli()) as Cli;
-        Cli.SetActive(false);
-        Cli.SetVisible(false);
+        // Cli.SetActive(false);
+        // Cli.SetVisible(false);
     }
 
     public override void Update()
@@ -55,6 +55,8 @@ public class DeveloperTools : Thing
         {
             Editor.SetActive(true);
             Editor.SetVisible(true);
+
+            Viewport.RelativeLayer.ClearColor = Colors.Black;
 
             Game.Mode = GameMode.Edit;
             if (Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
@@ -87,6 +89,7 @@ public class DeveloperTools : Thing
 
     void Play()
     {
+        Viewport.RelativeLayer.ClearColor = Colors.Black;
         Editor.SetActive(false);
         Editor.SetVisible(false);
         Cli.SetActive(false);

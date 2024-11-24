@@ -44,7 +44,12 @@ public class Editor : Thing
         DrawMode = DrawMode.Absolute;
         DrawOrder = 99;
 
-        AddChild(new Drawer("Tool", action: () =>
+        AddChild(new Drawer("Background", drawOrder: -200, action: d =>
+        {
+            d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-5), scale: new Vector2(1, 1000), color: Colors.Green, origin: new Vector2(0));
+            d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-5), scale: new Vector2(1000, 1), color: Colors.Red, origin: new Vector2(0));
+        }));
+        AddChild(new Drawer("Tool", action: d =>
         {
             if (tool != null) tool.Draw();
         }));
@@ -57,9 +62,9 @@ public class Editor : Thing
         {
             gridMouse = AddChild(new Sprite($"{CONSTANTS.TILE_SIZE}ObliqueGridCursor", drawOrder: 100)) as Sprite;
         }
-        else if (Game.ProjectionType == ProjectionType.Oblique)
+        else if (Game.ProjectionType == ProjectionType.Isometric)
         {
-            // ...
+            // TODO
         }
         gridMouse.Color = new Color(255, 0, 0, 50);
 
@@ -266,7 +271,7 @@ public class Editor : Thing
         cell.Create(Room);
 
         recentGridInteractionPositions.AddRange(PositionWithNeighbors(position));
-        LastGridInteractPosition = position;
+        // LastGridInteractPosition = position;
     }
 
     public void RemoveCell(Vector2 position, int? layer = null)
@@ -291,7 +296,7 @@ public class Editor : Thing
         Room.Map.RemoveCell(cell);
 
         recentGridInteractionPositions.AddRange(PositionWithNeighbors(position));
-        LastGridInteractPosition = position;
+        // LastGridInteractPosition = position;
     }
 
     public void PickCell(Vector2 position)

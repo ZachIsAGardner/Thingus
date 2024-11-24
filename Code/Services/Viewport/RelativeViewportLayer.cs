@@ -22,7 +22,7 @@ public class RelativeViewportLayer : ViewportLayer
 
         Raylib.BeginTextureMode(Texture);
 
-        Raylib.ClearBackground(Colors.Black.ToRaylib());
+        Raylib.ClearBackground(ClearColor.ToRaylib());
 
         Raylib.BeginMode2D(Camera);
         // Children.ForEach(x => x.Draw());

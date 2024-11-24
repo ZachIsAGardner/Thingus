@@ -16,7 +16,7 @@ namespace Thingus;
 //     {
 //         base.Init();
 
-//         AddChild(new Sprite("16White", drawMode: DrawMode.Absolute));
+//         AddChild(new Sprite("16Square", drawMode: DrawMode.Absolute));
 //     }
 
 //     public override void Update()

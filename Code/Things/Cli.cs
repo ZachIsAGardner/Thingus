@@ -21,6 +21,7 @@ public class Cli : Thing
         lines.Add("-----------");
         lines.Add("| THINGUS |");
         lines.Add("-----------");
+        Help();
     }
 
     public override void SetActive(bool active)
@@ -105,6 +106,7 @@ public class Cli : Thing
         List<string> arguments = words.Slice(1, words.Count - 1);
 
         if (command == "load") Load(arguments);
+        else if (command == "help") Help();
         else if (command == "clear") Clear();
         else NoCommand();
     }
@@ -128,6 +130,18 @@ public class Cli : Thing
             Game.Root.Load(map);
             lines.Add($"loaded {mapName}");
         }
+    }
+
+    void Help()
+    {
+        lines.Add("valid commands: load, help, clear.");
+        lines.Add("");
+        lines.Add("`: Toggle CLI");
+        lines.Add("1: Toggle Editor");
+        lines.Add("2: Toggle Debug Info");
+        lines.Add("");
+        lines.Add("F1: Toggle Frame Advance");
+        lines.Add("F2: Advance Frame");
     }
 
     void Clear()

@@ -4,12 +4,12 @@ namespace Thingus;
 
 public class Drawer : Thing
 {
-    public Action Action = null;
+    public Action<Drawer> Action = null;
 
     public Drawer() { }
     public Drawer(
         string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
-        Action action = null
+        Action<Drawer> action = null
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {
         Action = action;
@@ -19,6 +19,6 @@ public class Drawer : Thing
     {
         base.Draw();
 
-        if (Action != null) Action();
+        if (Action != null) Action(this);
     }
 }
