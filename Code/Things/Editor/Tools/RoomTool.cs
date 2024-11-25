@@ -4,6 +4,8 @@ namespace Thingus;
 
 public class RoomTool : Tool
 {
+    public override string Name => "Room";
+
     Vector2? actionMousePositionStart = null;
     Vector2? actionRoomPositionStart = null;
     Vector2? actionRoomBoundsStart = null;
@@ -69,6 +71,7 @@ public class RoomTool : Tool
                     actionRoom.Map.Cells.Where(c => c != actionRoom.Cell).ToList().ForEach(c =>
                     {
                         actionRoomCellPositions[i] = c.Position;
+                        i++;    
                     });
 
                     state = ResizeRoomHorizontal;
@@ -109,6 +112,7 @@ public class RoomTool : Tool
                     actionRoom.Map.Cells.Where(c => c != actionRoom.Cell).ToList().ForEach(c =>
                     {
                         actionRoomCellPositions[i] = c.Position;
+                        i++;
                     });
 
                     state = ResizeRoomVertical;
@@ -147,11 +151,7 @@ public class RoomTool : Tool
             // Delete
             if (Input.RightMouseButtonIsPressed)
             {
-                editor.Target.Map.RemoveCell(hoveredRoom.ParentCell);
-                editor.Room = null;
-                hoveredRoom.Map.Delete();
-                hoveredRoom.Destroy();
-                hoveredRoom = null;
+                RemoveRoom(hoveredRoom);
             }
         }
         else
@@ -168,42 +168,101 @@ public class RoomTool : Tool
 
                 if (Input.LeftMouseButtonIsPressed)
                 {
-                    Thing child = editor.Target.Children.OrderByDescending(c => c.Name).FirstOrDefault();
-                    string index = child == null ? "000" : (child.Map.Name.Split("_").Last().ToInt() + 1).ToString().PadLeft(3, '0');
-                    string mapName = $"{editor.Target.Map.Name}_{index}";
-                    string roomName = "Room";
-                    int width = CONSTANTS.VIRTUAL_WIDTH;
-                    int height = CONSTANTS.VIRTUAL_HEIGHT;
-                    Vector2 position = editor.GridPosition;
-                    if (Game.ProjectionType == ProjectionType.Grid)
-                    {
-                        while (width % CONSTANTS.TILE_SIZE != 0) width++;
-                        while (height % CONSTANTS.TILE_SIZE != 0) height++;
-                        position = editor.GridPosition;
-                    }
-                    else if (Game.ProjectionType == ProjectionType.Oblique)
-                    {
-                        while (width % CONSTANTS.TILE_SIZE_OBLIQUE != 0) width++;
-                        while (height % CONSTANTS.TILE_SIZE_OBLIQUE / 2 != 0) height++;
-                        position = editor.GridPosition - new Vector2(CONSTANTS.TILE_SIZE_THIRD / 2);
-                    }
-                    else if (Game.ProjectionType == ProjectionType.Isometric)
-                    {
-                        // TODO
-                    }
-        
-                    Room room = new Room(roomName, position, new Vector2(width, height));
-                    room.Map = new Map(mapName);
-                    room.Cell = new MapCell(roomName, room.Position, bounds: room.Bounds);
-                    room.Map.AddCell(room.Cell);
-                    room.Map.Path = editor.Target.Map.Path;
-                    room.ParentCell = new MapCell($"={mapName}", room.Position, parent: editor.Target.Name);
-                    editor.Target.AddChild(room);
-                    editor.Target.Map.AddCell(room.ParentCell);
-                    editor.Room = room;
-                    editor.Save();
+                    AddRoom();
                 }
             }
+        }
+    }
+
+    Room AddRoom()
+    {
+        Thing child = editor.Target.Children.OrderByDescending(c => c.Map.Name).FirstOrDefault();
+        string index = child == null ? "000" : (child.Map.Name.Split("_").Last().ToInt() + 1).ToString().PadLeft(3, '0');
+        string mapName = $"{editor.Target.Map.Name}_{index}";
+        int width = CONSTANTS.VIRTUAL_WIDTH;
+        int height = CONSTANTS.VIRTUAL_HEIGHT;
+        Vector2 position = editor.GridPosition;
+        if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
+        {
+            while (width % CONSTANTS.TILE_SIZE != 0) width++;
+            while (height % CONSTANTS.TILE_SIZE != 0) height++;
+            position = editor.GridPosition - new Vector2(CONSTANTS.TILE_SIZE / 2);
+        }
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
+        {
+            while (width % CONSTANTS.TILE_SIZE_OBLIQUE != 0) width++;
+            while (height % CONSTANTS.TILE_SIZE_OBLIQUE / 2 != 0) height++;
+            position = editor.GridPosition - new Vector2(CONSTANTS.TILE_SIZE_THIRD / 2);
+        }
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
+        {
+            // TODO
+        }
+
+        return AddRoom(mapName, position, width, height);
+    }
+
+    Room AddRoom(string mapName, Vector2 position, int width, int height, bool changeHistory = true)
+    {
+        Room room = new Room(mapName, position, new Vector2(width, height));
+        room.Map = new Map(mapName);
+        room.Cell = new MapCell(mapName, "Room", Vector2.Zero, bounds: room.Bounds);
+        room.Map.AddCell(room.Cell);
+        room.Map.Path = editor.Target.Map.Path;
+        room.ParentCell = new MapCell($"={mapName}", position: room.Position, parent: editor.Target.Name);
+        editor.Target.AddChild(room);
+        editor.Target.Map.AddCell(room.ParentCell);
+        editor.Room = room;
+
+        if (changeHistory)
+        {
+            editor.AddHistoryAction(new HistoryAction(
+                "NewRoom",
+                () =>
+                {
+                    RemoveRoom(room, false);
+                },
+                () => 
+                {
+                    room = AddRoom(mapName, position, width, height, false);
+                }
+            ));
+        }
+
+        return room;
+    }
+
+    void RemoveRoom(Room room, bool changeHistory = true)
+    {
+        editor.Target.Map.RemoveCell(room.ParentCell);
+        editor.Room = null;
+        room.Children.Where(c => c.Cell != null).ToList().ForEach(c =>
+        {
+            editor.RemoveCell(c.Cell, room: room, changeHistory: changeHistory);
+        });
+        room.GetThings<BakedTilemap>().ForEach(b =>
+        {
+            b.Tiles.ForEach(t =>
+            {
+                editor.RemoveCell(t.Position + room.Position, b.Layer, room: room, changeHistory: changeHistory);
+            });
+        });
+        room.Map.Delete();
+        room.Destroy();
+
+        if (changeHistory)
+        {
+            editor.AddHistoryAction(new HistoryAction(
+                "RemoveRoom",
+                () =>
+                {
+                    room = AddRoom(room.Map.Name, room.Position, (int)room.Bounds.X, (int)room.Bounds.Y, false);
+                },
+                () => 
+                {
+                    RemoveRoom(room, false);
+                }
+            ));
         }
     }
 
@@ -214,12 +273,31 @@ public class RoomTool : Tool
 
         if (Input.LeftMouseButtonIsReleased)
         {
+            Room storedRoom = actionRoom;
+            Vector2 storedDestination = actionRoom.Position;
+            Vector2 storedStart = actionRoomPositionStart.Value;
+
+            editor.AddHistoryAction(new HistoryAction(
+                "MoveRoom",
+                () =>
+                {
+                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    storedRoom.Position = storedStart;
+                },
+                () =>
+                {
+                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    storedRoom.Position = storedDestination;
+                }
+            ));
             Reset();
         }
     }
 
     void ResizeRoomHorizontal()
     {
+        if (editor.GridPosition == editor.LastGridInteractPosition && Input.LeftMouseButtonIsHeld) return;
+
         Vector2 difference = editor.GridPosition - actionMousePositionStart.Value;
         if (resizeReverse)
         {
@@ -233,6 +311,7 @@ public class RoomTool : Tool
             actionRoom.Map.Cells.Where(c => c != actionRoom.Cell).ToList().ForEach(c =>
             {
                 c.Position.X = actionRoomCellPositions[i].X - difference.X;
+                i++;
             }); 
         }
         else
@@ -250,6 +329,70 @@ public class RoomTool : Tool
                     b.Tiles.ForEach(t => t.Position.X -= difference.X);
                 });
             }
+
+            actionRoom.Map.Cells.ToList().ForEach(c =>
+            {
+                if (c.Position.X < 0)
+                {
+                    editor.RemoveCell(c);
+                }
+
+                if (c.Position.X > actionRoom.Bounds.X + (CONSTANTS.TILE_SIZE / 2))
+                {
+                    editor.RemoveCell(c);
+                }
+            });
+
+            Room storedRoom = actionRoom;
+            Vector2 storedDestination = actionRoom.Position;
+            Vector2 storedStart = actionRoomPositionStart.Value;
+            Vector2 storedBoundsStart = actionRoomBoundsStart.Value;
+            Vector2 storedBoundsDestination = actionRoom.Bounds;
+            Vector2 storedDifference = difference;
+            bool storedResizeReverse = resizeReverse;
+
+            editor.AddHistoryAction(new HistoryAction(
+                "ResizeRoomHorizontal",
+                () =>
+                {
+                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    if (storedResizeReverse)
+                    {
+                        storedRoom.Children.ForEach(c =>
+                        {
+                            if (c.TypeName == "BakedTilemap") (c as BakedTilemap).Tiles.ForEach(t => t.Position.X += storedDifference.X);
+                            else c.Position.X += storedDifference.X;
+                        });
+
+                        storedRoom.Map.Cells.Where(c => c != storedRoom.Cell).ToList().ForEach(c =>
+                        {
+                            c.Position.X += storedDifference.X;
+                        });
+                    }
+                    storedRoom.Position = storedRoom.ParentCell.Position = storedStart;
+                    storedRoom.Bounds = storedRoom.Cell.Bounds = storedBoundsStart;
+                },
+                () =>
+                {
+                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    if (storedResizeReverse)
+                    {
+                        storedRoom.Children.ForEach(c =>
+                        {
+                            if (c.TypeName == "BakedTilemap") (c as BakedTilemap).Tiles.ForEach(t => t.Position.X -= storedDifference.X);
+                            else c.Position.X -= storedDifference.X;
+                        });
+
+                        storedRoom.Map.Cells.Where(c => c != storedRoom.Cell).ToList().ForEach(c =>
+                        {
+                            c.Position.X -= storedDifference.X;
+                        });
+                    }
+                    storedRoom.Position = storedRoom.ParentCell.Position = storedDestination;
+                    storedRoom.Bounds = storedRoom.Cell.Bounds = storedBoundsDestination;
+                }
+            ));
+
             Reset();
         }
     }
@@ -257,10 +400,100 @@ public class RoomTool : Tool
     void ResizeRoomVertical()
     {
         Vector2 difference = editor.GridPosition - actionMousePositionStart.Value;
-        actionRoom.Bounds.Y = actionRoomBoundsStart.Value.Y + difference.Y;
+        if (resizeReverse)
+        {
+            actionRoom.Position.Y = actionRoom.ParentCell.Position.Y = actionRoomPositionStart.Value.Y + difference.Y;
+            actionRoom.Bounds.Y = actionRoom.Cell.Bounds.Y = actionRoomBoundsStart.Value.Y - difference.Y;
+            actionRoom.Children.ForEach(c =>
+            {
+                c.Position.Y = actionRoomChildPositions[c.Id].Y - difference.Y;
+            });
+            int i = 0;
+            actionRoom.Map.Cells.Where(c => c != actionRoom.Cell).ToList().ForEach(c =>
+            {
+                c.Position.Y = actionRoomCellPositions[i].Y - difference.Y;
+                i++;
+            }); 
+        }
+        else
+        {
+            actionRoom.Bounds.Y = actionRoom.Cell.Bounds.Y = actionRoomBoundsStart.Value.Y + difference.Y;
+        }
 
         if (Input.LeftMouseButtonIsReleased)
         {
+            if (resizeReverse)
+            {
+                actionRoom.GetThings<BakedTilemap>().ForEach(b =>
+                {
+                    b.Position.Y += difference.Y;
+                    b.Tiles.ForEach(t => t.Position.Y -= difference.Y);
+                });
+            }
+
+            actionRoom.Map.Cells.ToList().ForEach(c =>
+            {
+                if (c.Position.Y < 0)
+                {
+                    editor.RemoveCell(c);
+                }
+
+                if (c.Position.Y > actionRoom.Bounds.Y + (CONSTANTS.TILE_SIZE / 2))
+                {
+                    editor.RemoveCell(c);
+                }
+            });
+
+            Room storedRoom = actionRoom;
+            Vector2 storedDestination = actionRoom.Position;
+            Vector2 storedStart = actionRoomPositionStart.Value;
+            Vector2 storedBoundsStart = actionRoomBoundsStart.Value;
+            Vector2 storedBoundsDestination = actionRoom.Bounds;
+            Vector2 storedDifference = difference;
+            bool storedResizeReverse = resizeReverse;
+
+            editor.AddHistoryAction(new HistoryAction(
+                "ResizeRoomVertical",
+                () =>
+                {
+                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    if (storedResizeReverse)
+                    {
+                        storedRoom.Children.ForEach(c =>
+                        {
+                            if (c.TypeName == "BakedTilemap") (c as BakedTilemap).Tiles.ForEach(t => t.Position.Y += storedDifference.Y);
+                            else c.Position.Y += storedDifference.Y;
+                        });
+
+                        storedRoom.Map.Cells.Where(c => c != storedRoom.Cell).ToList().ForEach(c =>
+                        {
+                            c.Position.Y += storedDifference.Y;
+                        });
+                    }
+                    storedRoom.Position = storedRoom.ParentCell.Position = storedStart;
+                    storedRoom.Bounds = storedRoom.Cell.Bounds = storedBoundsStart;
+                },
+                () =>
+                {
+                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    if (storedResizeReverse)
+                    {
+                        storedRoom.Children.ForEach(c =>
+                        {
+                            if (c.TypeName == "BakedTilemap") (c as BakedTilemap).Tiles.ForEach(t => t.Position.Y -= storedDifference.Y);
+                            else c.Position.Y -= storedDifference.Y;
+                        });
+
+                        storedRoom.Map.Cells.Where(c => c != storedRoom.Cell).ToList().ForEach(c =>
+                        {
+                            c.Position.Y -= storedDifference.Y;
+                        });
+                    }
+                    storedRoom.Position = storedRoom.ParentCell.Position = storedDestination;
+                    storedRoom.Bounds = storedRoom.Cell.Bounds = storedBoundsDestination;
+                }
+            ));
+
             Reset();
         }
     }

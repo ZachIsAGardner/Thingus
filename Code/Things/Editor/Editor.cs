@@ -8,6 +8,9 @@ public class Editor : Thing
     public Thing Target => Game.Root.Dynamic.Children?.FirstOrDefault();
     public Room Room;
 
+    public Dictionary<int, HistoryStep> History = new Dictionary<int, HistoryStep>() { };
+    public int HistoryIndex = 0;
+
     public Sprite Mouse;
     public Thing CameraTarget;
     Sprite gridMouse;
@@ -22,14 +25,14 @@ public class Editor : Thing
 
     public Vector2 MousePosition;
     public Vector2 GridPosition;
-    Vector2 lastGridPosition;
+    public Vector2 LastGridPosition;
     public Vector2? LastGridInteractPosition;
     HashSet<Vector2> recentGridInteractionPositions = new HashSet<Vector2>() { };
 
     List<Stamp> stamps = new List<Stamp>() { };
 
     Tool tool = null;
-    Stamp stamp = null;
+    public Stamp Stamp = null;
 
     public override void Init()
     {
@@ -46,14 +49,14 @@ public class Editor : Thing
 
         AddChild(new Drawer("Background", drawOrder: -200, action: d =>
         {
-            d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-2), scale: new Vector2(1, 1080 * 4), color: PaletteBasic.Green, origin: new Vector2(0));
+            d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-2), scale: new Vector2(1, 1088 * 4), color: PaletteBasic.Green, origin: new Vector2(0));
             d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-2), scale: new Vector2(1920 * 4, 1), color: PaletteBasic.Red, origin: new Vector2(0));
             d.DrawSprite(Library.Textures["Pixel"], position: new Vector2(-2), scale: new Vector2(1, 1), color: PaletteBasic.Yellow, origin: new Vector2(0));
             for (int x = 0; x < 4; x++)
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    d.DrawSprite(Library.Textures["EditorBackground"], origin: new Vector2(0), position: new Vector2(x * 1920, y * 1080));
+                    d.DrawSprite(Library.Textures["EditorBackground"], origin: new Vector2(0), position: new Vector2(x * 1920, y * 1088));
                 }
             }
         }));
@@ -62,15 +65,15 @@ public class Editor : Thing
             if (tool != null) tool.Draw();
         }));
 
-        if (Game.ProjectionType == ProjectionType.Grid)
+        if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
         {
             gridMouse = AddChild(new Sprite("Pixel", drawOrder: 100, scale: new Vector2(CONSTANTS.TILE_SIZE, CONSTANTS.TILE_SIZE))) as Sprite;
         }
-        else if (Game.ProjectionType == ProjectionType.Oblique)
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
         {
             gridMouse = AddChild(new Sprite($"{CONSTANTS.TILE_SIZE}ObliqueGridCursor", drawOrder: 100)) as Sprite;
         }
-        else if (Game.ProjectionType == ProjectionType.Isometric)
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
         {
             // TODO
         }
@@ -78,13 +81,15 @@ public class Editor : Thing
 
         Mouse = AddChild(new Sprite("Mouse", tileSize: 16, tileNumber: 0, drawOrder: 110, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Sprite;
 
-        stamp = stamps.First();
+        Stamp = stamps.First();
         previewBackground = AddChild(new Sprite("Pixel", drawOrder: 108, color: PaletteBasic.Black, scale: new Vector2(18), drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Sprite;
-        preview = AddChild(new Sprite(stamp.Name, drawOrder: 109, tileSize: CONSTANTS.TILE_SIZE, color: CONSTANTS.PRIMARY_COLOR, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Sprite;
-        previewText = AddChild(new Text(stamp.Name, position: new Vector2(0), Library.Font, color: CONSTANTS.PRIMARY_COLOR, outlineColor: PaletteBasic.Black, order: 111, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Text;
-        SelectStamp(stamp);
+        preview = AddChild(new Sprite(Stamp.Name, drawOrder: 109, tileSize: CONSTANTS.TILE_SIZE, color: CONSTANTS.PRIMARY_COLOR, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Sprite;
+        previewText = AddChild(new Text(Stamp.Name, position: new Vector2(0), Library.Font, color: CONSTANTS.PRIMARY_COLOR, outlineColor: PaletteBasic.Black, order: 111, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Text;
+        SelectStamp(Stamp);
 
         CameraTarget = AddChild(new Thing("CameraTarget"));
+
+        Focus();
     }
 
     public override void Update()
@@ -112,6 +117,23 @@ public class Editor : Thing
         {
             tool = new RoomTool(this);
         }
+        else if (Input.IsPressed(KeyboardKey.G))
+        {
+            tool = new FillTool(this);
+        }
+        else if (Input.IsPressed(KeyboardKey.Q))
+        {
+            tool = new WandTool(this);
+        }
+        
+        if (!Input.ShiftIsHeld && Input.IsRepeating(KeyboardKey.Z))
+        {
+            Undo();
+        }
+        if (Input.ShiftIsHeld && Input.IsRepeating(KeyboardKey.Z))
+        {
+            Redo();
+        }
 
         if (tool != null) tool.Update();
 
@@ -121,22 +143,19 @@ public class Editor : Thing
         }
 
         MousePosition = Input.MousePositionRelative();
-        Mouse.Position = Input.MousePositionAbsolute() + new Vector2(8);
+        Mouse.Position = Input.MousePositionAbsolute() + new Vector2(CONSTANTS.TILE_SIZE / 2);
         Mouse.SetVisible(Input.IsMouseInsideWindow());
 
-        if (Game.ProjectionType == ProjectionType.Isometric)
+        if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
+        {
+            GridPosition = (MousePosition - new Vector2(CONSTANTS.TILE_SIZE / 2)).ToNearest(CONSTANTS.TILE_SIZE) + new Vector2(CONSTANTS.TILE_SIZE / 2);
+        }
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
         {
             GridPosition = new Vector2(MousePosition.X.ToNearest(CONSTANTS.TILE_SIZE_HALF), MousePosition.Y.ToNearest(CONSTANTS.TILE_SIZE_QUARTER));
         }
-        else if (Game.ProjectionType == ProjectionType.Oblique)
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
         {
-            // 48
-            // GridPosition.X = MousePosition.X.ToNearest(CONSTANTS.TILE_SIZE - CONSTANTS.TILE_SIZE_THIRD) - (CONSTANTS.TILE_SIZE_THIRD / 2);
-            // GridPosition.Y = MousePosition.Y.ToNearest(CONSTANTS.TILE_SIZE_THIRD) + (CONSTANTS.TILE_SIZE_THIRD / 2);
-            // if ((GridPosition.Y - (CONSTANTS.TILE_SIZE_THIRD / 2)) % (CONSTANTS.TILE_SIZE - CONSTANTS.TILE_SIZE_THIRD) == 0)
-            // {
-            //     GridPosition.X += CONSTANTS.TILE_SIZE_THIRD;
-            // }
             GridPosition.X = MousePosition.X.ToNearest(CONSTANTS.TILE_SIZE_OBLIQUE)
                 - CONSTANTS.TILE_SIZE_THIRD / 2;
             GridPosition.Y = MousePosition.Y.ToNearest(CONSTANTS.TILE_SIZE_THIRD) 
@@ -146,12 +165,8 @@ public class Editor : Thing
                 GridPosition.X += CONSTANTS.TILE_SIZE_THIRD;
             }
         }
-        else
-        {
-            GridPosition = MousePosition.ToNearest(CONSTANTS.TILE_SIZE);
-        }
         gridMouse.Position = GridPosition;
-        gridMouse.SetVisible(Input.IsMouseInsideWindow() && Room != null);
+        gridMouse.SetVisible(Input.IsMouseInsideWindow() && Room != null && tool?.Name != "Room");
 
         preview.Position = preview.Position.MoveOverTime(Mouse.Position + new Vector2((previewBackground.Scale.X / 2f) + 8, -4), 0.00001f);
         previewText.Position = preview.Position + new Vector2(-7, preview.TileSize / 2f);
@@ -173,7 +188,7 @@ public class Editor : Thing
             // Select Stamp
             if (Input.AltIsHeld)
             {
-                int index = stamps.IndexOf(stamp);
+                int index = stamps.IndexOf(Stamp);
                 index += (int)scroll.Sign();
                 if (index < 0) index = stamps.Count - 1;
                 if (index > stamps.Count - 1) index = 0;
@@ -190,11 +205,11 @@ public class Editor : Thing
 
                 float scaleFactor = 1.0f + (0.25f * scroll.Abs());
                 if (scroll < 0) scaleFactor = 1.0f / scaleFactor;
-                Viewport.Zoom = Math.Clamp(Viewport.Zoom * scaleFactor, 0.25f, 64.0f);
+                Viewport.Zoom = Math.Clamp(Viewport.Zoom * scaleFactor, 0.125f, 64.0f);
             }
 
         }
-        lastGridPosition = GridPosition;
+        LastGridPosition = GridPosition;
 
         if (Input.ShiftIsHeld)
         {
@@ -206,10 +221,18 @@ public class Editor : Thing
         }
     }
 
-    public void Save()
+    public void Reset()
+    {
+        Room = null;
+        History.Clear();
+        HistoryIndex = 0;
+    }
+
+    public void Save(bool changeHistory = true)
     {
         if (Target?.Map != null) Target.Map.Save();
         if (Room?.Map != null) Room.Map.Save();
+        if (changeHistory) IncrementHistory();
     }
 
     public void TogglePreview(bool show)
@@ -224,6 +247,17 @@ public class Editor : Thing
         stamps = Library.ThingImports.Select(t => new Stamp(t.Key)).ToList();
     }
 
+    public void Focus()
+    {
+        Room = Game.GetThing<Room>();
+        if (Room != null)
+        {
+            CameraTarget.Position = Room.TopLeft;
+            Viewport.Zoom = 0.5f;
+            Viewport.RelativeLayer.Camera.Offset = Vector2.Zero;
+        }
+    }
+
     public int GetTileNumber(MapCell cell)
     {
         if (cell.Import.StampType.Contains("Auto16"))
@@ -236,7 +270,7 @@ public class Editor : Thing
         }
         else
         {
-            return Chance.Range(0, (stamp.Texture.Width / CONSTANTS.TILE_SIZE));
+            return Chance.Range(0, (Stamp.Texture.Width / CONSTANTS.TILE_SIZE));
         }
     }
 
@@ -252,61 +286,117 @@ public class Editor : Thing
     public void RefreshAutoTilemaps(List<Vector2> positions)
     {
         if (Room == null) return;
+
+        return;
         
         Room.Map.Cells.ToList().ForEach(c =>
         {
             if (positions != null && !positions.Contains(c.Position)) return;
 
-            AddCell(c);
+            MapCell cell = Room.Map.GetCell(c.Position + Room.Position, c.Import.Layer);
+            if (cell == null || cell.Name != c.Name) AddCell(c.Position + Room.Position, c.Name, c.Import.Layer);
         });
     }
 
-    public void AddCell(MapCell cell) => AddCell(cell.Position + Room.Position, cell.Name, cell.Import.Layer);
-
-    public void AddCell(Vector2 position) => AddCell(position, stamp.Name, stamp.Import.Layer);
-
-    public void AddCell(Vector2 position, string name, int layer)
+    public void AddCell(MapCell cell, bool changeHistory = true, Room room = null) => AddCell(cell.Position + (room ?? Room).Position, cell.Name, cell.Import.Layer, changeHistory, room);
+    public void AddCell(Vector2 position, bool changeHistory = true, Room room = null) => AddCell(position, Stamp.Name, Stamp.Import.Layer, changeHistory, room);
+    public void AddCell(Vector2 position, string name, int layer, bool changeHistory = true, Room room = null)
     {
-        RemoveCell(position, layer);
-        position -= Room.Position;
+        if (room == null) room = Room;
+
+        if (!room.IsPositionInside(position)) return;
+
+        new ParticleEffect(
+            position: position, 
+            amount: 2, 
+            texture: Library.Textures.Get("5Star"),
+            dampening: 0.001f,
+            speed: 5,
+            time: 0.3f,
+            color: PaletteAapSplendor128.NightlyAurora
+        );
+
+        RemoveCell(position, layer, changeHistory);
+        position -= room.Position;
 
         MapCell cell = new MapCell(
             name: name,
             position: position,
             tileNumber: 0,
-            parent: Room.Name
+            parent: room.Name
         );
-        Room.Map.AddCell(cell);
+        room.Map.AddCell(cell);
         cell.TileNumber = GetTileNumber(cell);
-        cell.Create(Room);
+        cell.Create(room);
 
         recentGridInteractionPositions.AddRange(PositionWithNeighbors(position));
         // LastGridInteractPosition = position;
+        if (changeHistory)
+        {
+            Vector2 storedRoomPosition = room.Position;
+            Room storedRoom = room;
+            AddHistoryAction(new HistoryAction(
+                "AddCell",
+                () =>
+                {
+                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    RemoveCell(position + storedRoomPosition, changeHistory: false, room: storedRoom);
+                },
+                () =>
+                {
+                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    AddCell(position + storedRoomPosition, name, layer, changeHistory: false, room: storedRoom);
+                }
+            ));
+        }
     }
 
-    public void RemoveCell(Vector2 position, int? layer = null)
-    {
-        position -= Room.Position;
 
-        MapCell cell = Room.Map.GetCell(position, layer);
+    public void RemoveCell(MapCell cell, bool changeHistory = true, Room room = null) => RemoveCell(cell.Position + (room ?? Room).Position, cell.Import.Layer, changeHistory, room);
+    public void RemoveCell(Vector2 position, int? layer = null, bool changeHistory = true, Room room = null)
+    {
+        if (room == null) room = Room;
+
+        position -= room.Position;
+
+        MapCell cell = room.Map.GetCell(position, layer);
         if (cell == null) return;
 
         if (cell.Import.Thing == "BakedTilemap")
         {
             BakedTilemap bakedTilemap = layer != null
-                ? Room.GetThings<BakedTilemap>().Find(b => b.Layer == layer)
-                : Room.GetThings<BakedTilemap>().Where(b => b.Tiles.Any(t => t.Position == position)).OrderByDescending(b => b.Layer).FirstOrDefault();
+                ? room.GetThings<BakedTilemap>().Find(b => b.Layer == layer)
+                : room.GetThings<BakedTilemap>().Where(b => b.Tiles.Any(t => t.Position == position)).OrderByDescending(b => b.Layer).FirstOrDefault();
 
             if (bakedTilemap != null) bakedTilemap.RemoveTile(position);
         }
         else
         {
-            Room.Children.Where(t => t.Cell?.Name == cell.Name && t.Cell?.Position == cell.Position).ToList().ForEach(t => t.Destroy());
+            room.Children.Where(t => t.Cell?.Name == cell.Name && t.Cell?.Position == cell.Position).ToList().ForEach(t => t.Destroy());
         }
-        Room.Map.RemoveCell(cell);
+        room.Map.RemoveCell(cell);
 
         recentGridInteractionPositions.AddRange(PositionWithNeighbors(position));
         // LastGridInteractPosition = position;
+
+        if (changeHistory)
+        {
+            Vector2 storedRoomPosition = room.Position;
+            Room storedRoom = room;
+            AddHistoryAction(new HistoryAction(
+                "RemoveCell",
+                () =>
+                {
+                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    AddCell(cell.Position + storedRoomPosition, cell.Name, cell.Import.Layer, changeHistory: false, room: storedRoom);
+                },
+                () => 
+                {
+                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    RemoveCell(position + storedRoomPosition, layer, changeHistory: false, room: storedRoom);
+                }
+            ));
+        }
     }
 
     public void PickCell(Vector2 position)
@@ -321,12 +411,80 @@ public class Editor : Thing
 
     public void SelectStamp(Stamp stamp)
     {
-        this.stamp = stamp;
+        this.Stamp = stamp;
         preview.Texture = stamp.Texture;
         previewText.Content = stamp.Name;
 
         preview.TileSize = Library.ThingImports[stamp.Name].TileSize ?? stamp.Texture.Height;
         previewBackground.Scale = new Vector2(preview.TileSize + 2);
+    }
+
+    public void AddHistoryAction(HistoryAction historyAction)
+    {
+        History = History.Where(h => h.Key <= HistoryIndex).ToDictionary(x => x.Key, x => x.Value);
+
+        if (!History.ContainsKey(HistoryIndex)) History[HistoryIndex] = new HistoryStep();
+
+        if (History[HistoryIndex].Committed) History[HistoryIndex].Clear();
+        History[HistoryIndex].Actions.Add(historyAction);
+    }
+
+    public void IncrementHistory()
+    {
+        if (History.Get(HistoryIndex) == null || History[HistoryIndex].Actions.Count <= 0)
+        {
+            return;
+        }
+        History[HistoryIndex].Committed = true;
+        HistoryIndex++;
+
+        int highest = History.Select(h => h.Key).OrderBy(h => h).LastOrDefault();
+        int lowest = History.Select(h => h.Key).OrderBy(h => h).FirstOrDefault();
+        if (History.Count <= 0) HistoryIndex = 0;
+        else if (HistoryIndex > highest + 1) HistoryIndex = highest + 1;
+        else if (HistoryIndex < lowest) HistoryIndex = lowest;
+
+        if (History.Count > 0 && History.ContainsKey(HistoryIndex)) History[HistoryIndex].Actions.Clear();
+    }
+
+    public void Undo()
+    {
+        HistoryIndex--;
+        if (HistoryIndex < 0) HistoryIndex = 0;
+
+        if (HistoryIndex < 0 || History.Count <= 0)
+        {
+            // Nothing to undo
+            return;
+        }
+
+        int highest = History.Select(h => h.Key).OrderBy(h => h).LastOrDefault();
+        if (HistoryIndex > highest) HistoryIndex = highest;
+
+        History[HistoryIndex].Actions.Reversed().ToList().ForEach(x => x.Undo());
+
+        Save(false);
+    }
+
+    public void Redo()
+    {
+        int highest = History.Select(h => h.Key).OrderBy(h => h).LastOrDefault();
+
+        if (HistoryIndex > highest || History.Count <= 0)
+        {
+            // Nothing to redo
+            return;
+        }
+
+        int lowest = History.Select(h => h.Key).OrderBy(h => h).FirstOrDefault();
+        if (HistoryIndex < lowest) HistoryIndex = lowest;
+
+        History[HistoryIndex].Actions.ForEach(x => x.Redo());
+
+        HistoryIndex++;
+        if (HistoryIndex > highest + 1) HistoryIndex = highest + 1;
+
+        Save(false);
     }
 
     public override void Draw()
@@ -335,6 +493,7 @@ public class Editor : Thing
 
         if (Target?.Map != null) DrawText($"Map: {Target?.Map?.Name}.map", new Vector2(4, 2), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
         if (Room?.Map != null) DrawText($"Room: {Room?.Map?.Name}.map", new Vector2(4, 2 + Library.FontSmall.BaseSize * 2), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
-        DrawText($"{GridPosition}", new Vector2(4, CONSTANTS.VIRTUAL_HEIGHT - Library.FontSmall.BaseSize - 4), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
+
+        DrawText($"{tool?.Name} {Viewport.Zoom} {GridPosition} {HistoryIndex}: <{History.ToList().Select(h => (h.Value.Committed ? "*" : "") + h.Key).Join(", ")}>", new Vector2(4, CONSTANTS.VIRTUAL_HEIGHT - Library.FontSmall.BaseSize - 4), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
     }
 }

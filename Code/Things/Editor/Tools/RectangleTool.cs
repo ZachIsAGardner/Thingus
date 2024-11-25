@@ -5,6 +5,8 @@ namespace Thingus;
 
 public class RectangleTool : Tool
 {
+    public override string Name => "Rectangle";
+
     Vector2? start = null;
     bool erase = false;
     List<Vector2> positions = new List<Vector2>() { };
@@ -12,15 +14,15 @@ public class RectangleTool : Tool
 
     public RectangleTool(Editor editor) : base(editor)
     {
-        if (Game.ProjectionType == ProjectionType.Grid)
+        if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
         {
             square = Library.Textures[$"{CONSTANTS.TILE_SIZE}Square"];
         }
-        else if (Game.ProjectionType == ProjectionType.Oblique)
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
         {
             square = Library.Textures[$"{CONSTANTS.TILE_SIZE}ObliqueBox"];
         }
-        else if (Game.ProjectionType == ProjectionType.Isometric)
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
         {
             // TODO
         }
@@ -72,17 +74,17 @@ public class RectangleTool : Tool
             Vector2 distance = editor.GridPosition - start.Value;
             int row = 1;
             int column = 1;
-            if (Game.ProjectionType == ProjectionType.Grid)
+            if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
             {
                 row = (int)(distance.X / CONSTANTS.TILE_SIZE).Abs();
                 column = (int)(distance.Y / CONSTANTS.TILE_SIZE).Abs();
             }
-            else if (Game.ProjectionType == ProjectionType.Oblique)
+            else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
             {
                 row = (int)(distance.X / CONSTANTS.TILE_SIZE_OBLIQUE).Abs();
                 column = (int)(distance.Y / CONSTANTS.TILE_SIZE_THIRD).Abs();
             }
-            else if (Game.ProjectionType == ProjectionType.Isometric)
+            else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
             {
                 // TODO
             }
@@ -92,14 +94,14 @@ public class RectangleTool : Tool
                 for (int c = 0; c <= column; c++)
                 {
                     Vector2 position = start.Value;
-                    if (Game.ProjectionType == ProjectionType.Grid)
+                    if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
                     { 
                         position += new Vector2(
                             r * CONSTANTS.TILE_SIZE * distance.X.Sign(),
                             c * CONSTANTS.TILE_SIZE * distance.Y.Sign()
                         );
                     }
-                    else if (Game.ProjectionType == ProjectionType.Oblique)
+                    else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
                     { 
                         position += new Vector2(
                             r * CONSTANTS.TILE_SIZE_OBLIQUE * distance.X.Sign(),
@@ -110,7 +112,7 @@ public class RectangleTool : Tool
                             position.X += CONSTANTS.TILE_SIZE_THIRD;
                         }
                     }
-                    else if (Game.ProjectionType == ProjectionType.Isometric)
+                    else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
                     { 
                         // TODO
                     }

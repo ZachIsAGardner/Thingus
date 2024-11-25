@@ -212,6 +212,7 @@ public class Cli : Thing
         lines.Add("");
         lines.Add("F1: Toggle Frame Advance");
         lines.Add("F2: Advance Frame");
+        lines.Add("");
     }
 
     void Clear()

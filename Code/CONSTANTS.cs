@@ -14,6 +14,8 @@ public class CONSTANTS
         public int? DEFAULT_SCREEN_MULTIPLIER;
         public int? TILE_SIZE;
         public string? PRIMARY_COLOR;
+        public string? PROJECTION_TYPE;
+        public string? SAVE_FOLDER;
     }
 
     public static readonly string TITLE = "Thingus Game";
@@ -28,6 +30,8 @@ public class CONSTANTS
     public static int TILE_SIZE_QUARTER => TILE_SIZE / 4;
     public static int TILE_SIZE_OBLIQUE => TILE_SIZE - TILE_SIZE_THIRD;
     public static readonly Color PRIMARY_COLOR = PaletteBasic.Gray;
+    public static ProjectionType PROJECTION_TYPE = ProjectionType.Grid;
+    public static string SAVE_FOLDER = "thingus";
 
     static CONSTANTS()
     {
@@ -41,6 +45,13 @@ public class CONSTANTS
         if (c.VIRTUAL_HEIGHT != null) VIRTUAL_HEIGHT = c.VIRTUAL_HEIGHT.Value;
         if (c.DEFAULT_SCREEN_MULTIPLIER != null) DEFAULT_SCREEN_MULTIPLIER = c.DEFAULT_SCREEN_MULTIPLIER.Value;
         if (c.TILE_SIZE != null) TILE_SIZE = c.TILE_SIZE.Value;
-        if (c.PRIMARY_COLOR != null) PRIMARY_COLOR = Utility.HexToColor(c.PRIMARY_COLOR);
+        if (c.PRIMARY_COLOR != null) PRIMARY_COLOR = Color.HexToColor(c.PRIMARY_COLOR);
+        if (c.PROJECTION_TYPE != null)
+        {
+            if (c.PROJECTION_TYPE.ToLower() == "grid") PROJECTION_TYPE = ProjectionType.Grid;
+            if (c.PROJECTION_TYPE.ToLower() == "oblique") PROJECTION_TYPE = ProjectionType.Oblique;
+            if (c.PROJECTION_TYPE.ToLower() == "isometric") PROJECTION_TYPE = ProjectionType.Isometric;
+        }
+        if (c.SAVE_FOLDER != null) SAVE_FOLDER = c.SAVE_FOLDER;
     }
 }

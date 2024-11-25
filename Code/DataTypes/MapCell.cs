@@ -7,6 +7,7 @@ namespace Thingus;
 public class MapCell
 {
     public string Name;
+    public string Thing;
     public Vector2 Position;
     public string Parent;
 
@@ -14,9 +15,10 @@ public class MapCell
     public Vector2 Bounds;
 
     public MapCell() { }
-    public MapCell(string name, Vector2? position = null, int? tileNumber = null, Vector2? bounds = null, string parent = null)
+    public MapCell(string name, string thing = null, Vector2? position = null, int? tileNumber = null, Vector2? bounds = null, string parent = null)
     {
         Name = name;
+        Thing = thing;
         Position = position ?? Vector2.Zero;
         Parent = parent;
         TileNumber = tileNumber;
@@ -24,7 +26,7 @@ public class MapCell
     }
 
     [JsonIgnore]
-    public ThingImport Import => import ?? (import = Library.ThingImports.Get(Name));
+    public ThingImport Import => import ?? (import = Library.ThingImports.Get(Thing) ?? Library.ThingImports.Get(Name));
     [JsonIgnore]
     ThingImport import = null;
 
@@ -49,12 +51,14 @@ public class MapCell
         {
             thing = Import.Create(root, this);
             thing.Map = Map;
+            thing.Cell = this;
         }
         // No Import
         else
         {
             ThingModel model = new ThingModel(this);
-            MethodInfo method = Utility.FindCreateMethod(Name);
+            MethodInfo method = Utility.FindCreateMethod(Thing);
+            if (method == null)  method = Utility.FindCreateMethod(Name);
             thing = root.AddChild(method.Invoke(null, new object[] { root, model }) as Thing);
             thing.Map = Map;
             thing.Cell = this;

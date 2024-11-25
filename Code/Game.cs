@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.InteropServices;
 using Raylib_cs;
 
 namespace Thingus;
@@ -40,7 +41,7 @@ public static class Game
 
     public static Map LastMap = null;
 
-    public static ProjectionType ProjectionType = ProjectionType.Oblique;
+    public static PlatformType Platform;
 
     public static List<T> GetThings<T>() where T : Thing
     {
@@ -68,6 +69,11 @@ public static class Game
 
         Library.Refresh();
         Viewport.Start();
+
+        // Get platform
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Platform = PlatformType.Windows;
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) Platform = PlatformType.Mac;
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) Platform = PlatformType.Linux;
 
         Root = new Root();
     }

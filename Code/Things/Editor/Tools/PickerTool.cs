@@ -3,6 +3,8 @@ using Thingus;
 
 public class PickerTool : Tool
 {
+    public override string Name => "Picker";
+
     public PickerTool(Editor editor) : base(editor)
     {
 

@@ -11,12 +11,12 @@ public static class ListExtensions
         if (index >= list.Count) index = 0;
         return list[index];
     }
-    public static string Join(this List<string> list, string seperator)
+    public static string Join<T>(this List<T> list, string seperator)
     {
         return String.Join(seperator, list);
     }
 
-    public static string Join(this IEnumerable<string> list, string seperator)
+    public static string Join<T>(this IEnumerable<T> list, string seperator)
     {
         return String.Join(seperator, list);
     }

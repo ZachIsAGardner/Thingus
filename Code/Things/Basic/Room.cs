@@ -46,9 +46,9 @@ public class Room : Thing
                 d.DrawOrder = -110;
             }
             Vector2 bounds = Bounds;
-            bounds += (Game.ProjectionType == ProjectionType.Grid
+            bounds += (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid
                 ? new Vector2(CONSTANTS.TILE_SIZE)
-                : Game.ProjectionType == ProjectionType.Oblique
+                : CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique
                     ? new Vector2(0)
                     : new Vector2(CONSTANTS.TILE_SIZE_HALF, CONSTANTS.TILE_SIZE_QUARTER)
             );
@@ -104,8 +104,8 @@ public class Room : Thing
         if (Game.Root.DeveloperTools.Cli.Active) return;
 
         Hovered = Utility.CheckRectangleOverlap(
-            Input.MousePositionRelative() - new Vector2(8, 8),
-            Input.MousePositionRelative() + new Vector2(8, 8),
+            Game.Root.DeveloperTools.Editor.GridPosition - new Vector2(16),
+            Game.Root.DeveloperTools.Editor.GridPosition,
             TopLeft,
             BottomRight
         );
@@ -127,6 +127,11 @@ public class Room : Thing
         return Utility.CheckRectangleOverlap(TopLeft, BottomRight, other.GlobalTopLeft, other.GlobalBottomRight);
     }
 
+    public bool IsPositionInside(Vector2 other)
+    {
+        return Utility.CheckRectangleOverlap(TopLeft, BottomRight + new Vector2(CONSTANTS.TILE_SIZE), other, other);
+    }
+
     public void Click()
     {
         Editor editor = Game.GetThing<Editor>();
@@ -138,7 +143,7 @@ public class Room : Thing
 
     void DrawGrid()
     {
-        if (Game.ProjectionType == ProjectionType.Grid)
+        if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
         {
             for (int c = 0; c <= (Bounds.Y / CONSTANTS.TILE_SIZE); c++)
             {
@@ -153,7 +158,7 @@ public class Room : Thing
                 }
             }
         }
-        else if (Game.ProjectionType == ProjectionType.Oblique)
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
         {
             for (int c = 0; c < (Bounds.Y / (CONSTANTS.TILE_SIZE_OBLIQUE)); c++)
             {
@@ -171,7 +176,7 @@ public class Room : Thing
                 }
             }
         }
-        else if (Game.ProjectionType == ProjectionType.Isometric)
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
         {
             for (int c = 0; c <= (Bounds.Y / CONSTANTS.TILE_SIZE_QUARTER); c++)
             {
@@ -196,7 +201,7 @@ public class Room : Thing
 
         DrawGrid();
 
-        string message = $"{Name} {Map?.Name}.map";
+        string message = $"{Name}";
         Shapes.DrawText(
             text: message,
             position: new Vector2(Center.X, TopLeft.Y) - new Vector2(Raylib.MeasureText(message, Library.Font.BaseSize) / 2f, Library.Font.BaseSize * 2.25f),

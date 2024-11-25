@@ -2,6 +2,8 @@ using Thingus;
 
 public class BrushTool : Tool
 {
+    public override string Name => "Brush";
+
     public BrushTool(Editor editor) : base(editor)
     {
 

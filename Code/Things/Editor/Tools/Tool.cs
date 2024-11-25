@@ -5,6 +5,8 @@ namespace Thingus;
 
 public class Tool
 {
+    public virtual string Name => "Tool";
+    
     protected Editor editor;
     protected Vector2? dragCameraPosition = null;
     protected Vector2? dragMousePosition = null;

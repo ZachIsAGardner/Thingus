@@ -1,4 +1,4 @@
-# Thingus
+![Logo](Content/Sprites/Logo.png "Logo")
 
 Everything is a Thing.
 

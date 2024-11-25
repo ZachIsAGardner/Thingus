@@ -33,7 +33,7 @@ public class Map
 
     public void AddCell(MapCell cell)
     {
-        Cells = Cells.Where(c => !(c.Position == cell.Position && c.Import?.Layer == cell.Import?.Layer)).ToList();
+        Cells = Cells.Where(c => !(c.Position == cell.Position && (c.Import != null && cell.Import != null && c.Import.Layer == cell.Import.Layer))).ToList();
         Cells.Add(cell);
         cell.Map = this;
     }

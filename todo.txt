@@ -1,15 +1,13 @@
 TODO
-- contiguous fill
-- non-contiguous fill
-- particle effects
-
-LATER
+- fix refresh auto tilemap
+- export
 - editor
     - tool buttons
     - tile buttons
     - action buttons
 - move multiple rooms
-- undo/redo
+
+LATER
 
 WAY LATER
 - toast
@@ -21,7 +19,6 @@ WAY LATER
 - projection type by map
 - translation support
 - fix lighting with zoom
-- export
 - remove Vignette
 - better lighting code
 

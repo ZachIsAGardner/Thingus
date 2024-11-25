@@ -64,6 +64,8 @@ public class DeveloperTools : Thing
             Viewport.Target = Editor.CameraTarget;
             Viewport.LightLayer.Visible = false;
             Viewport.SetScalePixels(true);
+
+            Editor.Focus();
         }
         else
         {

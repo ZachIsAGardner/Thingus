@@ -64,7 +64,7 @@ public class Root : Thing
     {
         if (DeveloperTools.Editor != null)
         {
-            DeveloperTools.Editor.Room = null;
+            DeveloperTools.Editor.Reset();
         }
 
         Dynamic.Children.ToList().ForEach(c => c.Destroy());
