@@ -39,6 +39,8 @@ public static class Shapes
         // Absolute
         else if (drawMode == DrawMode.Absolute)
         {
+            return position;
+            
             if (adjustFrom != AdjustFrom.None)
             {
                 if (Viewport.Margin.X < 0)

@@ -73,6 +73,7 @@ public class Sprite : Thing
     public bool FlipHorizontally = false;
     public bool FlipVertically = false;
     public AdjustFrom AdjustFrom = AdjustFrom.Auto;
+    public Vector2? Origin = null;
 
     // Shake
     float shakeXOffset;
@@ -110,7 +111,7 @@ public class Sprite : Thing
     // Create from code
     public Sprite(
         string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
-        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, AdjustFrom adjustFrom = AdjustFrom.Auto
+        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, AdjustFrom adjustFrom = AdjustFrom.Auto, Vector2? origin = null
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {
         Texture = Library.Textures[name];
@@ -121,6 +122,7 @@ public class Sprite : Thing
         if (scale != null) Scale = scale.Value;
         Rotation = rotation;
         AdjustFrom = adjustFrom;
+        if (origin != null) Origin = origin;
     }
 
     public void ShakeX(float magnitude = 2, float duration = 0.25f)
@@ -222,7 +224,7 @@ public class Sprite : Thing
 
         Shapes.DrawSprite(
             texture: Texture,
-            position: GlobalPosition
+            position: (DrawMode == DrawMode.Texture ? Position : GlobalPosition)
                 + new Vector2(shakeXOffset, shakeYOffset),
             tileSize: TileSize,
             tileNumber: (int)(TileNumber + TileNumberOffset).Floor(),
@@ -232,10 +234,8 @@ public class Sprite : Thing
             drawMode: DrawMode,
             flipHorizontally: FlipHorizontally,
             flipVertically: FlipVertically,
-            adjustFrom: AdjustFrom
+            adjustFrom: AdjustFrom,
+            origin: Origin
         );
-
-        // DrawText(GlobalPosition, outlineColor: PaletteBasic.Black, color: PaletteBasic.White, position: GlobalPosition);
-        // DrawText(Position, outlineColor: PaletteBasic.Black, color: PaletteBasic.White, position: GlobalPosition + new Vector2(0, 16));
     }
 }

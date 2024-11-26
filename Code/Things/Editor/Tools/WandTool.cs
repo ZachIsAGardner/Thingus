@@ -4,6 +4,8 @@ using Thingus;
 public class WandTool : Tool
 {
     public override string Name => "Wand";
+    public override KeyboardKey Shortcut => KeyboardKey.W;
+    public override int TileNumber => 13;
 
     public WandTool(Editor editor) : base(editor)
     {

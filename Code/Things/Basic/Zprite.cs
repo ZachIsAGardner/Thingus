@@ -9,11 +9,11 @@ public class Zprite : Sprite
 
     public Zprite(
         string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
-        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f
+        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, AdjustFrom adjustFrom = AdjustFrom.Auto, Vector2? origin = null
     )
     : base(
         name, position, drawMode, drawOrder, updateOrder,
-        tileSize, tileNumber, color, scale, rotation
+        tileSize, tileNumber, color, scale, rotation, adjustFrom, origin
     )
     {
     }

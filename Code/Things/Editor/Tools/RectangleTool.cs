@@ -6,6 +6,8 @@ namespace Thingus;
 public class RectangleTool : Tool
 {
     public override string Name => "Rectangle";
+    public override KeyboardKey Shortcut => KeyboardKey.U;
+    public override int TileNumber => 12;
 
     Vector2? start = null;
     bool erase = false;
@@ -51,8 +53,6 @@ public class RectangleTool : Tool
         {
             return;
         }
-
-        editor.TogglePreview(true);
 
         if (editor.InteractDisabled) return;
 

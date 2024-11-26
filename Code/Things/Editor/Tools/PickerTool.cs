@@ -4,6 +4,8 @@ using Thingus;
 public class PickerTool : Tool
 {
     public override string Name => "Picker";
+    public override KeyboardKey Shortcut => KeyboardKey.I;
+    public override int TileNumber => 2;
 
     public PickerTool(Editor editor) : base(editor)
     {
@@ -29,8 +31,6 @@ public class PickerTool : Tool
         }
 
         Picker();
-
-        editor.TogglePreview(true);
 
         base.Update();
     }

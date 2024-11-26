@@ -12,7 +12,7 @@ public class AbsoluteViewportLayer : ViewportLayer
     {
         base.DrawToTexture();
 
-        Viewport.BeginTextureMode(Texture);
+        Raylib.BeginTextureMode(Texture);
 
         Raylib.ClearBackground(PaletteBasic.Blank.ToRaylib());
 
@@ -20,6 +20,6 @@ public class AbsoluteViewportLayer : ViewportLayer
         Game.DrawThings.Where(x => x.DrawMode == DrawMode.Absolute).ToList().ForEach(x => x.Draw());
         Raylib.EndMode2D();
 
-        Viewport.EndTextureMode();
+        Raylib.EndTextureMode();
     }
 }

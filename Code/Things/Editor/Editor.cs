@@ -30,15 +30,25 @@ public class Editor : Thing
     HashSet<Vector2> recentGridInteractionPositions = new HashSet<Vector2>() { };
 
     List<Stamp> stamps = new List<Stamp>() { };
-
+    public List<Tool> Tools = new List<Tool>() { };
     Tool tool = null;
     public Stamp Stamp = null;
+    bool hoveringControl = false;
 
     public override void Init()
     {
         base.Init();
 
         RefreshStamps();
+        Tools = new List<Tool>()
+        {
+            new BrushTool(this),
+            new RectangleTool(this),
+            new PickerTool(this),
+            new RoomTool(this),
+            new FillTool(this),
+            new WandTool(this)
+        };
 
         tool = new BrushTool(this);
 
@@ -90,6 +100,66 @@ public class Editor : Thing
         CameraTarget = AddChild(new Thing("CameraTarget"));
 
         Focus();
+
+        TilesetUi();
+        ToolsUi();
+    }
+
+    void TilesetUi()
+    {
+        ScrollableControl subViewport = new ScrollableControl(new Vector2(64, 80), new Vector2(64, 160));
+        subViewport.DrawMode = DrawMode.Absolute;
+        subViewport.Position = new Vector2(4, 16);
+        subViewport.Color = new Color(0, 0, 0, 1);
+        AddChild(subViewport);
+
+        GridFlexControl flex = new GridFlexControl();
+        flex.DrawMode = DrawMode.Texture;
+        flex.AdjustFrom = AdjustFrom.TopLeft;
+        flex.SubViewport = subViewport;
+        flex.Bounds = new Vector2(64, 160);
+        flex.Color = PaletteBasic.DarkGray;
+        AddChild(flex);
+
+        foreach (Stamp stamp in Library.ThingImports.Select(t => new Stamp(t.Key)).ToList())
+        {
+            ButtonControl control = new ButtonControl();
+            control.Pressed = () => 
+            {
+                SelectStamp(stamp);
+            };
+            control.DrawOrder = 10;
+            control.Texture = stamp.Texture;
+            control.Bounds = new Vector2(16);
+            control.Name = stamp.Name;
+            flex.AddChild(control);
+        }
+    }
+
+    void ToolsUi()
+    {
+        GridFlexControl flex = new GridFlexControl();
+        flex.DrawMode = DrawMode.Absolute;
+        flex.AdjustFrom = AdjustFrom.TopLeft;
+        flex.Bounds = new Vector2(64, 100);
+        flex.Position = new Vector2(4, 100);
+        flex.Color = PaletteBasic.Blank;
+        AddChild(flex);
+
+        foreach (Tool tool in Tools)
+        {
+            ButtonControl control = new ButtonControl();
+            control.Pressed = () => 
+            {
+                SelectTool(tool);
+            };
+            control.Texture = Library.Textures["Mouse"];
+            control.Bounds = new Vector2(16);
+            control.DrawOrder = 0;
+            control.TileNumber = tool.TileNumber;
+            control.TileSize = 16;
+            flex.AddChild(control);
+        }
     }
 
     public override void Update()
@@ -97,34 +167,26 @@ public class Editor : Thing
         base.Update();
 
         if (Game.Root.DeveloperTools.Cli.Active) return;
+        hoveringControl = Game.GetThings<Control>().Any(c => c.Hovered || c.Held);
 
         // Log.Write(Viewport.RelativeLayer.Camera.Zoom);
-        TogglePreview(Input.IsMouseInsideWindow() && Room != null);
+        TogglePreview(Input.IsMouseInsideWindow() && Room != null && tool?.Name != "Room");
+        UpdateShortcuts();
+        UpdatePosition();
+        UpdateCamera();
+        LastGridPosition = GridPosition;
+        if (hoveringControl) return;
+        UpdateZoom();
+        if (tool != null) tool.Update();
+        UpdateCharacter();
+    }
 
-        if (Input.IsPressed(KeyboardKey.B))
+    void UpdateShortcuts()
+    {
+        Tools.ForEach(t =>
         {
-            tool = new BrushTool(this);
-        }
-        else if (Input.IsPressed(KeyboardKey.U))
-        {
-            tool = new RectangleTool(this);
-        }
-        else if (Input.IsPressed(KeyboardKey.I))
-        {
-            tool = new PickerTool(this);
-        }
-        else if (Input.IsPressed(KeyboardKey.R))
-        {
-            tool = new RoomTool(this);
-        }
-        else if (Input.IsPressed(KeyboardKey.G))
-        {
-            tool = new FillTool(this);
-        }
-        else if (Input.IsPressed(KeyboardKey.Q))
-        {
-            tool = new WandTool(this);
-        }
+            if (Input.IsPressed(t.Shortcut)) SelectTool(t);
+        });
         
         if (!Input.ShiftIsHeld && Input.IsRepeating(KeyboardKey.Z))
         {
@@ -134,9 +196,10 @@ public class Editor : Thing
         {
             Redo();
         }
+    }
 
-        if (tool != null) tool.Update();
-
+    void UpdatePosition()
+    {
         if (!Input.LeftMouseButtonIsHeld)
         {
             Holdup = false;
@@ -175,12 +238,15 @@ public class Editor : Thing
             GridPosition = new Vector2(MousePosition.X.ToNearest(CONSTANTS.TILE_SIZE_HALF), MousePosition.Y.ToNearest(CONSTANTS.TILE_SIZE_QUARTER));
         }
         gridMouse.Position = GridPosition;
-        gridMouse.SetVisible(Input.IsMouseInsideWindow() && Room != null && tool?.Name != "Room");
+        gridMouse.SetVisible(!hoveringControl && Input.IsMouseInsideWindow() && Room != null && tool?.Name != "Room");
 
         preview.Position = preview.Position.MoveOverTime(Mouse.Position + new Vector2((previewBackground.Scale.X / 2f) + 8, -4), 0.00001f);
         previewText.Position = preview.Position + new Vector2(-7, preview.TileSize / 2f);
         previewBackground.Position = preview.Position;
+    }
 
+    void UpdateCamera()
+    {
         float speed = 1200f / Viewport.RelativeLayer.Camera.Zoom;
         // float speed = 1200f / Viewport.Zoom;
         Vector2 input = Vector2.Zero;
@@ -190,7 +256,10 @@ public class Editor : Thing
         if (Input.IsHeld(KeyboardKey.D)) input.X++;
         cameraVelocity = cameraVelocity.MoveOverTime(input * speed, 0.0001f);
         CameraTarget.Position += cameraVelocity * Time.Delta;
+    }
 
+    void UpdateZoom()
+    {
         float scroll = Raylib.GetMouseWheelMove();
         if (scroll != 0)
         {
@@ -218,8 +287,10 @@ public class Editor : Thing
             }
 
         }
-        LastGridPosition = GridPosition;
+    }
 
+    void UpdateCharacter()
+    {
         if (Input.ShiftIsHeld)
         {
             if (Game.CharacterType != null)
@@ -416,6 +487,12 @@ public class Editor : Thing
         if (cell == null) return;
 
         SelectStamp(stamps.Find(s => s.Name == cell.Name));
+    }
+
+    public void SelectTool(Tool tool)
+    {
+        this.tool = tool;
+        Mouse.TileNumber = tool.TileNumber;
     }
 
     public void SelectStamp(Stamp stamp)

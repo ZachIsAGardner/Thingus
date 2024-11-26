@@ -5,6 +5,8 @@ namespace Thingus;
 public class RoomTool : Tool
 {
     public override string Name => "Room";
+    public override KeyboardKey Shortcut => KeyboardKey.R;
+    public override int TileNumber => 7;
 
     Vector2? actionMousePositionStart = null;
     Vector2? actionRoomPositionStart = null;
@@ -23,8 +25,6 @@ public class RoomTool : Tool
 
     public override void Update()
     {
-        editor.TogglePreview(false);
-
         if (Input.AltIsHeld)
         {
             Picker();

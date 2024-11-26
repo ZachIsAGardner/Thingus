@@ -19,6 +19,7 @@ public class Thing
     public string Name;
 
     public DrawMode DrawMode = DrawMode.Relative;
+    public SubViewport SubViewport = null;
 
     // Relative Position
     public Vector2 Position;
@@ -59,37 +60,10 @@ public class Thing
     public List<string> Tags = new List<string>() { };
 
     public string TypeName;
-    public string RootTypeName = null;
 
     float lastUpdateOrder;
     float lastDrawOrder;
     bool lastActive = true;
-
-    void Construct(string name = null)
-    {
-        Id = id;
-        id++;
-
-        Game.Things.Add(this);
-        if (Game.Root?.Dynamic != null) Game.Root?.Dynamic.AddChild(this);
-
-        TypeName = GetType().Name;
-        Name = name ?? TypeName;
-        if (!Game.TypeThings.ContainsKey(TypeName)) Game.TypeThings[TypeName] = new List<Thing>() { };
-        Game.TypeThings[TypeName].Add(this);
-
-        Type rootType = GetType().BaseType;
-        if (rootType != typeof(Thing))
-        {
-            RootTypeName = rootType.Name;
-            if (!Game.TypeThings.ContainsKey(RootTypeName)) Game.TypeThings[RootTypeName] = new List<Thing>() { };
-            Game.TypeThings[RootTypeName].Add(this);
-        }
-
-        Init();
-
-        Game.QueueReorder();
-    }
 
     public static Thing Create(Thing root, ThingModel model) => new Thing(model.Name, model.Position, model.DrawMode, model.DrawOrder, model.UpdateOrder);
     public Thing() : this(null) { }
@@ -107,15 +81,14 @@ public class Thing
         DrawMode = drawMode;
         DrawOrder = drawOrder;
         UpdateOrder = updateOrder;
-        if (!Game.TypeThings.ContainsKey(TypeName)) Game.TypeThings[TypeName] = new List<Thing>() { };
-        Game.TypeThings[TypeName].Add(this);
-
-        Type rootType = GetType().BaseType;
-        if (rootType != typeof(Thing))
+        
+        Type type = GetType();
+        while (type != typeof(Thing))
         {
-            RootTypeName = rootType.Name;
-            if (!Game.TypeThings.ContainsKey(RootTypeName)) Game.TypeThings[RootTypeName] = new List<Thing>() { };
-            Game.TypeThings[RootTypeName].Add(this);
+            string rootTypeName = type.Name;
+            if (!Game.TypeThings.ContainsKey(rootTypeName)) Game.TypeThings[rootTypeName] = new List<Thing>() { };
+            Game.TypeThings[rootTypeName].Add(this);
+            type = type.BaseType;
         }
 
         Init();
@@ -235,8 +208,14 @@ public class Thing
         Game.Things.Remove(this);
         // Game.UpdateThings.Remove(this);
         // Game.DrawThings.Remove(this);
-        Game.TypeThings[TypeName].Remove(this);
-        if (RootTypeName != null) Game.TypeThings[RootTypeName].Remove(this);
+        Type type = GetType();
+        while (type != typeof(Thing))
+        {
+            string rootTypeName = type.Name;
+            if (!Game.TypeThings.ContainsKey(rootTypeName)) Game.TypeThings[rootTypeName] = new List<Thing>() { };
+            Game.TypeThings[rootTypeName].Remove(this);
+            type = type.BaseType;
+        }
         Game.QueueReorder();
     }
 
@@ -287,11 +266,11 @@ public class Thing
 
     public void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, AdjustFrom adjustFrom = AdjustFrom.Auto, Rectangle? source = null, Rectangle? destination = null)
     {
-        Shapes.DrawSprite(texture, position ?? Position, tileNumber, tileSize, rotation, color, scale, DrawMode, origin, flipHorizontally, flipVertically, adjustFrom, source, destination);
+        Shapes.DrawSprite(texture, position ?? GlobalPosition, tileNumber, tileSize, rotation, color, scale, DrawMode, origin, flipHorizontally, flipVertically, adjustFrom, source, destination);
     }
 
     public void DrawText(object text, Vector2? position = null, Font? font = null, Color? color = null, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full, AdjustFrom adjustFrom = AdjustFrom.Auto)
     {
-        Shapes.DrawText(text?.ToString() ?? "null", position ?? Position, font, color, DrawMode, outlineColor, outlineStyle, adjustFrom);
+        Shapes.DrawText(text?.ToString() ?? "null", position ?? GlobalPosition, font, color, DrawMode, outlineColor, outlineStyle, adjustFrom);
     }
 }

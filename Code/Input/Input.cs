@@ -33,6 +33,8 @@ public static class Input
     public static bool MiddleMouseButtonIsHeld => Raylib.IsMouseButtonDown(MouseButton.Middle);
     public static bool MiddleMouseButtonIsReleased => Raylib.IsMouseButtonReleased(MouseButton.Middle);
 
+    public static float MouseWheel => Raylib.GetMouseWheelMove();
+
     static KeyboardKey currentKey = KeyboardKey.Null;
     public static void Update()
     {
@@ -49,6 +51,14 @@ public static class Input
                 currentKey = KeyboardKey.Null;
             }
         }
+    }
+
+    public static Vector2 MousePosition(DrawMode drawMode)
+    {
+        Vector2 mouse = Vector2.Zero;
+        if (drawMode == DrawMode.Relative) mouse = Input.MousePositionRelative();
+        if (drawMode == DrawMode.Absolute) mouse = Input.MousePositionAbsolute();
+        return mouse;
     }
 
     public static Vector2 MousePositionRelative()

@@ -3,6 +3,8 @@ using Thingus;
 public class BrushTool : Tool
 {
     public override string Name => "Brush";
+    public override KeyboardKey Shortcut => KeyboardKey.B;
+    public override int TileNumber => 3;
 
     public BrushTool(Editor editor) : base(editor)
     {

@@ -6,6 +6,8 @@ namespace Thingus;
 public class Tool
 {
     public virtual string Name => "Tool";
+    public virtual KeyboardKey Shortcut => KeyboardKey.Null;
+    public virtual int TileNumber => 1;
     
     protected Editor editor;
     protected Vector2? dragCameraPosition = null;

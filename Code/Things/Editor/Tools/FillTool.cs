@@ -4,6 +4,8 @@ using Thingus;
 public class FillTool : Tool
 {
     public override string Name => "Fill";
+    public override KeyboardKey Shortcut => KeyboardKey.G;
+    public override int TileNumber => 6;
 
     public FillTool(Editor editor) : base(editor)
     {
