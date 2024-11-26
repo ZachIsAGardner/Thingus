@@ -114,6 +114,7 @@ public static class Viewport
     public static void Draw()
     {
         Raylib.ClearBackground(ClearColor.ToRaylib());
+        Game.DrawThings.ForEach(t => t.DrawToTexture());
         DrawToLayers();
         DrawToWindow();
     }

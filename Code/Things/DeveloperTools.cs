@@ -131,19 +131,19 @@ public class DeveloperTools : Thing
             Game.Mute = !Game.Mute;
         }
 
-        // if (Input.CtrlIsHeld && Input.IsPressed(KeyboardKey.One))
-        // {
-        //     int ratio = Viewport.VirtualRatio.Value - 1;
-        //     if (ratio < 1) ratio = 1;
-        //     Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * ratio, CONSTANTS.VIRTUAL_HEIGHT * ratio);
-        // }
+        if (Input.IsPressed(KeyboardKey.Nine))
+        {
+            int ratio = Viewport.VirtualRatio.Value - 1;
+            if (ratio < 1) ratio = 1;
+            Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * ratio, CONSTANTS.VIRTUAL_HEIGHT * ratio);
+        }
 
-        // if (Input.CtrlIsHeld && Input.IsPressed(KeyboardKey.Two))
-        // {
-        //     int ratio = Viewport.VirtualRatio.Value + 1;
-        //     if (ratio > 7) ratio = 7;
-        //     Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * ratio, CONSTANTS.VIRTUAL_HEIGHT * ratio);
-        // }
+        if (Input.IsPressed(KeyboardKey.Zero))
+        {
+            int ratio = Viewport.VirtualRatio.Value + 1;
+            if (ratio > 7) ratio = 7;
+            Raylib.SetWindowSize(CONSTANTS.VIRTUAL_WIDTH * ratio, CONSTANTS.VIRTUAL_HEIGHT * ratio);
+        }
 
         // if (Input.CtrlIsHeld && Input.IsPressed(KeyboardKey.Three))
         // {
@@ -216,6 +216,14 @@ public class DeveloperTools : Thing
     public override void Draw()
     {
         base.Draw();
+
+        if (Game.FrameAdvance) DrawText(
+            "FRAME ADVANCE", 
+            position: new Vector2((CONSTANTS.VIRTUAL_WIDTH / 2f) - (Raylib.MeasureText("FRAME ADVANCE", Library.FontSmall.BaseSize) / 2f), 4), 
+            color: PaletteBasic.Red, 
+            outlineColor: PaletteBasic.Black,
+            font: Library.FontSmall
+        );
 
         if (display == DeveloperDisplay.Tree) DrawThingTree();
         else if (display == DeveloperDisplay.Log) Log.Draw();

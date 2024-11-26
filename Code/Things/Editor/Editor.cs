@@ -143,27 +143,36 @@ public class Editor : Thing
         }
 
         MousePosition = Input.MousePositionRelative();
-        Mouse.Position = Input.MousePositionAbsolute() + new Vector2(CONSTANTS.TILE_SIZE / 2);
+        Mouse.Position = Input.MousePositionAbsolute() + new Vector2(8);
         Mouse.SetVisible(Input.IsMouseInsideWindow());
 
         if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
         {
-            GridPosition = (MousePosition - new Vector2(CONSTANTS.TILE_SIZE / 2)).ToNearest(CONSTANTS.TILE_SIZE) + new Vector2(CONSTANTS.TILE_SIZE / 2);
+            GridPosition = (MousePosition - new Vector2(CONSTANTS.TILE_SIZE / 2)).ToNearest(CONSTANTS.TILE_SIZE) 
+                + new Vector2(CONSTANTS.TILE_SIZE / 2);
+        }
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
+        {
+            GridPosition.Y = (MousePosition.Y + (CONSTANTS.TILE_SIZE_THIRD / 2)).ToNearest(CONSTANTS.TILE_SIZE_THIRD) 
+                + CONSTANTS.TILE_SIZE_THIRD / 2;
+
+
+            if ((GridPosition.Y - (CONSTANTS.TILE_SIZE_THIRD / 2)) % (CONSTANTS.TILE_SIZE - CONSTANTS.TILE_SIZE_THIRD) == 0)
+            {
+                GridPosition.X = (MousePosition.X).ToNearest(CONSTANTS.TILE_SIZE_OBLIQUE)
+                    - CONSTANTS.TILE_SIZE_THIRD / 2;
+
+                GridPosition.X += CONSTANTS.TILE_SIZE_THIRD;
+            }
+            else
+            {
+                GridPosition.X = (MousePosition.X + (CONSTANTS.TILE_SIZE_THIRD / 2)).ToNearest(CONSTANTS.TILE_SIZE_OBLIQUE) 
+                    - CONSTANTS.TILE_SIZE_THIRD / 2;
+            }
         }
         else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
         {
             GridPosition = new Vector2(MousePosition.X.ToNearest(CONSTANTS.TILE_SIZE_HALF), MousePosition.Y.ToNearest(CONSTANTS.TILE_SIZE_QUARTER));
-        }
-        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
-        {
-            GridPosition.X = MousePosition.X.ToNearest(CONSTANTS.TILE_SIZE_OBLIQUE)
-                - CONSTANTS.TILE_SIZE_THIRD / 2;
-            GridPosition.Y = MousePosition.Y.ToNearest(CONSTANTS.TILE_SIZE_THIRD) 
-                + CONSTANTS.TILE_SIZE_THIRD / 2;
-            if ((GridPosition.Y - (CONSTANTS.TILE_SIZE_THIRD / 2)) % (CONSTANTS.TILE_SIZE - CONSTANTS.TILE_SIZE_THIRD) == 0)
-            {
-                GridPosition.X += CONSTANTS.TILE_SIZE_THIRD;
-            }
         }
         gridMouse.Position = GridPosition;
         gridMouse.SetVisible(Input.IsMouseInsideWindow() && Room != null && tool?.Name != "Room");
@@ -491,9 +500,9 @@ public class Editor : Thing
     {
         base.Draw();
 
-        if (Target?.Map != null) DrawText($"Map: {Target?.Map?.Name}.map", new Vector2(4, 2), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
-        if (Room?.Map != null) DrawText($"Room: {Room?.Map?.Name}.map", new Vector2(4, 2 + Library.FontSmall.BaseSize * 2), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
+        if (Target?.Map != null) DrawText($"{Target?.Map?.Name}{(Room?.Map != null ? $", {Room.Map.Name}" : "")}", new Vector2(4, 2), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
 
-        DrawText($"{tool?.Name} {Viewport.Zoom} {GridPosition} {HistoryIndex}: <{History.ToList().Select(h => (h.Value.Committed ? "*" : "") + h.Key).Join(", ")}>", new Vector2(4, CONSTANTS.VIRTUAL_HEIGHT - Library.FontSmall.BaseSize - 4), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
+        DrawText($"{tool?.Name} {GridPosition}", new Vector2(4, CONSTANTS.VIRTUAL_HEIGHT - Library.FontSmall.BaseSize - 4), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
+        //  {HistoryIndex}: <{History.ToList().Select(h => (h.Value.Committed ? "*" : "") + h.Key).Join(", ")}>
     }
 }

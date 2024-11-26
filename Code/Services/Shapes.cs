@@ -29,7 +29,64 @@ public static class Shapes
         return new Vector2(tileNumber * tileSize, row * tileSize);
     }
 
-    public static void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, DrawMode drawMode = DrawMode.Relative, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, AdjustFrom adjustFrom = AdjustFrom.Auto)
+    public static Vector2 Adjust(Vector2 position, DrawMode drawMode, AdjustFrom adjustFrom)
+    { 
+        // Relative
+        if (drawMode == DrawMode.Relative)
+        {
+            position += Viewport.Position;
+        }
+        // Absolute
+        else if (drawMode == DrawMode.Absolute)
+        {
+            if (adjustFrom != AdjustFrom.None)
+            {
+                if (Viewport.Margin.X < 0)
+                {
+                    // Left
+                    if ((adjustFrom == AdjustFrom.Auto && position.X < CONSTANTS.VIRTUAL_WIDTH / 2f)
+                        || adjustFrom == AdjustFrom.TopLeft
+                        || adjustFrom == AdjustFrom.Left
+                        || adjustFrom == AdjustFrom.BottomLeft)
+                    {
+                        position.X -= Viewport.Margin.X;
+                    }
+                    // Right
+                    else if ((adjustFrom == AdjustFrom.Auto && position.X >= CONSTANTS.VIRTUAL_WIDTH / 2f) 
+                        || adjustFrom == AdjustFrom.TopRight 
+                        || adjustFrom == AdjustFrom.Right 
+                        || adjustFrom == AdjustFrom.BottomRight)
+                    {
+                        position.X += Viewport.Margin.X;
+                    } 
+                }
+
+                if (Viewport.Margin.Y < 0)
+                {
+                    // Top
+                    if ((adjustFrom == AdjustFrom.Auto && position.Y < CONSTANTS.VIRTUAL_HEIGHT / 2f)
+                        || adjustFrom == AdjustFrom.TopLeft
+                        || adjustFrom == AdjustFrom.Top
+                        || adjustFrom == AdjustFrom.TopRight)
+                    {
+                        position.Y -= Viewport.Margin.Y;
+                    }
+                    // Bottom
+                    else if ((adjustFrom == AdjustFrom.Auto && position.Y >= CONSTANTS.VIRTUAL_HEIGHT / 2f) 
+                        || adjustFrom == AdjustFrom.BottomLeft 
+                        || adjustFrom == AdjustFrom.Bottom 
+                        || adjustFrom == AdjustFrom.BottomRight)
+                    {
+                        position.Y += Viewport.Margin.Y;
+                    } 
+                }
+            }
+        }
+
+        return position;
+    }
+
+    public static void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, DrawMode drawMode = DrawMode.Relative, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, AdjustFrom adjustFrom = AdjustFrom.Auto, Rectangle? source = null, Rectangle? destination = null)
     {
         if (scale == null) scale = new Vector2(1);
 
@@ -46,65 +103,14 @@ public static class Shapes
         }
 
 
-        Vector2 p = position ?? Vector2.Zero;
-        // Relative
-        if (drawMode == DrawMode.Relative)
-        {
-            p += Viewport.Position;
-        }
-        // Absolute
-        else
-        {
-            if (adjustFrom != AdjustFrom.None)
-            {
-                if (Viewport.Margin.X < 0)
-                {
-                    // Left
-                    if ((adjustFrom == AdjustFrom.Auto && p.X < CONSTANTS.VIRTUAL_WIDTH / 2f)
-                        || adjustFrom == AdjustFrom.TopLeft
-                        || adjustFrom == AdjustFrom.Left
-                        || adjustFrom == AdjustFrom.BottomLeft)
-                    {
-                        p.X -= Viewport.Margin.X;
-                    }
-                    // Right
-                    else if ((adjustFrom == AdjustFrom.Auto && p.X >= CONSTANTS.VIRTUAL_WIDTH / 2f) 
-                        || adjustFrom == AdjustFrom.TopRight 
-                        || adjustFrom == AdjustFrom.Right 
-                        || adjustFrom == AdjustFrom.BottomRight)
-                    {
-                        p.X += Viewport.Margin.X;
-                    } 
-                }
-
-                if (Viewport.Margin.Y < 0)
-                {
-                    // Top
-                    if ((adjustFrom == AdjustFrom.Auto && p.Y < CONSTANTS.VIRTUAL_HEIGHT / 2f)
-                        || adjustFrom == AdjustFrom.TopLeft
-                        || adjustFrom == AdjustFrom.Top
-                        || adjustFrom == AdjustFrom.TopRight)
-                    {
-                        p.Y -= Viewport.Margin.Y;
-                    }
-                    // Bottom
-                    else if ((adjustFrom == AdjustFrom.Auto && p.Y >= CONSTANTS.VIRTUAL_HEIGHT / 2f) 
-                        || adjustFrom == AdjustFrom.BottomLeft 
-                        || adjustFrom == AdjustFrom.Bottom 
-                        || adjustFrom == AdjustFrom.BottomRight)
-                    {
-                        p.Y += Viewport.Margin.Y;
-                    } 
-                }
-            }
-        }
+        Vector2 p = Adjust(position ?? Vector2.Zero, drawMode, adjustFrom);
 
         Vector2 coord = CoordinatesFromNumber(tileNumber, texture, tileSize);
         
         Raylib.DrawTexturePro(
             texture: texture,
-            source: new Rectangle(coord.X, coord.Y, width * (flipHorizontally ? -1 : 1), height * (flipVertically ? -1 : 1)),
-            dest: new Rectangle(p.X, p.Y, width * scale.Value.X, height * scale.Value.Y),
+            source: source ?? new Rectangle(coord.X, coord.Y, width * (flipHorizontally ? -1 : 1), height * (flipVertically ? -1 : 1)),
+            dest: destination ?? new Rectangle(p.X, p.Y, width * scale.Value.X, height * scale.Value.Y),
             origin: origin ?? new Vector2((width * scale.Value.X) / 2, (height * scale.Value.Y) / 2),
             rotation: rotation,
             tint: (color ?? PaletteBasic.White).ToRaylib()
@@ -115,58 +121,7 @@ public static class Shapes
     {
         if (font == null) font = Library.Font;
 
-        Vector2 p = position ?? Vector2.Zero;
-        // Relative
-        if (drawMode == DrawMode.Relative)
-        {
-            p += Viewport.Position;
-        }
-        // Absolute
-        else
-        {
-            if (adjustFrom != AdjustFrom.None)
-            {
-                if (Viewport.Margin.X < 0)
-                {
-                    // Left
-                    if ((adjustFrom == AdjustFrom.Auto && p.X < CONSTANTS.VIRTUAL_WIDTH / 2f)
-                        || adjustFrom == AdjustFrom.TopLeft
-                        || adjustFrom == AdjustFrom.Left
-                        || adjustFrom == AdjustFrom.BottomLeft)
-                    {
-                        p.X -= Viewport.Margin.X;
-                    }
-                    // Right
-                    else if ((adjustFrom == AdjustFrom.Auto && p.X >= CONSTANTS.VIRTUAL_WIDTH / 2f) 
-                        || adjustFrom == AdjustFrom.TopRight 
-                        || adjustFrom == AdjustFrom.Right 
-                        || adjustFrom == AdjustFrom.BottomRight)
-                    {
-                        p.X += Viewport.Margin.X;
-                    } 
-                }
-
-                if (Viewport.Margin.Y < 0)
-                {
-                    // Top
-                    if ((adjustFrom == AdjustFrom.Auto && p.Y < CONSTANTS.VIRTUAL_HEIGHT / 2f)
-                        || adjustFrom == AdjustFrom.TopLeft
-                        || adjustFrom == AdjustFrom.Top
-                        || adjustFrom == AdjustFrom.TopRight)
-                    {
-                        p.Y -= Viewport.Margin.Y;
-                    }
-                    // Bottom
-                    else if ((adjustFrom == AdjustFrom.Auto && p.Y >= CONSTANTS.VIRTUAL_HEIGHT / 2f) 
-                        || adjustFrom == AdjustFrom.BottomLeft 
-                        || adjustFrom == AdjustFrom.Bottom 
-                        || adjustFrom == AdjustFrom.BottomRight)
-                    {
-                        p.Y += Viewport.Margin.Y;
-                    } 
-                }
-            }
-        }
+        Vector2 p = Adjust(position ?? Vector2.Zero, drawMode, adjustFrom);
 
         if (outlineColor != null)
         {

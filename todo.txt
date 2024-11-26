@@ -1,5 +1,6 @@
 TODO
 - fix refresh auto tilemap
+- fix undo multiples times same step
 - export
 - editor
     - tool buttons

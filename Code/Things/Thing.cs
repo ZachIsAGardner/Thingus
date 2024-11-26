@@ -8,7 +8,8 @@ namespace Thingus;
 public enum DrawMode
 {
     Relative,
-    Absolute
+    Absolute,
+    Texture
 }
 
 public class Thing
@@ -208,6 +209,11 @@ public class Thing
         lastDrawOrder = DrawOrder;
     }
 
+    public virtual void DrawToTexture()
+    {
+
+    }
+
     public virtual void Draw()
     {
 
@@ -279,9 +285,9 @@ public class Thing
         Game.PlaySound(name, volume.Value, pitch.Value, pan.Value);
     }
 
-    public void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, AdjustFrom adjustFrom = AdjustFrom.Auto)
+    public void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, AdjustFrom adjustFrom = AdjustFrom.Auto, Rectangle? source = null, Rectangle? destination = null)
     {
-        Shapes.DrawSprite(texture, position ?? Position, tileNumber, tileSize, rotation, color, scale, DrawMode, origin, flipHorizontally, flipVertically, adjustFrom);
+        Shapes.DrawSprite(texture, position ?? Position, tileNumber, tileSize, rotation, color, scale, DrawMode, origin, flipHorizontally, flipVertically, adjustFrom, source, destination);
     }
 
     public void DrawText(object text, Vector2? position = null, Font? font = null, Color? color = null, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full, AdjustFrom adjustFrom = AdjustFrom.Auto)
