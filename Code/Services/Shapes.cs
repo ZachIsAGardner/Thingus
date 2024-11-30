@@ -29,16 +29,18 @@ public static class Shapes
         return new Vector2(tileNumber * tileSize, row * tileSize);
     }
 
-    public static void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, DrawMode drawMode = DrawMode.Relative, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, Rectangle? source = null, Rectangle? destination = null)
+    public static void DrawSprite(Texture2D? texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, DrawMode drawMode = DrawMode.Relative, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, Rectangle? source = null, Rectangle? destination = null)
     {
+        if (texture == null) return;
+
         if (scale == null) scale = new Vector2(1);
 
         float width = 0;
         float height = 0;
         if (tileSize == 0)
         {
-            width = texture.Width;
-            height = texture.Height;
+            width = texture.Value.Width;
+            height = texture.Value.Height;
         }
         else
         {
@@ -56,10 +58,10 @@ public static class Shapes
             }
         }
 
-        Vector2 coord = CoordinatesFromNumber(tileNumber, texture, tileSize);
+        Vector2 coord = CoordinatesFromNumber(tileNumber, texture.Value, tileSize);
         
         Raylib.DrawTexturePro(
-            texture: texture,
+            texture: texture.Value,
             source: source ?? new Rectangle(coord.X, coord.Y, width * (flipHorizontally ? -1 : 1), height * (flipVertically ? -1 : 1)),
             dest: destination ?? new Rectangle(position.Value.X, position.Value.Y, width * scale.Value.X, height * scale.Value.Y),
             origin: origin ?? new Vector2((width * scale.Value.X) / 2, (height * scale.Value.Y) / 2),
@@ -124,8 +126,137 @@ public static class Shapes
         );
     }
 
-    public static void DrawNineSlice()
+    public static void DrawNineSlice(Texture2D? texture, Vector2 position, int tileSize, int width, int height, Vector2? origin = null, DrawMode drawMode = DrawMode.Relative, Color? color = null)
     {
-        
+        if (texture == null) return;
+
+        int maxX = width - tileSize;
+        int maxY = height - tileSize;
+        if (origin == null) origin = new Vector2(0, 0);
+        for (int x = 0; x < width; x += tileSize)
+        {
+            if (x != 0 && x < maxX)
+            {
+                for (int y = 0; y < height; y += tileSize)
+                {
+                    if (x != 0 && y != 0 && x < maxX && y < maxY)
+                    {
+                        // Center
+                        DrawSprite(
+                            texture: texture, 
+                            position: position + origin + new Vector2(x, y),
+                            tileNumber: 4,
+                            tileSize: tileSize,
+                            rotation: 0f,
+                            color: color ?? PaletteBasic.White,
+                            drawMode: drawMode,
+                            origin: new Vector2(0)
+                        );
+                    }
+                }
+                
+                // Top
+                DrawSprite(
+                    texture: texture, 
+                    position: position + origin + new Vector2(x, 0),
+                    tileNumber: 1,
+                    tileSize: tileSize,
+                    rotation: 0f,
+                    color: color ?? PaletteBasic.White,
+                    drawMode: drawMode,
+                    origin: new Vector2(0)
+                );
+
+                // Bottom
+                DrawSprite(
+                    texture: texture, 
+                    position: position + origin + new Vector2(x, maxY),
+                    tileNumber: 7,
+                    tileSize: tileSize,
+                    rotation: 0f,
+                    color: color ?? PaletteBasic.White,
+                    drawMode: drawMode,
+                    origin: new Vector2(0)
+                );
+            }
+        }
+
+        for (int y = 0; y < height; y += tileSize)
+        {
+            if (y != 0 && y < maxY)
+            {
+                // Left
+                DrawSprite(
+                    texture: texture, 
+                    position: position + origin + new Vector2(0, y),
+                    tileNumber: 3,
+                    tileSize: tileSize,
+                    rotation: 0f,
+                    color: color ?? PaletteBasic.White,
+                    drawMode: drawMode,
+                    origin: new Vector2(0)
+                );
+
+                // Right
+                DrawSprite(
+                    texture: texture, 
+                    position: position + origin + new Vector2(maxX, y),
+                    tileNumber: 5,
+                    tileSize: tileSize,
+                    rotation: 0f,
+                    color: color ?? PaletteBasic.White,
+                    drawMode: drawMode,
+                    origin: new Vector2(0)
+                );
+            }
+        }
+
+        // Top Left
+        DrawSprite(
+            texture: texture, 
+            position: position + origin + new Vector2(0, 0),
+            tileNumber: 0,
+            tileSize: tileSize,
+            rotation: 0f,
+            color: color ?? PaletteBasic.White,
+            drawMode: drawMode,
+            origin: new Vector2(0)
+        );
+
+        // Top Right
+        DrawSprite(
+            texture: texture, 
+            position: position + origin + new Vector2(maxX, 0),
+            tileNumber: 2,
+            tileSize: tileSize,
+            rotation: 0f,
+            color: color ?? PaletteBasic.White,
+            drawMode: drawMode,
+            origin: new Vector2(0)
+        );
+
+        // Bottom Left
+        DrawSprite(
+            texture: texture, 
+            position: position + origin + new Vector2(0, maxY),
+            tileNumber: 6,
+            tileSize: tileSize,
+            rotation: 0f,
+            color: color ?? PaletteBasic.White,
+            drawMode: drawMode,
+            origin: new Vector2(0)
+        );
+
+        // Bottom Right
+        DrawSprite(
+            texture: texture, 
+            position: position + origin + new Vector2(maxX, maxY),
+            tileNumber: 8,
+            tileSize: tileSize,
+            rotation: 0f,
+            color: color ?? PaletteBasic.White,
+            drawMode: drawMode,
+            origin: new Vector2(0)
+        );
     }
 }

@@ -5,18 +5,18 @@ namespace Thingus;
 
 public class SubViewport : Control
 {
-    public RenderTexture2D? Texture;
+    public RenderTexture2D? RenderTexture;
     public Vector2 Scroll;
     public Vector2 Max => new Vector2(
-        Texture.Value.Texture.Width - Bounds.X,
-        Texture.Value.Texture.Height - Bounds.Y
+        RenderTexture.Value.Texture.Width - Bounds.X,
+        RenderTexture.Value.Texture.Height - Bounds.Y
     );
 
     public SubViewport() { }
     public SubViewport(Vector2 bounds, Vector2 area) 
     {
         Bounds = bounds;
-        Texture = Raylib.LoadRenderTexture((int)area.X, (int)area.Y);
+        RenderTexture = Raylib.LoadRenderTexture((int)area.X, (int)area.Y);
     }
 
     public override void Init()
@@ -48,10 +48,10 @@ public class SubViewport : Control
     {
         base.DrawToTexture();
 
-        if (Texture == null) return;
+        if (RenderTexture == null) return;
 
-        Raylib.BeginTextureMode(Texture.Value);
-        Raylib.ClearBackground(Color.ToRaylib());
+        Raylib.BeginTextureMode(RenderTexture.Value);
+        Raylib.ClearBackground(PaletteBasic.Blank.ToRaylib());
         Game.DrawThings.Where(d => d.DrawMode == DrawMode.Texture && d.SubViewport == this).ToList().ForEach(d =>
         {
             d.Draw();
@@ -63,10 +63,10 @@ public class SubViewport : Control
     {
         base.Draw();
 
-        if (Texture == null) return;
+        if (RenderTexture == null) return;
 
         DrawSprite(
-            texture: Texture.Value.Texture, 
+            texture: RenderTexture.Value.Texture, 
             position: Position,
             source: new Rectangle(Scroll.X, -Bounds.Y - Scroll.Y, Bounds.X, -Bounds.Y),
             destination: new Rectangle(GlobalPosition.X, GlobalPosition.Y, Bounds.X, Bounds.Y),

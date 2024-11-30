@@ -5,8 +5,6 @@ namespace Thingus;
 
 public class TextureControl : Control
 {
-    public Texture2D Texture;
-
     public override void Draw()
     {
         base.Draw();
@@ -16,7 +14,7 @@ public class TextureControl : Control
         DrawSprite(
             texture: Texture,
             origin: new Vector2(0),
-            color: Color,
+            color: Pressed != null && IsHovered ? HighlightColor : Color,
 
             destination: rectangle,
             tileNumber: TileNumber,

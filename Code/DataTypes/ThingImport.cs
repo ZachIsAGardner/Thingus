@@ -11,7 +11,8 @@ public class ThingImport
     public int Layer = 0;
     public BlendMode? BlendMode = null;
     public List<string> Tags = new List<string>() { };
-    public Dictionary<string, string> Properties = new Dictionary<string, string>() { };
+    public List<ThingProperty> Properties = new List<ThingProperty>() { };
+    public List<ThingOption> Options = new List<ThingOption>() { };
     public string StampType = "Single";
     public List<string> AutoKeys = new List<string>() { };
 

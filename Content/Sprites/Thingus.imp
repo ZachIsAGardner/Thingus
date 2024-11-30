@@ -1,3 +1,15 @@
 {
-    "Thing": "TheThingus"
+    "Thing": "TheThingus",
+    "Options": [
+        {
+            "Name": "Flip",
+            "Type": "Checkbox",
+            "Value": false
+        },
+        {
+            "Name": "Name",
+            "Type": "TextInput",
+            "Value": "Default value."
+        }
+    ]
 }

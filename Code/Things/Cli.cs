@@ -88,12 +88,7 @@ public class Cli : Thing
         }
 
         string lastCurrent = current;
-        current += Input.GetKeyboardString();
-        if (Input.IsRepeating(KeyboardKey.Backspace) && current.Count() > 0)
-        {
-            if (Input.AltIsHeld || Input.CtrlIsHeld) current = "";
-            else current = current.Remove(current.Count() - 1);
-        }
+        current = Input.ApplyKeyboardToString(current);
         if (Input.IsRepeating(KeyboardKey.Enter))
         {
             lines.Add(current);

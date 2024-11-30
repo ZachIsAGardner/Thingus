@@ -17,6 +17,7 @@ public class Editor : Thing
     Sprite previewBackground;
     Sprite preview;
     Text previewText;
+    VerticalFlexControl verticalFlex;
 
     Vector2 cameraVelocity;
 
@@ -47,7 +48,8 @@ public class Editor : Thing
             new PickerTool(this),
             new RoomTool(this),
             new FillTool(this),
-            new WandTool(this)
+            new WandTool(this),
+            new EditTool(this),
         };
 
         tool = new BrushTool(this);
@@ -101,25 +103,31 @@ public class Editor : Thing
 
         Focus();
 
+        AdjusterControl adjuster = new AdjusterControl();
+        AddChild(adjuster);
+        verticalFlex = new VerticalFlexControl();
+        verticalFlex.DrawMode = DrawMode.Absolute;
+        verticalFlex.Position = new Vector2(4, 16);
+        verticalFlex.Spacing = 1;
+        adjuster.AddChild(verticalFlex);
         TilesetUi();
         ToolsUi();
     }
 
     void TilesetUi()
     {
-        AdjusterControl adjuster = new AdjusterControl();
-
-        ScrollableControl subViewport = new ScrollableControl(new Vector2(64, 80), new Vector2(64, 160));
-        subViewport.DrawMode = DrawMode.Absolute;
-        subViewport.Position = new Vector2(4, 16);
-        subViewport.Color = new Color(0, 0, 0, 1);
-        adjuster.AddChild(subViewport);
+        ScrollableControl scrollable = new ScrollableControl(new Vector2(48 + ScrollableControl.ScrollBarWidth + 1, 80), new Vector2(48 + ScrollableControl.ScrollBarWidth + 1, 160));
+        scrollable.DrawMode = DrawMode.Absolute;
+        scrollable.Texture = Library.Textures["BoxThinSlice"];
+        scrollable.TileSize = 5;
+        scrollable.Padding = 3;
+        verticalFlex.AddChild(scrollable);
         
         GridFlexControl flex = new GridFlexControl();
         flex.DrawMode = DrawMode.Texture;
-        flex.SubViewport = subViewport;
-        flex.Bounds = new Vector2(64, 160);
-        flex.Color = PaletteBasic.DarkGray;
+        flex.SubViewport = scrollable;
+        flex.Bounds = new Vector2(48, 160);
+        flex.Color = new Color(0, 0, 0, 1);
         AddChild(flex);
 
         foreach (Stamp stamp in Library.ThingImports.Select(t => new Stamp(t.Key)).ToList())
@@ -139,14 +147,13 @@ public class Editor : Thing
 
     void ToolsUi()
     {
-        AdjusterControl adjuster = new AdjusterControl();
-
         GridFlexControl flex = new GridFlexControl();
         flex.DrawMode = DrawMode.Absolute;
-        flex.Bounds = new Vector2(64, 100);
-        flex.Position = new Vector2(4, 100);
-        flex.Color = PaletteBasic.Blank;
-        adjuster.AddChild(flex);
+        flex.Bounds = new Vector2(16, Tools.Count * 16);
+        flex.Texture = Library.Textures["BoxThinSlice"];
+        flex.TileSize = 5;
+        flex.Padding = 3;
+        verticalFlex.AddChild(flex);
 
         foreach (Tool tool in Tools)
         {
@@ -169,10 +176,10 @@ public class Editor : Thing
         base.Update();
 
         if (Game.Root.DeveloperTools.Cli.Active) return;
-        hoveringControl = Game.GetThings<Control>().Any(c => c.Hovered || c.Held);
+        hoveringControl = Game.GetThings<Control>().Any(c => c.IsHovered || c.IsHeld);
 
         // Log.Write(Viewport.RelativeLayer.Camera.Zoom);
-        TogglePreview(Input.IsMouseInsideWindow() && Room != null && tool?.Name != "Room");
+        TogglePreview(Input.IsMouseInsideWindow() && Room != null && tool?.ShowPreview == true);
         UpdateShortcuts();
         UpdatePosition();
         UpdateCamera();
@@ -244,7 +251,7 @@ public class Editor : Thing
             GridPosition = new Vector2(MousePosition.X.ToNearest(CONSTANTS.TILE_SIZE_HALF), MousePosition.Y.ToNearest(CONSTANTS.TILE_SIZE_QUARTER));
         }
         gridMouse.Position = GridPosition;
-        gridMouse.SetVisible(!hoveringControl && Input.IsMouseInsideWindow() && Room != null && tool?.Name != "Room");
+        gridMouse.SetVisible(!hoveringControl && Input.IsMouseInsideWindow() && Room != null && tool?.ShowPreview == true);
 
         preview.Position = preview.Position.MoveOverTime(Mouse.Position + new Vector2((previewBackground.Scale.X / 2f) + 8, -4), 0.00001f);
         previewText.Position = preview.Position + new Vector2(-7, preview.TileSize / 2f);
@@ -499,7 +506,7 @@ public class Editor : Thing
     public void SelectTool(Tool tool)
     {
         this.tool = tool;
-        Mouse.TileNumber = tool.TileNumber;
+        // Mouse.TileNumber = tool.TileNumber;
     }
 
     public void SelectStamp(Stamp stamp)

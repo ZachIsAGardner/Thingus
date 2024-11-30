@@ -7,4 +7,9 @@ public static class IntExtensions
         if (min < 1) min = 1;
         return (int)(((float)num).MoveOverTime(destination, time, useModifiedDelta, max, min));
     }
+
+    public static int ToNearest(this int i, int nearest)
+    {
+        return (int)(MathF.Round(i / nearest) * nearest);
+    }
 }

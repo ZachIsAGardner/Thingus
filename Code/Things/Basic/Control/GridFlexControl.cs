@@ -4,24 +4,32 @@ namespace Thingus;
 
 public class GridFlexControl : Control
 {
+    public int Spacing;
+
     public override void Update()
     {
         base.Update();
 
+        Refresh();
+    }
+
+    public void Refresh()
+    {
         Control last = null;
         Vector2 position = new Vector2(0, 0);
         Children.Select(c => c as Control).ToList().ForEach(c =>
         {
             if (last != null)
             {
-                position.X += last.Bounds.X;
+                position.X += last.Bounds.X + Spacing;
                 if (position.X + c.Bounds.X > Bounds.X)
                 {
                     position.X = 0;
-                    position.Y += last.Bounds.Y;
+                    position.Y += last.Bounds.Y + Spacing;
                 }
             }
             c.DrawMode = DrawMode;
+            c.DrawOrder = DrawOrder + 1;
             c.SubViewport = SubViewport;
             c.Position = position;
             last = c;
@@ -31,12 +39,13 @@ public class GridFlexControl : Control
     public override void Draw()
     {
         base.Draw();
-
-        DrawSprite(
-            texture: Library.Textures["Pixel"],
-            position: GlobalPosition,
-            scale: Bounds,
-            origin: new Vector2(0),
+        
+        DrawNineSlice(
+            texture: Texture,
+            tileSize: 5,
+            position: GlobalPosition - new Vector2(Padding),
+            width: (int)Bounds.X + (Padding * 2),
+            height: (int)Bounds.Y + (Padding * 2),
             color: Color
         );
     }

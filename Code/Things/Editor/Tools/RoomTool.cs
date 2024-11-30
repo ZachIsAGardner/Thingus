@@ -7,6 +7,7 @@ public class RoomTool : Tool
 {
     public override string Name => "Room";
     public override KeyboardKey Shortcut => KeyboardKey.R;
+    public override bool ShowPreview => false;
     public override int TileNumber => 7;
 
     Vector2? actionMousePositionStart = null;

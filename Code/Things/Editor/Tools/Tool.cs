@@ -7,6 +7,7 @@ public class Tool
 {
     public virtual string Name => "Tool";
     public virtual KeyboardKey Shortcut => KeyboardKey.Null;
+    public virtual bool ShowPreview => true;
     public virtual int TileNumber => 1;
     
     protected Editor editor;

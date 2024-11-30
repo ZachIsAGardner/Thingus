@@ -16,7 +16,7 @@ public class ThingModel
     public int DrawOrder;
     public int UpdateOrder;
     public List<string> Tags = new List<string>() { };
-    public Dictionary<string, string> Properties = new Dictionary<string, string>() { };
+    public List<ThingProperty> Properties = new List<ThingProperty>() { };
 
     public ThingModel() { }
     public ThingModel(ThingImport import, MapCell cell)

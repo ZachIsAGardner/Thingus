@@ -9,17 +9,17 @@ public static class Input
 {
     public static List<InputState> KeyStates = new List<InputState>();
 
-    public static bool CtrlIsPressed => Input.IsPressed(KeyboardKey.LeftControl) || Input.IsPressed(KeyboardKey.RightControl);
-    public static bool CtrlIsHeld => Input.IsHeld(KeyboardKey.LeftControl) || Input.IsHeld(KeyboardKey.RightControl);
-    public static bool CtrlIsReleased => Input.IsReleased(KeyboardKey.LeftControl) || Input.IsReleased(KeyboardKey.RightControl);
+    public static bool CtrlIsPressed => IsPressed(KeyboardKey.LeftControl) || IsPressed(KeyboardKey.RightControl);
+    public static bool CtrlIsHeld => IsHeld(KeyboardKey.LeftControl) || IsHeld(KeyboardKey.RightControl);
+    public static bool CtrlIsReleased => IsReleased(KeyboardKey.LeftControl) || IsReleased(KeyboardKey.RightControl);
 
-    public static bool AltIsPressed => Input.IsPressed(KeyboardKey.LeftAlt) || Input.IsPressed(KeyboardKey.RightAlt);
-    public static bool AltIsHeld => Input.IsHeld(KeyboardKey.LeftAlt) || Input.IsHeld(KeyboardKey.RightAlt);
-    public static bool AltIsReleased => Input.IsReleased(KeyboardKey.LeftAlt) || Input.IsReleased(KeyboardKey.RightAlt);
+    public static bool AltIsPressed => IsPressed(KeyboardKey.LeftAlt) || IsPressed(KeyboardKey.RightAlt);
+    public static bool AltIsHeld => IsHeld(KeyboardKey.LeftAlt) || IsHeld(KeyboardKey.RightAlt);
+    public static bool AltIsReleased => IsReleased(KeyboardKey.LeftAlt) || IsReleased(KeyboardKey.RightAlt);
 
-    public static bool ShiftIsPressed => Input.IsPressed(KeyboardKey.LeftShift) || Input.IsPressed(KeyboardKey.RightShift);
-    public static bool ShiftIsHeld => Input.IsHeld(KeyboardKey.LeftShift) || Input.IsHeld(KeyboardKey.RightShift);
-    public static bool ShiftIsReleased => Input.IsReleased(KeyboardKey.LeftShift) || Input.IsReleased(KeyboardKey.RightShift);
+    public static bool ShiftIsPressed => IsPressed(KeyboardKey.LeftShift) || IsPressed(KeyboardKey.RightShift);
+    public static bool ShiftIsHeld => IsHeld(KeyboardKey.LeftShift) || IsHeld(KeyboardKey.RightShift);
+    public static bool ShiftIsReleased => IsReleased(KeyboardKey.LeftShift) || IsReleased(KeyboardKey.RightShift);
 
     public static bool LeftMouseButtonIsPressed => Raylib.IsMouseButtonPressed(MouseButton.Left);
     public static bool LeftMouseButtonIsHeld => Raylib.IsMouseButtonDown(MouseButton.Left);
@@ -46,7 +46,7 @@ public static class Input
         }
         else 
         {
-            if (Input.IsReleased(currentKey))
+            if (IsReleased(currentKey))
             {
                 currentKey = KeyboardKey.Null;
             }
@@ -56,8 +56,8 @@ public static class Input
     public static Vector2 MousePosition(DrawMode drawMode)
     {
         Vector2 mouse = Vector2.Zero;
-        if (drawMode == DrawMode.Relative) mouse = Input.MousePositionRelative();
-        if (drawMode == DrawMode.Absolute) mouse = Input.MousePositionAbsolute();
+        if (drawMode == DrawMode.Relative) mouse = MousePositionRelative();
+        if (drawMode == DrawMode.Absolute) mouse = MousePositionAbsolute();
         return mouse;
     }
 
@@ -119,11 +119,22 @@ public static class Input
     public static string GetKeyboardString()
     {
         KeyboardKey keyboardKey = KeyboardKey.Null;
-        if (Input.IsRepeating(currentKey)) keyboardKey = currentKey;
-        string result = Input.ShiftIsHeld
+        if (IsRepeating(currentKey)) keyboardKey = currentKey;
+        string result = ShiftIsHeld
             ? KeyboardKeyStringShift[keyboardKey] 
             : KeyboardKeyString[keyboardKey];
         return result;
+    }
+
+    public static string ApplyKeyboardToString(string text)
+    {
+        text += GetKeyboardString();
+        if (IsRepeating(KeyboardKey.Backspace) && text.Count() > 0)
+        {
+            if (AltIsHeld || CtrlIsHeld) text = "";
+            else text = text.Remove(text.Count() - 1);
+        }
+        return text;
     }
     
     public static Dictionary<KeyboardKey, string> KeyboardKeyString = new Dictionary<KeyboardKey, string>()

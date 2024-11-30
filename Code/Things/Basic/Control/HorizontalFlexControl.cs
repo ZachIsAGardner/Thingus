@@ -4,31 +4,62 @@ namespace Thingus;
 
 public class HorizontalFlexControl : Control
 {
+    public int Spacing;
+    public Vector2 Offset;
+    public FlexJustify Justify = FlexJustify.Start;
+
     public override void Update()
     {
         base.Update();
 
-        Control last = null;
-        Vector2 position = new Vector2(0, 0);
-        Children.Select(c => c as Control).ToList().ForEach(c =>
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        if (Justify == FlexJustify.Start)
         {
-            if (last != null) position.X += last.Bounds.X;
-            c.DrawMode = DrawMode;
-            c.SubViewport = SubViewport;
-            c.Position = position;
-            last = c;
-        });
+            Control last = null;
+            Vector2 position = new Vector2(0, 0);
+            Children.Select(c => c as Control).ToList().ForEach(c =>
+            {
+                if (last != null) position.X += last.Bounds.X + Spacing;
+                c.DrawMode = DrawMode;
+                c.DrawOrder = DrawOrder + 1;
+                c.SubViewport = SubViewport;
+                c.Position = position + Offset;
+                last = c;
+            });
+        }
+        // TODO
+        else if (Justify == FlexJustify.Between)
+        {
+            List<Control> children = Children.Select(c => c as Control).ToList();
+            float spacing = Bounds.X / children.Count();
+            float i = 0;
+            children.ForEach(c =>
+            {
+                c.DrawMode = DrawMode;
+                c.DrawOrder = DrawOrder + 1;
+                c.SubViewport = SubViewport;
+                c.Position = new Vector2(i * spacing, 0) + Offset;
+                if (i == children.Count - 1) c.Position.X = Bounds.X - c.Bounds.X;
+                i++;
+            });
+        }
     }
 
     public override void Draw()
     {
         base.Draw();
 
-        DrawSprite(
-            texture: Library.Textures["Pixel"],
-            position: GlobalPosition,
-            scale: Bounds,
-            origin: new Vector2(0)
+        DrawNineSlice(
+            texture: Texture,
+            tileSize: 5,
+            position: GlobalPosition - new Vector2(Padding),
+            width: (int)Bounds.X + (Padding * 2),
+            height: (int)Bounds.Y + (Padding * 2),
+            color: Pressed != null && IsHovered ? HighlightColor : Color
         );
     }
 }

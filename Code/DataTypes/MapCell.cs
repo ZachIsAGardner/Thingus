@@ -14,6 +14,8 @@ public class MapCell
     public int? TileNumber;
     public Vector2 Bounds;
 
+    public List<ThingOption> Options = new List<ThingOption>() { };
+
     public MapCell() { }
     public MapCell(string name, string thing = null, Vector2? position = null, int? tileNumber = null, Vector2? bounds = null, string parent = null)
     {

@@ -1,15 +1,16 @@
 using System.Numerics;
+using Raylib_cs;
 
 namespace Thingus;
 
 public class ScrollableControl : SubViewport
-{
+{    
     ButtonControl scrollHead;
     bool scrolling = false;
     Vector2 scrollHeadStart;
     Vector2 mouseStart;
 
-    int width = 6;
+    public static readonly int ScrollBarWidth = 6;
 
     public ScrollableControl() { }
     public ScrollableControl(Vector2 bounds, Vector2 area)
@@ -24,10 +25,9 @@ public class ScrollableControl : SubViewport
 
         scrollHead = new ButtonControl();
         scrollHead.Pressed = () => Log.Write("Click");
-        scrollHead.Texture = Library.Textures["Pixel"];
-        scrollHead.Bounds = new Vector2(width, 12);
+        scrollHead.Texture = Library.Textures["ScrollHead"];
+        scrollHead.Bounds = new Vector2(ScrollBarWidth, 12);
         scrollHead.DrawOrder = 10;
-        scrollHead.Color = new Color(0, 0, 0, 1);
         scrollHead.DrawMode = DrawMode;
         scrollHead.Position.X = Bounds.X - scrollHead.Bounds.X;
         scrollHead.Pressed = () =>
@@ -52,7 +52,7 @@ public class ScrollableControl : SubViewport
             Vector2 difference = Input.MousePosition(DrawMode) - mouseStart;
             scrollHead.Position.Y = scrollHeadStart.Y + difference.Y;
         }
-        else if (Hovered)
+        else if (IsHovered)
         {
             scrollHead.Position.Y -= Input.MouseWheel * 5;
         }
@@ -74,13 +74,22 @@ public class ScrollableControl : SubViewport
         //     color: PaletteBasic.Black
         // );
 
+        DrawNineSlice(
+            texture: Texture,
+            tileSize: 5,
+            position: GlobalPosition - new Vector2(Padding),
+            width: (int)Bounds.X + (Padding * 2),
+            height: (int)Bounds.Y + (Padding * 2),
+            color: Color
+        );
+
         base.Draw();
 
         // Scroll Background
         DrawSprite(
             texture: Library.Textures["Pixel"],
-            position: GlobalPosition + new Vector2(Bounds.X - width, 0),
-            scale: new Vector2(width, Bounds.Y),
+            position: GlobalPosition + new Vector2(Bounds.X - ScrollBarWidth, 0),
+            scale: new Vector2(ScrollBarWidth, Bounds.Y),
             color: PaletteBasic.Black,
             origin: new Vector2(0)
         );

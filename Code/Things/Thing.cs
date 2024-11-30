@@ -264,7 +264,7 @@ public class Thing
         Game.PlaySound(name, volume.Value, pitch.Value, pan.Value);
     }
 
-    public void DrawSprite(Texture2D texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, Rectangle? source = null, Rectangle? destination = null)
+    public void DrawSprite(Texture2D? texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, Rectangle? source = null, Rectangle? destination = null)
     {
         Shapes.DrawSprite(texture, position ?? GlobalPosition, tileNumber, tileSize, rotation, color, scale, DrawMode, origin, flipHorizontally, flipVertically, source, destination);
     }
@@ -272,5 +272,10 @@ public class Thing
     public void DrawText(object text, Vector2? position = null, Font? font = null, Color? color = null, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full)
     {
         Shapes.DrawText(text?.ToString() ?? "null", position ?? GlobalPosition, font, color, DrawMode, outlineColor, outlineStyle);
+    }
+
+    public void DrawNineSlice(Texture2D? texture, Vector2? position = null, int tileSize = 5, int width = 15, int height = 15, Vector2? origin = null, Color? color = null)
+    {
+        Shapes.DrawNineSlice(texture, position ?? GlobalPosition, tileSize, width, height, origin, DrawMode, color);
     }
 }

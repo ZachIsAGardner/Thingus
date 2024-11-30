@@ -1,12 +1,13 @@
 TODO
-- 9 slice for controls and scroll head
-- export
+- edit tool
 
 LATER
+- export
+- better room code behind
 - toast
 - palette swap
 - translation support
-- edit tool
+- branch view
 
 WAY LATER
 - refactor
