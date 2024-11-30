@@ -1,25 +1,26 @@
 TODO
 - 9 slice for controls and scroll head
-- fix undo multiples times same step
-- fix refresh auto tilemap
-- fix adjust elements with viewport cutoff
 - export
-- move multiple rooms
 
 LATER
 - toast
 - palette swap
 - translation support
+- edit tool
 
 WAY LATER
 - refactor
-    - combine SubViewport and Viewport
-    - combine Root and Game, convert Game into a Thing
-    - convert Viewport into a Thing
-    - convert everything all Services into Things?
-    - tilesize by map
-    - projection type by map
-    - fix lighting with zoom
-    - remove Vignette
-    - better lighting code
-    - should Maps just be Rooms and Zones?
+    - should absolute and relative be special Things instead of Modes? (Canvas vs. Normal)
+    - consolidate
+        - combine SubViewport and Viewport
+        - combine Root and Game, convert Game into a Thing
+        - convert Viewport into a Thing
+        - convert all Services into Things?
+        - should Maps just be Rooms and Zones?
+    - by map
+        - tilesize by map
+        - projection type by map
+    - lighting
+        - fix lighting with zoom
+        - remove Vignette
+        - better lighting code

@@ -9,26 +9,10 @@ public class RectangleTool : Tool
     public override KeyboardKey Shortcut => KeyboardKey.U;
     public override int TileNumber => 12;
 
-    Vector2? start = null;
     bool erase = false;
-    List<Vector2> positions = new List<Vector2>() { };
-    Texture2D square;
+    RectangleSelection selection;
 
-    public RectangleTool(Editor editor) : base(editor)
-    {
-        if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
-        {
-            square = Library.Textures[$"{CONSTANTS.TILE_SIZE}Square"];
-        }
-        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
-        {
-            square = Library.Textures[$"{CONSTANTS.TILE_SIZE}ObliqueBox"];
-        }
-        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
-        {
-            // TODO
-        }
-    }
+    public RectangleTool(Editor editor) : base(editor) { }
 
     public override void Update()
     {
@@ -56,83 +40,29 @@ public class RectangleTool : Tool
 
         if (editor.InteractDisabled) return;
 
-        if (Input.LeftMouseButtonIsHeld && editor.LastGridInteractPosition != editor.GridPosition && start == null)
+        if (Input.LeftMouseButtonIsHeld && editor.LastGridInteractPosition != editor.GridPosition && selection == null)
         {
-            start = editor.GridPosition;
+            selection = new RectangleSelection(editor.GridPosition, () => editor.GridPosition, new Color(0, 255, 0, 255));
             erase = false;
         }
 
-        if (Input.RightMouseButtonIsHeld && editor.LastGridInteractPosition != editor.GridPosition && start == null)
+        if (Input.RightMouseButtonIsHeld && editor.LastGridInteractPosition != editor.GridPosition && selection == null)
         {
-            start = editor.GridPosition;
+            selection = new RectangleSelection(editor.GridPosition, () => editor.GridPosition, new Color(0, 0, 0, 255));
             erase = true;
         }
 
-        if (start != null)
+        if (Input.LeftMouseButtonIsReleased && selection != null && !erase)
         {
-            positions.Clear();
-            Vector2 distance = editor.GridPosition - start.Value;
-            int row = 1;
-            int column = 1;
-            if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
-            {
-                row = (int)(distance.X / CONSTANTS.TILE_SIZE).Abs();
-                column = (int)(distance.Y / CONSTANTS.TILE_SIZE).Abs();
-            }
-            else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
-            {
-                row = (int)(distance.X / CONSTANTS.TILE_SIZE_OBLIQUE).Abs();
-                column = (int)(distance.Y / CONSTANTS.TILE_SIZE_THIRD).Abs();
-            }
-            else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
-            {
-                // TODO
-            }
-
-            for (int r = 0; r <= row; r++)
-            {
-                for (int c = 0; c <= column; c++)
-                {
-                    Vector2 position = start.Value;
-                    if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
-                    { 
-                        position += new Vector2(
-                            r * CONSTANTS.TILE_SIZE * distance.X.Sign(),
-                            c * CONSTANTS.TILE_SIZE * distance.Y.Sign()
-                        );
-                    }
-                    else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
-                    { 
-                        position += new Vector2(
-                            r * CONSTANTS.TILE_SIZE_OBLIQUE * distance.X.Sign(),
-                            c * CONSTANTS.TILE_SIZE_THIRD * distance.Y.Sign()
-                        );
-                        if (c % 2 != 0)
-                        {
-                            position.X += CONSTANTS.TILE_SIZE_THIRD;
-                        }
-                    }
-                    else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
-                    { 
-                        // TODO
-                    }
-
-                    positions.Add(position);
-                }
-            }
-        }
-
-        if (Input.LeftMouseButtonIsReleased && start != null && !erase)
-        {
-            positions.ForEach(p =>
+            selection.Positions.ForEach(p =>
             {
                 editor.AddCell(p);
             });
         }
 
-        if (Input.RightMouseButtonIsReleased && start != null && erase)
+        if (Input.RightMouseButtonIsReleased && selection != null && erase)
         {
-            positions.ForEach(p =>
+            selection.Positions.ForEach(p =>
             {
                 editor.RemoveCell(p);
             });
@@ -140,9 +70,9 @@ public class RectangleTool : Tool
 
         if (Input.LeftMouseButtonIsReleased || Input.RightMouseButtonIsReleased)
         {
-            start = null;
+            selection.Destroy();
+            selection = null;
             erase = false;
-            positions.Clear();
         }
 
         base.Update();
@@ -151,13 +81,5 @@ public class RectangleTool : Tool
     public override void Draw()
     {
         base.Draw();
-
-        if (start != null)
-        {
-            positions.ForEach(p =>
-            {
-                Shapes.DrawSprite(texture: square, position: p, color: erase ? new Color(0, 0, 0, 64) : new Color(0, 255, 0, 64));
-            });
-        }
     }
 }

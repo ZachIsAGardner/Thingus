@@ -14,7 +14,6 @@ public class HorizontalFlexControl : Control
         {
             if (last != null) position.X += last.Bounds.X;
             c.DrawMode = DrawMode;
-            c.AdjustFrom = AdjustFrom;
             c.SubViewport = SubViewport;
             c.Position = position;
             last = c;

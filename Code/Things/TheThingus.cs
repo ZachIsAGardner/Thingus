@@ -18,7 +18,7 @@ public class TheThingus : Sprite
     // Create from code
     public TheThingus(
         string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
-        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, AdjustFrom adjustFrom = AdjustFrom.Auto
+        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {
         Texture = Library.Textures[name];

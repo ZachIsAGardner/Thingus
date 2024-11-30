@@ -108,7 +108,7 @@ public class BakedTilemap : Thing
         if (BlendMode != null) Raylib.BeginBlendMode(BlendMode.Value);
         Tiles.ForEach(t =>
         {
-            Shapes.DrawSprite(
+            DrawSprite(
                 texture: t.Texture,
                 tileNumber: t.TileNumber,
                 tileSize: CONSTANTS.TILE_SIZE,

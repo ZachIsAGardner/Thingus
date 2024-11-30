@@ -172,10 +172,10 @@ public class DeveloperTools : Thing
         for (int i = 0; i < root.Children.Count; i++)
         {
             Thing c = root.Children[i];
-            Shapes.DrawText(
+            DrawText(
                 font: font,
                 text: $"{c.Id}: {c.Name} ({c.TypeName})",
-                position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth) + (depth * 6), 4 + (height * (font.BaseSize + fontOffset))) + Viewport.AdjustFromTopRight,
+                position: Viewport.Adjust(new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth) + (depth * 6), 4 + (height * (font.BaseSize + fontOffset))), AdjustFrom.TopRight),
                 color: depth % 2 == 0 ? PaletteBasic.White : PaletteAapSplendor128.NightlyAurora
             );
             height++;
@@ -185,27 +185,27 @@ public class DeveloperTools : Thing
 
     void DrawThingTree()
     {
-        Shapes.DrawSprite(
+        DrawSprite(
             texture: Library.Textures["Pixel"],
-            position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth / 2f) - 4, CONSTANTS.VIRTUAL_HEIGHT / 2f) + Viewport.AdjustFromTopRight,
+            position: Viewport.Adjust(new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth / 2f) - 4, CONSTANTS.VIRTUAL_HEIGHT / 2f), AdjustFrom.TopRight),
             scale: new Vector2(interfaceWidth, interfaceHeight),
             color: new Color(0, 50, 0, 245)
         );
 
-        Shapes.DrawText(
+        DrawText(
             font: font,
             text: "TREE",
-            position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth), 4) + Viewport.AdjustFromTopRight,
+            position: Viewport.Adjust(new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth), 4), AdjustFrom.TopRight),
             color: PaletteBasic.Green
         );
 
         int height = 1;
         Game.Things.Where(c => c.Parent == null).ToList().ForEach(c =>
         {
-            Shapes.DrawText(
+            DrawText(
                 font: font,
                 text: $"{c.Id}: {c.Name}",
-                position: new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth), 4 + (height * (font.BaseSize + fontOffset))) + Viewport.AdjustFromTopRight,
+                position: Viewport.Adjust(new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth), 4 + (height * (font.BaseSize + fontOffset))), AdjustFrom.TopRight),
                 color: PaletteBasic.White
             );
             height++;

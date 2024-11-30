@@ -65,14 +65,11 @@ public class SubViewport : Control
 
         if (Texture == null) return;
 
-        Vector2 position = Shapes.Adjust(Position, DrawMode, AdjustFrom.TopLeft);
-
         DrawSprite(
             texture: Texture.Value.Texture, 
             position: Position,
             source: new Rectangle(Scroll.X, -Bounds.Y - Scroll.Y, Bounds.X, -Bounds.Y),
-            destination: new Rectangle(position.X, position.Y, Bounds.X, Bounds.Y),
-            adjustFrom: AdjustFrom.TopLeft,
+            destination: new Rectangle(GlobalPosition.X, GlobalPosition.Y, Bounds.X, Bounds.Y),
             origin: new Vector2(0)
         );
     }

@@ -8,7 +8,6 @@ public class Text : Thing
     public Font Font;
     public Color Color;
     public Color? OutlineColor;
-    public AdjustFrom AdjustFrom = AdjustFrom.Auto;
 
     RenderTexture2D? texture;
     Rectangle rectangle;
@@ -32,7 +31,7 @@ public class Text : Thing
     float shakeStepDuration = 0.01f;
 
     public Text() { }
-    public Text(string content, Vector2 position, Font? font = null, DrawMode drawMode = DrawMode.Relative, Color? color = null, Color? outlineColor = null, int order = 0, AdjustFrom adjustFrom = AdjustFrom.Auto)
+    public Text(string content, Vector2 position, Font? font = null, DrawMode drawMode = DrawMode.Relative, Color? color = null, Color? outlineColor = null, int order = 0)
     {
         this.Content = content;
         Position = position;
@@ -41,7 +40,6 @@ public class Text : Thing
         Font = font ?? Library.Font;
         DrawMode = drawMode;
         DrawOrder = order;
-        AdjustFrom = adjustFrom;
     }
 
     public override void Start()
@@ -60,15 +58,13 @@ public class Text : Thing
     {
         base.Draw();
 
-        Shapes.DrawText(
+        DrawText(
             font: Font,
             text: Content,
             position: GlobalPosition
                 + new Vector2(shakeXOffset, shakeYOffset),
             color: Color,
-            outlineColor: OutlineColor,
-            drawMode: DrawMode,
-            adjustFrom: AdjustFrom
+            outlineColor: OutlineColor
         );
     }
 

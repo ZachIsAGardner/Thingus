@@ -6,7 +6,6 @@ public class Control : Thing
 {
     public Vector2 Bounds;
     public Color Color = PaletteBasic.White;
-    public AdjustFrom AdjustFrom = AdjustFrom.None;
     public int TileNumber = 0;
     public int TileSize = 0;
 
@@ -33,8 +32,8 @@ public class Control : Thing
                 Hovered = false;
                 return;
             }
-            if (SubViewport.DrawMode == DrawMode.Relative) mouse = Input.MousePositionRelative() + SubViewport.Scroll - SubViewport.Position;
-            if (SubViewport.DrawMode == DrawMode.Absolute) mouse = Input.MousePositionAbsolute() + SubViewport.Scroll - SubViewport.Position;
+            if (SubViewport.DrawMode == DrawMode.Relative) mouse = Input.MousePositionRelative() + SubViewport.Scroll - SubViewport.GlobalPosition;
+            if (SubViewport.DrawMode == DrawMode.Absolute) mouse = Input.MousePositionAbsolute() + SubViewport.Scroll - SubViewport.GlobalPosition;
         }
 
             

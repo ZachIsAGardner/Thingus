@@ -65,20 +65,22 @@ public class ScrollableControl : SubViewport
 
     public override void Draw()
     {
-        DrawSprite(
-            texture: Library.Textures["Pixel"],
-            position: GlobalPosition - new Vector2(1),
-            scale: Bounds + new Vector2(2),
-            origin: new Vector2(0),
-            color: PaletteBasic.Black
-        );
+        // Outline
+        // DrawSprite(
+        //     texture: Library.Textures["Pixel"],
+        //     position: GlobalPosition - new Vector2(1),
+        //     scale: Bounds + new Vector2(2),
+        //     origin: new Vector2(0),
+        //     color: PaletteBasic.Black
+        // );
 
         base.Draw();
 
+        // Scroll Background
         DrawSprite(
             texture: Library.Textures["Pixel"],
-            position: Position + new Vector2(Bounds.X - width - 1, -1),
-            scale: new Vector2(width + 2, Bounds.Y + 2),
+            position: GlobalPosition + new Vector2(Bounds.X - width, 0),
+            scale: new Vector2(width, Bounds.Y),
             color: PaletteBasic.Black,
             origin: new Vector2(0)
         );

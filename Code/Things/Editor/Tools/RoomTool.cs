@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace Thingus;
 
@@ -14,6 +15,9 @@ public class RoomTool : Tool
     Dictionary<int, Vector2> actionRoomChildPositions = new Dictionary<int, Vector2>() { };
     Dictionary<int, Vector2> actionRoomCellPositions = new Dictionary<int, Vector2>() { };
     Room actionRoom = null;
+
+    List<(Room Room, Vector2 StartPosition)> moveRooms = new List<(Room Room, Vector2 StartPosition)>() { };
+
     bool resizeReverse = false;
 
     Action state = null;
@@ -171,6 +175,45 @@ public class RoomTool : Tool
                     AddRoom();
                 }
             }
+            else
+            {
+                if (Input.LeftMouseButtonIsPressed)
+                {
+                    state = Drag;
+                }
+            }
+        }
+    }
+
+    RectangleSelection selection = null;
+
+    void Drag()
+    {
+        editor.Mouse.TileNumber = 7;
+
+        if (Input.LeftMouseButtonIsHeld && editor.LastGridInteractPosition != editor.GridPosition && selection == null)
+        {
+            selection = new RectangleSelection(editor.GridPosition, () => editor.GridPosition, new Color(0, 255, 0, 255));
+            editor.Holdup = true;
+        }
+
+        if (Input.LeftMouseButtonIsReleased && selection != null)
+        {
+            List<Room> rooms = Game.GetThings<Room>().Where(r => selection.Positions.Any(p => r.IsPositionInside(p))).ToList();
+            rooms.ForEach(r => Log.Write(r.Name));
+            selection.Destroy();
+            selection = null;
+            actionMousePositionStart = editor.GridPosition;
+            if (rooms.Count <= 0)
+            {
+                state = Normal;
+            } 
+            else
+            {
+                moveRooms = rooms.Select(r => (r, r.Position)).ToList();
+                rooms.ForEach(r => r.GroupMove = true);
+                state = MoveRooms;
+            }
         }
     }
 
@@ -263,6 +306,42 @@ public class RoomTool : Tool
                     RemoveRoom(room, false);
                 }
             ));
+        }
+    }
+
+    void MoveRooms()
+    {
+        moveRooms.ForEach(m =>
+        {
+            Vector2 difference = editor.GridPosition - actionMousePositionStart.Value;
+            m.Room.Position = m.Room.ParentCell.Position = m.StartPosition + difference;
+        });
+
+        if (Input.LeftMouseButtonIsPressed)
+        {
+            List<(Room Room, Vector2 StartPosition, Vector2 Destination)> storedMoveRooms = new List<(Room Room, Vector2 StartPosition, Vector2 Destination)>() { };
+            moveRooms.ForEach(m => storedMoveRooms.Add((m.Room, m.StartPosition, m.Room.Position)));
+
+            editor.AddHistoryAction(new HistoryAction(
+                "MoveRooms",
+                () =>
+                {
+                    storedMoveRooms.ForEach(s =>
+                    {
+                        if (s.Room.GlobalRemoved) s.Room = Game.GetThings<Room>().Find(t => t.Name == s.Room.Name);
+                        s.Room.Position = s.StartPosition;
+                    });
+                },
+                () =>
+                {
+                    storedMoveRooms.ForEach(s =>
+                    {
+                        if (s.Room.GlobalRemoved) s.Room = Game.GetThings<Room>().Find(t => t.Name == s.Room.Name);
+                        s.Room.Position = s.Destination;
+                    });
+                }
+            ));
+            Reset();
         }
     }
 
@@ -508,6 +587,8 @@ public class RoomTool : Tool
         resizeReverse = false;
         actionRoomChildPositions.Clear();
         actionRoomCellPositions.Clear();
+        moveRooms.ForEach(m => m.Room.GroupMove = false);
+        moveRooms.Clear();
     }
 
     public override void Draw()

@@ -118,7 +118,7 @@ public class Cli : Thing
 
         DrawSprite(
             texture: Library.Textures["Pixel"],
-            position: new Vector2(CONSTANTS.VIRTUAL_WIDTH / 2f, CONSTANTS.VIRTUAL_HEIGHT / 2f),
+            position: Viewport.Adjust(new Vector2(CONSTANTS.VIRTUAL_WIDTH / 2f, CONSTANTS.VIRTUAL_HEIGHT / 2f)),
             scale: new Vector2(CONSTANTS.VIRTUAL_WIDTH - 8, CONSTANTS.VIRTUAL_HEIGHT - 8),
             color: new Color(0, 50, 0, 245)
         );
@@ -128,18 +128,16 @@ public class Cli : Thing
         {
             DrawText(
                 text: $"* {line}",
-                position: new Vector2(6, 4 + (Library.Font.BaseSize * i)),
-                color: PaletteAapSplendor128.NightlyAurora,
-                adjustFrom: AdjustFrom.Top
+                position: Viewport.Adjust(new Vector2(6, 4 + (Library.Font.BaseSize * i))),
+                color: PaletteAapSplendor128.NightlyAurora
             );
             i++;
         }
 
         DrawText(
             text: $"$ {current}{(caret ? "|" : "")}",
-            position: new Vector2(6, 4 + (Library.Font.BaseSize * i)),
-            color: PaletteBasic.Green,
-            adjustFrom: AdjustFrom.Top
+            position: Viewport.Adjust(new Vector2(6, 4 + (Library.Font.BaseSize * i))),
+            color: PaletteBasic.Green
         );
     }
 

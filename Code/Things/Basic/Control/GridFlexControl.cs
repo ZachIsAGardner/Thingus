@@ -22,7 +22,6 @@ public class GridFlexControl : Control
                 }
             }
             c.DrawMode = DrawMode;
-            c.AdjustFrom = AdjustFrom;
             c.SubViewport = SubViewport;
             c.Position = position;
             last = c;

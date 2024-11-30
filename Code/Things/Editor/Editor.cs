@@ -89,12 +89,12 @@ public class Editor : Thing
         }
         gridMouse.Color = new Color(0, 255, 0, 50);
 
-        Mouse = AddChild(new Sprite("Mouse", tileSize: 16, tileNumber: 0, drawOrder: 110, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Sprite;
+        Mouse = AddChild(new Sprite("Mouse", tileSize: 16, tileNumber: 0, drawOrder: 110, drawMode: DrawMode.Absolute)) as Sprite;
 
         Stamp = stamps.First();
-        previewBackground = AddChild(new Sprite("Pixel", drawOrder: 108, color: PaletteBasic.Black, scale: new Vector2(18), drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Sprite;
-        preview = AddChild(new Sprite(Stamp.Name, drawOrder: 109, tileSize: CONSTANTS.TILE_SIZE, color: CONSTANTS.PRIMARY_COLOR, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Sprite;
-        previewText = AddChild(new Text(Stamp.Name, position: new Vector2(0), Library.Font, color: CONSTANTS.PRIMARY_COLOR, outlineColor: PaletteBasic.Black, order: 111, drawMode: DrawMode.Absolute, adjustFrom: AdjustFrom.None)) as Text;
+        previewBackground = AddChild(new Sprite("Pixel", drawOrder: 108, color: PaletteBasic.Black, scale: new Vector2(18), drawMode: DrawMode.Absolute)) as Sprite;
+        preview = AddChild(new Sprite(Stamp.Name, drawOrder: 109, tileSize: CONSTANTS.TILE_SIZE, color: CONSTANTS.PRIMARY_COLOR, drawMode: DrawMode.Absolute)) as Sprite;
+        previewText = AddChild(new Text(Stamp.Name, position: new Vector2(0), Library.Font, color: CONSTANTS.PRIMARY_COLOR, outlineColor: PaletteBasic.Black, order: 111, drawMode: DrawMode.Absolute)) as Text;
         SelectStamp(Stamp);
 
         CameraTarget = AddChild(new Thing("CameraTarget"));
@@ -107,15 +107,16 @@ public class Editor : Thing
 
     void TilesetUi()
     {
+        AdjusterControl adjuster = new AdjusterControl();
+
         ScrollableControl subViewport = new ScrollableControl(new Vector2(64, 80), new Vector2(64, 160));
         subViewport.DrawMode = DrawMode.Absolute;
         subViewport.Position = new Vector2(4, 16);
         subViewport.Color = new Color(0, 0, 0, 1);
-        AddChild(subViewport);
-
+        adjuster.AddChild(subViewport);
+        
         GridFlexControl flex = new GridFlexControl();
         flex.DrawMode = DrawMode.Texture;
-        flex.AdjustFrom = AdjustFrom.TopLeft;
         flex.SubViewport = subViewport;
         flex.Bounds = new Vector2(64, 160);
         flex.Color = PaletteBasic.DarkGray;
@@ -138,13 +139,14 @@ public class Editor : Thing
 
     void ToolsUi()
     {
+        AdjusterControl adjuster = new AdjusterControl();
+
         GridFlexControl flex = new GridFlexControl();
         flex.DrawMode = DrawMode.Absolute;
-        flex.AdjustFrom = AdjustFrom.TopLeft;
         flex.Bounds = new Vector2(64, 100);
         flex.Position = new Vector2(4, 100);
         flex.Color = PaletteBasic.Blank;
-        AddChild(flex);
+        adjuster.AddChild(flex);
 
         foreach (Tool tool in Tools)
         {
@@ -175,7 +177,11 @@ public class Editor : Thing
         UpdatePosition();
         UpdateCamera();
         LastGridPosition = GridPosition;
-        if (hoveringControl) return;
+        if (hoveringControl)
+        {
+            Mouse.TileNumber = 17;
+            return;
+        }
         UpdateZoom();
         if (tool != null) tool.Update();
         UpdateCharacter();
@@ -366,15 +372,16 @@ public class Editor : Thing
     public void RefreshAutoTilemaps(List<Vector2> positions)
     {
         if (Room == null) return;
-
-        return;
         
         Room.Map.Cells.ToList().ForEach(c =>
         {
             if (positions != null && !positions.Contains(c.Position)) return;
 
-            MapCell cell = Room.Map.GetCell(c.Position + Room.Position, c.Import.Layer);
-            if (cell == null || cell.Name != c.Name) AddCell(c.Position + Room.Position, c.Name, c.Import.Layer);
+            MapCell cell = Room.Map.GetCell(c.Position, c.Import.Layer);
+            if (cell == null || cell.Name != c.Name)
+            {
+                AddCell(c.Position + Room.Position, c.Name, c.Import.Layer);
+            }
         });
     }
 
@@ -536,11 +543,13 @@ public class Editor : Thing
     public void Undo()
     {
         HistoryIndex--;
-        if (HistoryIndex < 0) HistoryIndex = 0;
-
-        if (HistoryIndex < 0 || History.Count <= 0)
+        if (HistoryIndex < 0)
         {
-            // Nothing to undo
+            HistoryIndex = 0;
+            return;
+        } 
+        if (History.Count <= 0)
+        {
             return;
         }
 
@@ -577,9 +586,24 @@ public class Editor : Thing
     {
         base.Draw();
 
-        if (Target?.Map != null) DrawText($"{Target?.Map?.Name}{(Room?.Map != null ? $", {Room.Map.Name}" : "")}", new Vector2(4, 2), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
+        if (Target?.Map != null)
+        {
+            DrawText(
+                $"{Target?.Map?.Name}{(Room?.Map != null ? $", {Room.Map.Name}" : "")}", 
+                Viewport.Adjust(new Vector2(4, 2), AdjustFrom.TopLeft), 
+                color: PaletteBasic.White, 
+                outlineColor: PaletteBasic.Black, 
+                font: Library.FontSmall
+            );
+        }
 
-        DrawText($"{tool?.Name} {GridPosition}", new Vector2(4, CONSTANTS.VIRTUAL_HEIGHT - Library.FontSmall.BaseSize - 4), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
-        //  {HistoryIndex}: <{History.ToList().Select(h => (h.Value.Committed ? "*" : "") + h.Key).Join(", ")}>
+        DrawText(
+            text: $"{tool?.Name} {GridPosition}", 
+            position: Viewport.Adjust(new Vector2(4, CONSTANTS.VIRTUAL_HEIGHT - Library.FontSmall.BaseSize - 4), AdjustFrom.BottomLeft), 
+            color: PaletteBasic.White, 
+            outlineColor: PaletteBasic.Black, 
+            font: Library.FontSmall
+        );
+        // DrawText($"{HistoryIndex}: <{History.ToList().Select(h => (h.Value.Committed ? "*" : "") + h.Key).Join(", ")}>", new Vector2(4, CONSTANTS.VIRTUAL_HEIGHT - (Library.FontSmall.BaseSize + 4) * 2), color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
     }
 }

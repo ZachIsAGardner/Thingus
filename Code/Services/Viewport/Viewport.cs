@@ -22,31 +22,76 @@ public static class Viewport
 
     // public static Rectangle VisibleArea;
     public static Vector2 Margin;
-    public static Vector2 Adjust => new Vector2(-Viewport.Margin.X * (1 + Viewport.VirtualRatio.Value), -Viewport.Margin.Y * (1 + Viewport.VirtualRatio.Value));
+    public static float AdjustFromLeft => Margin.X < 0 
+        ? -Margin.X
+        : 0;
+    public static float AdjustFromRight => Margin.X < 0 
+        ? Margin.X
+        : 0;
+    public static float AdjustFromTop => Margin.Y < 0 
+        ? -Margin.Y
+        : 0;
+    public static float AdjustFromBottom => Margin.Y < 0 
+        ? Margin.Y
+        : 0;
     public static Vector2 AdjustFromBottomLeft => new Vector2(
-        Margin.X == 0 ? 0
-            : Margin.X < 0 ? -Margin.X * (1 + VirtualRatio.Value) : -Margin.X * (VirtualRatio.Value),
-        Margin.Y == 0 ? 0
-            : Margin.Y < 0 ? -Margin.Y * (VirtualRatio.Value - 1) : -Margin.Y * (VirtualRatio.Value)
+        Margin.X == 0 ? 0 : AdjustFromLeft,
+        Margin.Y == 0 ? 0 : AdjustFromBottom
     );
     public static Vector2 AdjustFromBottomRight => new Vector2(
-        Margin.X == 0 ? 0
-            : Margin.X < 0 ? -Margin.X * (VirtualRatio.Value - 1) : -Margin.X * (VirtualRatio.Value),
-        Margin.Y == 0 ? 0
-            : Margin.Y < 0 ? -Margin.Y * (VirtualRatio.Value - 1) : -Margin.Y * (VirtualRatio.Value)
+        Margin.X == 0 ? 0 : AdjustFromRight,
+        Margin.Y == 0 ? 0 : AdjustFromBottom
     );
     public static Vector2 AdjustFromTopLeft => new Vector2(
-        Margin.X == 0 ? 0
-            : Margin.X < 0 ? -Margin.X * (1 + VirtualRatio.Value) : -Margin.X * (VirtualRatio.Value),
-        Margin.Y == 0 ? 0
-            : Margin.Y < 0 ? -Margin.Y * (2 + VirtualRatio.Value - 1) : -Margin.Y * (1 + VirtualRatio.Value - 1)
+        Margin.X == 0 ? 0 : AdjustFromLeft,
+        Margin.Y == 0 ? 0 : AdjustFromTop
     );
     public static Vector2 AdjustFromTopRight => new Vector2(
-        Margin.X == 0 ? 0
-            : Margin.X < 0 ? -Margin.X * (VirtualRatio.Value - 1) : -Margin.X * (VirtualRatio.Value),
-        Margin.Y == 0 ? 0
-            : Margin.Y < 0 ? -Margin.Y * (2 + VirtualRatio.Value - 1) : -Margin.Y * (1 + VirtualRatio.Value - 1)
+        Margin.X == 0 ? 0 : AdjustFromRight,
+        Margin.Y == 0 ? 0 : AdjustFromTop
     );
+
+    public static Vector2 Adjust(Vector2 position, AdjustFrom adjustFrom = AdjustFrom.TopLeft)
+    { 
+        if (adjustFrom != AdjustFrom.None)
+        {
+            // Left
+            if ((adjustFrom == AdjustFrom.Auto && position.X < CONSTANTS.VIRTUAL_WIDTH / 2f)
+                || adjustFrom == AdjustFrom.TopLeft
+                || adjustFrom == AdjustFrom.Left
+                || adjustFrom == AdjustFrom.BottomLeft)
+            {
+                position.X += AdjustFromLeft;
+            }
+            // Right
+            else if ((adjustFrom == AdjustFrom.Auto && position.X >= CONSTANTS.VIRTUAL_WIDTH / 2f) 
+                || adjustFrom == AdjustFrom.TopRight 
+                || adjustFrom == AdjustFrom.Right 
+                || adjustFrom == AdjustFrom.BottomRight)
+            {
+                position.X += AdjustFromRight;
+            } 
+
+            // Top
+            if ((adjustFrom == AdjustFrom.Auto && position.Y < CONSTANTS.VIRTUAL_HEIGHT / 2f)
+                || adjustFrom == AdjustFrom.TopLeft
+                || adjustFrom == AdjustFrom.Top
+                || adjustFrom == AdjustFrom.TopRight)
+            {
+                position.Y += AdjustFromTop;
+            }
+            // Bottom
+            else if ((adjustFrom == AdjustFrom.Auto && position.Y >= CONSTANTS.VIRTUAL_HEIGHT / 2f) 
+                || adjustFrom == AdjustFrom.BottomLeft 
+                || adjustFrom == AdjustFrom.Bottom 
+                || adjustFrom == AdjustFrom.BottomRight)
+            {
+                position.Y += AdjustFromBottom;
+            } 
+        }
+
+        return position;
+    }
 
     public static float Allowance = 0.9f;
 
@@ -148,15 +193,6 @@ public static class Viewport
                 Position.X / VirtualRatio.Value,
                 Position.Y / VirtualRatio.Value
             );
-
-            // VisibleArea = new Rectangle(
-            //     (-Margin.X / 2f) / VirtualRatio.Value,
-            //     (-Margin.Y / 2f) / VirtualRatio.Value,
-            //     (Rectangle.Width - (-Margin.X / 2f)) / VirtualRatio.Value,
-            //     (Rectangle.Height - (-Margin.Y / 2f)) / VirtualRatio.Value
-            // );
-
-            // Margin /= VirtualRatio.Value;
         }
         else if (Mode == ViewportMode.Free)
         {

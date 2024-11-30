@@ -14,7 +14,6 @@ public class VerticalFlexControl : Control
         {
             if (last != null) position.Y += last.Bounds.Y;
             c.DrawMode = DrawMode;
-            c.AdjustFrom = AdjustFrom;
             c.SubViewport = SubViewport;
             c.Position = position;
             last = c;
@@ -29,7 +28,8 @@ public class VerticalFlexControl : Control
             texture: Library.Textures["Pixel"],
             position: GlobalPosition,
             scale: Bounds,
-            origin: new Vector2(0)
+            origin: new Vector2(0),
+            color: Color
         );
     }
 }

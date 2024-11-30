@@ -16,6 +16,7 @@ public class Room : Thing
 
     public bool Hovered = false;
     public bool Focused => Game.Root.DeveloperTools.Editor.Room == this;
+    public bool GroupMove = false;
 
     public static Room Create(Thing root, ThingModel model) => new Room(model.Name, model.Position, model.Bounds);
     public Room() { }
@@ -52,21 +53,11 @@ public class Room : Thing
                     ? new Vector2(0)
                     : new Vector2(CONSTANTS.TILE_SIZE_HALF, CONSTANTS.TILE_SIZE_QUARTER)
             );
-            // Shapes.DrawSprite(
-            //     texture: Library.Textures["Pixel"],
-            //     position: TopLeft - new Vector2(4),
-            //     origin: new Vector2(0),
-            //     scale: bounds + new Vector2(8),
-            //     color: Focused 
-            //         ? PaletteBasic.White 
-            //         : Hovered 
-            //             ? PaletteBasic.White 
-            //             : PaletteBasic.DarkGray 
-            // );
+        
             // Drop Shadow
-            if (Focused)
+            if (!GroupMove && Focused)
             {
-                Shapes.DrawSprite(
+                DrawSprite(
                     texture: Library.Textures["Pixel"],
                     position: TopLeft + new Vector2(4),
                     origin: new Vector2(0),
@@ -75,7 +66,7 @@ public class Room : Thing
                 );
             }
             // Outline
-            Shapes.DrawSprite(
+            DrawSprite(
                 texture: Library.Textures["Pixel"],
                 position: TopLeft - new Vector2(1),
                 origin: new Vector2(0),
@@ -83,16 +74,18 @@ public class Room : Thing
                 color: PaletteBasic.Black
             );
             // Background
-            Shapes.DrawSprite(
+            DrawSprite(
                 texture: Library.Textures["Pixel"],
                 position: TopLeft,
                 origin: new Vector2(0),
                 scale: bounds,
-                color: Focused 
-                    ? PaletteBasic.Gray 
-                    : Hovered 
-                        ? PaletteBasic.LightGray 
-                        : PaletteBasic.DarkGray 
+                color: GroupMove
+                    ? PaletteBasic.Green
+                    : Focused 
+                        ? PaletteBasic.Gray 
+                        : Hovered 
+                            ? PaletteBasic.LightGray 
+                            : PaletteBasic.DarkGray 
             );
         }));
     }
@@ -102,6 +95,8 @@ public class Room : Thing
         base.Update();
 
         if (Game.Root.DeveloperTools.Cli.Active) return;
+
+        if (Game.Root.DeveloperTools.Editor.Holdup) return;
 
         Hovered = Utility.CheckRectangleOverlap(
             Game.Root.DeveloperTools.Editor.GridPosition - new Vector2(16),
@@ -149,7 +144,7 @@ public class Room : Thing
             {
                 for (int r = 0; r <= (Bounds.X / CONSTANTS.TILE_SIZE); r++)
                 {
-                    Shapes.DrawSprite(
+                    DrawSprite(
                         texture: Library.Textures[$"{CONSTANTS.TILE_SIZE}Grid"],
                         origin: Vector2.Zero,
                         color: new Color(255, 255, 255, Focused ? 128 : 16),
@@ -164,7 +159,7 @@ public class Room : Thing
             {
                 for (int r = 0; r < (Bounds.X / (CONSTANTS.TILE_SIZE_OBLIQUE)); r++)
                 {
-                    Shapes.DrawSprite(
+                    DrawSprite(
                         texture: Library.Textures[$"{(CONSTANTS.TILE_SIZE)}ObliqueGrid"],
                         origin: Vector2.Zero,
                         color: new Color(255, 255, 255, Focused ? 128 : 16),
@@ -182,7 +177,7 @@ public class Room : Thing
             {
                 for (int r = 0; r <= (Bounds.X / CONSTANTS.TILE_SIZE_HALF); r++)
                 {
-                    Shapes.DrawSprite(
+                    DrawSprite(
                         texture: Library.Textures[$"{CONSTANTS.TILE_SIZE_HALF}x{CONSTANTS.TILE_SIZE_QUARTER}Grid"],
                         origin: Vector2.Zero,
                         color: new Color(255, 255, 255, Focused ? 128 : 16),
@@ -202,7 +197,7 @@ public class Room : Thing
         DrawGrid();
 
         string message = $"{Name}";
-        Shapes.DrawText(
+        DrawText(
             text: message,
             position: new Vector2(Center.X, TopLeft.Y) - new Vector2(Raylib.MeasureText(message, Library.Font.BaseSize) / 2f, Library.Font.BaseSize * 2.25f),
             color: PaletteBasic.White,
@@ -210,7 +205,7 @@ public class Room : Thing
         );
 
         message = $"{Position.X}x,{Position.Y}y {Bounds.X}w,{Bounds.Y}h";
-        Shapes.DrawText(
+        DrawText(
             text: message,
             position: new Vector2(Center.X, TopLeft.Y) - new Vector2(Raylib.MeasureText(message, Library.Font.BaseSize) / 2f, Library.Font.BaseSize * 1.25f),
             color: PaletteBasic.LightGray,

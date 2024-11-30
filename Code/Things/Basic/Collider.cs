@@ -105,16 +105,6 @@ public class Collider : Thing
         Info.Reset();
     }
 
-    public bool IsOnScreen()
-    {
-        return Utility.CheckRectangleOverlap(
-            GlobalTopLeft,
-            GlobalBottomRight,
-            Viewport.CameraPosition + Viewport.Adjust,
-            Viewport.CameraPosition + Viewport.Adjust + new Vector2(CONSTANTS.VIRTUAL_WIDTH, CONSTANTS.VIRTUAL_HEIGHT)
-        );
-    }
-
     void GetBakedTilemapCollisions()
     {
         List<BakedTilemap> bakedTilemaps = Game.GetThings<BakedTilemap>();

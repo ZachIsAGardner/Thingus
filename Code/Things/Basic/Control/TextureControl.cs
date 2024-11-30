@@ -11,16 +11,16 @@ public class TextureControl : Control
     {
         base.Draw();
 
-        Vector2 position = Shapes.Adjust(GlobalPosition, DrawMode, AdjustFrom);
+        Rectangle rectangle = new Rectangle(GlobalPosition.X, GlobalPosition.Y, Bounds.X, Bounds.Y);
 
-        Shapes.DrawSprite(
+        DrawSprite(
             texture: Texture,
-            tileNumber: TileNumber,
-            tileSize: TileSize,
-            destination: new Rectangle(position.X, position.Y, Bounds.X, Bounds.Y),
             origin: new Vector2(0),
             color: Color,
-            drawMode: DrawMode
+
+            destination: rectangle,
+            tileNumber: TileNumber,
+            tileSize: TileSize
         );
     }
 }

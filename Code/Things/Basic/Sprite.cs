@@ -72,7 +72,6 @@ public class Sprite : Thing
     public int TileSize = 0;
     public bool FlipHorizontally = false;
     public bool FlipVertically = false;
-    public AdjustFrom AdjustFrom = AdjustFrom.Auto;
     public Vector2? Origin = null;
 
     // Shake
@@ -111,7 +110,7 @@ public class Sprite : Thing
     // Create from code
     public Sprite(
         string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
-        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, AdjustFrom adjustFrom = AdjustFrom.Auto, Vector2? origin = null
+        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, Vector2? origin = null
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {
         Texture = Library.Textures[name];
@@ -121,7 +120,6 @@ public class Sprite : Thing
         if (color != null) Color = color.Value;
         if (scale != null) Scale = scale.Value;
         Rotation = rotation;
-        AdjustFrom = adjustFrom;
         if (origin != null) Origin = origin;
     }
 
@@ -222,7 +220,7 @@ public class Sprite : Thing
     {
         base.Draw();
 
-        Shapes.DrawSprite(
+        DrawSprite(
             texture: Texture,
             position: (DrawMode == DrawMode.Texture ? Position : GlobalPosition)
                 + new Vector2(shakeXOffset, shakeYOffset),
@@ -231,10 +229,8 @@ public class Sprite : Thing
             rotation: Rotation,
             scale: Scale,
             color: Color,
-            drawMode: DrawMode,
             flipHorizontally: FlipHorizontally,
             flipVertically: FlipVertically,
-            adjustFrom: AdjustFrom,
             origin: Origin
         );
     }

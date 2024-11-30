@@ -13,13 +13,13 @@ public class ButtonControl : TextureControl
 
         Drawer drawer = new Drawer(name: "ButtonBackground", drawOrder: DrawOrder - 1, drawMode: DrawMode, action: d =>
         {
-            d.DrawSprite(
-                texture: Library.Textures["Pixel"],
-                scale: Bounds,
-                origin: new Vector2(0),
-                color: PaletteBasic.Black,
-                position: d.GlobalPosition
-            );
+            // d.DrawSprite(
+            //     texture: Library.Textures["Pixel"],
+            //     scale: Bounds,
+            //     origin: new Vector2(0),
+            //     color: PaletteBasic.Black,
+            //     position: d.GlobalPosition
+            // );
         });
         drawer.SubViewport = SubViewport;
 
@@ -51,12 +51,14 @@ public class ButtonControl : TextureControl
 
     public override void Draw()
     {
+        // Background
         DrawSprite(
             texture: Library.Textures["Pixel"],
-            scale: Bounds - new Vector2(2),
             origin: new Vector2(0),
             color: Held || Hovered ? PaletteBasic.Green : PaletteBasic.Gray,
-            position: GlobalPosition + new Vector2(1)
+
+            position: GlobalPosition,
+            scale: Bounds
         );
 
         base.Draw();
