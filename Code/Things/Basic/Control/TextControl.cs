@@ -18,17 +18,27 @@ public class TextControl : Control
     public void Refresh()
     {
         if (Font == null) Font = Library.Font;
-        Bounds = new Vector2(Raylib.MeasureText(Text, Font.Value.BaseSize), Font.Value.BaseSize);
+        // Bounds = new Vector2(Raylib.MeasureText(Text, Font.Value.BaseSize), Font.Value.BaseSize);
     }
 
     public override void Draw()
     {
         base.Draw();
 
+        DrawNineSlice(
+            texture: Library.Textures["WhiteSlice"],
+            tileSize: 5,
+            position: GlobalPosition - Padding,
+            width: (int)(Bounds.X + (Padding.X * 2)),
+            height: (int)(Bounds.Y + (Padding.Y * 2)),
+            color: Pressed != null && IsHovered ? HighlightColor : PaletteBasic.Blank
+        );
+
         DrawText(
             text: Text,
-            color: Pressed != null && IsHovered ? HighlightColor : Color,
-            font: Font
+            color: Pressed != null && IsHovered ? TextHighlightColor : TextColor,
+            font: Font,
+            position: GlobalPosition + TextPadding
         );
     }
 }

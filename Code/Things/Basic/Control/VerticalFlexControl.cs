@@ -21,7 +21,7 @@ public class VerticalFlexControl : Control
         {
             if (last != null) position.Y += last.Bounds.Y + (last.Padding.Y * 2) + Spacing;
             c.DrawMode = DrawMode;
-            c.DrawOrder = DrawOrder + 1;
+            if (c.DrawOrder < DrawOrder + 1) c.DrawOrder = DrawOrder + 1;
             c.SubViewport = SubViewport;
             c.Position = position;
             last = c;

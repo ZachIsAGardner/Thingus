@@ -11,6 +11,8 @@ public class RectangleSelection : Thing
     Func<Vector2> end = null;
     Texture2D square;
     Color color;
+
+    Action state;
     
     public RectangleSelection(Vector2 start, Func<Vector2> end, Color color)
     {
@@ -30,12 +32,25 @@ public class RectangleSelection : Thing
         {
             // TODO
         }
+
+        state = Drag;
     }
     
     public override void Update()
     {
         base.Update();
 
+        if (state != null) state();
+    }
+
+    public void ChangeState(Action state)
+    {
+        if (state == Move) start = end();
+        this.state = state;
+    }
+
+    public void Drag()
+    {
         if (start != null)
         {
             Positions.Clear();
@@ -91,15 +106,21 @@ public class RectangleSelection : Thing
         }
     }
 
+    public void Move()
+    {
+        Vector2 distance = end() - start.Value;
+        Position = distance;
+    }
+
     public override void Draw()
     {
         base.Draw();
 
         Positions.ForEach(p =>
         {
-            Shapes.DrawSprite(
+            DrawSprite(
                 texture: square, 
-                position: p, 
+                position: GlobalPosition + p, 
                 color: color
             );
         });

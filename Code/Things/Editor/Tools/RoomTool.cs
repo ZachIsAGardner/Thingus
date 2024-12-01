@@ -194,14 +194,13 @@ public class RoomTool : Tool
 
         if (Input.LeftMouseButtonIsHeld && editor.LastGridInteractPosition != editor.GridPosition && selection == null)
         {
-            selection = new RectangleSelection(editor.GridPosition, () => editor.GridPosition, new Color(0, 255, 0, 255));
-            editor.Holdup = true;
+            selection = new RectangleSelection(editor.GridPosition, () => editor.GridPosition, new Color(0, 255, 0, 50));
+            Input.Holdup = true;
         }
 
         if (Input.LeftMouseButtonIsReleased && selection != null)
         {
             List<Room> rooms = Game.GetThings<Room>().Where(r => selection.Positions.Any(p => r.IsPositionInside(p))).ToList();
-            rooms.ForEach(r => Log.Write(r.Name));
             selection.Destroy();
             selection = null;
             actionMousePositionStart = editor.GridPosition;
@@ -342,6 +341,7 @@ public class RoomTool : Tool
                     });
                 }
             ));
+            
             Reset();
         }
     }

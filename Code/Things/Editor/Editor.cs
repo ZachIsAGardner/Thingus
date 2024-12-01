@@ -5,6 +5,8 @@ namespace Thingus;
 
 public class Editor : Thing
 {
+    public static HashSet<string> Categories = new HashSet<string>() { };
+
     public Thing Target => Game.Root.Dynamic.Children?.FirstOrDefault();
     public Room Room;
 
@@ -21,8 +23,7 @@ public class Editor : Thing
 
     Vector2 cameraVelocity;
 
-    public bool Holdup = false;
-    public bool InteractDisabled => Holdup || Game.GetThings<Room>().Where(r => r != Room).Any(r => r.Hovered);
+    public bool InteractDisabled => Input.Holdup || Game.GetThings<Room>().Where(r => r != Room).Any(r => r.Hovered);
 
     public Vector2 MousePosition;
     public Vector2 GridPosition;
@@ -119,7 +120,23 @@ public class Editor : Thing
 
     void TilesetUi()
     {
-        ScrollableControl scrollable = new ScrollableControl(new Vector2(48 + ScrollableControl.ScrollBarWidth + 1, 80), new Vector2(48 + ScrollableControl.ScrollBarWidth + 1, 160));
+        int width = 64;
+
+        DropdownControl categoryControl = new DropdownControl("", Categories.ToList());
+        categoryControl.DrawMode = DrawMode.Absolute;
+        categoryControl.Bounds.X = width;
+        categoryControl.Bounds.Y = 16;
+        categoryControl.Texture = Library.Textures["BoxInsideSlice"];
+        categoryControl.DrawOrder = 20;
+        categoryControl.HighlightColor = PaletteBasic.DarkGreen;
+        categoryControl.Color = PaletteBasic.White;
+        // categoryControl.TextPadding.X = 3;
+        categoryControl.Padding = new Vector2(2);
+        categoryControl.TextHighlightColor = PaletteBasic.White;
+        categoryControl.Text = Categories.FirstOrDefault();
+        verticalFlex.AddChild(categoryControl);
+ 
+        ScrollableControl scrollable = new ScrollableControl(new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 80), new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 160));
         scrollable.DrawMode = DrawMode.Absolute;
         scrollable.Texture = Library.Textures["BoxThinSlice"];
         scrollable.TileSize = 5;
@@ -129,30 +146,48 @@ public class Editor : Thing
         GridFlexControl flex = new GridFlexControl();
         flex.DrawMode = DrawMode.Texture;
         flex.SubViewport = scrollable;
-        flex.Bounds = new Vector2(48, 160);
+        flex.Bounds = new Vector2(width, 160);
         flex.Color = new Color(0, 0, 0, 1);
         AddChild(flex);
 
-        foreach (Stamp stamp in Library.ThingImports.Select(t => new Stamp(t.Key)).ToList())
+        string category = categoryControl.Text;
+
+        Action refresh = () =>
         {
-            ButtonControl control = new ButtonControl();
-            control.Pressed = () => 
+            flex.Clear();
+
+            foreach (Stamp stamp in Library.ThingImports.Where(t => t.Value.Category?.ToLower() == category?.ToLower()).Select(t => new Stamp(t.Key)).ToList())
             {
-                SelectStamp(stamp);
-            };
-            control.DrawOrder = 10;
-            control.Texture = stamp.Texture;
-            control.Bounds = new Vector2(16);
-            control.Name = stamp.Name;
-            flex.AddChild(control);
-        }
+                ButtonControl control = new ButtonControl();
+                control.Pressed = () => 
+                {
+                    SelectStamp(stamp);
+                };
+                control.DrawOrder = 10;
+                control.Texture = stamp.Texture;
+                control.Bounds = new Vector2(16);
+                control.Name = stamp.Name;
+                flex.AddChild(control);
+            }
+
+            flex.Refresh();
+        };
+        refresh();
+
+        categoryControl.LostFocus = () =>
+        {
+            category = categoryControl.Text;
+            refresh();
+        };
     }
 
     void ToolsUi()
     {
+        int width = 64;
+
         GridFlexControl flex = new GridFlexControl();
         flex.DrawMode = DrawMode.Absolute;
-        flex.Bounds = new Vector2(16, Tools.Count * 16);
+        flex.Bounds = new Vector2(width, 32);
         flex.Texture = Library.Textures["BoxThinSlice"];
         flex.TileSize = 5;
         flex.Padding = new Vector2(3);
@@ -180,7 +215,7 @@ public class Editor : Thing
 
         if (Game.Root.DeveloperTools.Cli.Active) return;
         hoveringControl = Game.GetThings<Control>().Any(c => c.IsHovered || c.IsHeld);
-        focusedControl = Game.GetThings<TextInputControl>().Any(c => c.IsFocused);
+        focusedControl = Control.TextInputControl != null;
 
         // Log.Write(Viewport.RelativeLayer.Camera.Zoom);
         TogglePreview(Input.IsMouseInsideWindow() && Room != null && tool?.ShowPreview == true && !focusedControl);
@@ -222,11 +257,6 @@ public class Editor : Thing
 
     void UpdatePosition()
     {
-        if (!Input.LeftMouseButtonIsHeld)
-        {
-            Holdup = false;
-        }
-
         MousePosition = Input.MousePositionRelative();
         Mouse.Position = Input.MousePositionAbsolute() + new Vector2(8);
         Mouse.SetVisible(Input.IsMouseInsideWindow());
@@ -240,7 +270,6 @@ public class Editor : Thing
         {
             GridPosition.Y = (MousePosition.Y + (CONSTANTS.TILE_SIZE_THIRD / 2)).ToNearest(CONSTANTS.TILE_SIZE_THIRD) 
                 + CONSTANTS.TILE_SIZE_THIRD / 2;
-
 
             if ((GridPosition.Y - (CONSTANTS.TILE_SIZE_THIRD / 2)) % (CONSTANTS.TILE_SIZE - CONSTANTS.TILE_SIZE_THIRD) == 0)
             {

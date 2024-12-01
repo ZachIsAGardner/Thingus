@@ -3,19 +3,19 @@ using Raylib_cs;
 
 namespace Thingus;
 
-public class TextInputControl : Control
+public class DropdownControl : Control
 {
     public string Title;
+    public List<string> Options;
     public string Text;
     public Font? Font;
 
-    bool caret;
-    float caretTime = 0;
+    VerticalFlexControl window;
 
-    public TextInputControl(string title) 
+    public DropdownControl(string title, List<string> options) 
     {
         Title = title;
-
+        Options = options;
         Refresh();
     }
 
@@ -32,48 +32,65 @@ public class TextInputControl : Control
         base.Destroy();
     }
 
+    void Window()
+    {
+        window = new VerticalFlexControl();
+        window.Bounds.X = Bounds.X;
+        window.Bounds.Y = Options.Count() * 16;
+        window.Padding = new Vector2(1);
+        window.Texture = Library.Textures["BoxInsideSlice"];
+        window.DrawOrder = DrawOrder + 10;
+        window.DrawMode = DrawMode;
+        window.Position.Y = 16;
+
+        foreach (string option in Options)
+        {
+            TextControl control = new TextControl();
+            control.Bounds.X = Bounds.X;
+            control.Bounds.Y = 16;
+            control.Text = option;
+            control.TextPadding.X = 3;
+            control.HighlightColor = PaletteBasic.DarkGreen;
+            control.TextHighlightColor = PaletteBasic.White;
+            control.Pressed = () =>
+            {
+                Input.Holdup = true;
+                Text = option;
+                LoseFocus();
+            };
+            window.AddChild(control);
+        }
+        window.Refresh();
+        AddChild(window);
+    }
+
     public override void Focus()
     {
         base.Focus();
 
-        TextInputControl = this;
+        Window();
     }
 
     public override void LoseFocus()
     {
         base.LoseFocus();
 
-        if (TextInputControl == this) TextInputControl = null;
+        window?.Destroy();
+        window = null;
     }
 
     public override void Update()
     {
         base.Update();
 
-        if (IsHovered && Input.LeftMouseButtonIsPressed)
+        if (IsFocused && window != null && !window.IsHovered && Input.LeftMouseButtonIsPressed)
+        {
+            LoseFocus();
+        }
+
+        if (!IsFocused && IsHovered && Input.LeftMouseButtonIsPressed)
         {
             Focus();
-        }
-
-        if (IsFocused)
-        {
-            caretTime -= Time.Delta;
-            if (caretTime <= 0) 
-            {
-                caret = !caret;
-                caretTime = 0.5f;
-            }
-
-            Text = Input.ApplyKeyboardToString(Text);
-            if ((Input.LeftMouseButtonIsPressed && !IsHovered) || Input.IsPressed(KeyboardKey.Enter))
-            {
-                LoseFocus();
-            } 
-        }
-        else
-        {
-            caret = false;
-            caretTime = 0;
         }
 
         Refresh();
@@ -82,7 +99,6 @@ public class TextInputControl : Control
     public void Refresh()
     {
         if (Font == null) Font = Library.Font;
-        // Bounds = new Vector2(Raylib.MeasureText(Text, Font.Value.BaseSize), Font.Value.BaseSize);
     }
 
     public override void Draw()
@@ -98,6 +114,7 @@ public class TextInputControl : Control
             color: Pressed != null && IsHovered ? HighlightColor : PaletteBasic.Blank
         );
 
+
         string title = Title;
         int length = title.Width(Font.Value);
         if (Title?.HasValue() == true) title += " ";
@@ -112,10 +129,15 @@ public class TextInputControl : Control
         );
 
         DrawText(
-            text: $"{title}{Text}{(caret ? "|" : "")}",
+            text: $"{title}{Text}",
             color: Pressed != null && IsHovered ? TextHighlightColor : TextColor,
             font: Font,
             position: GlobalPosition + TextPadding
+        );
+
+        DrawSprite(
+            texture: Library.Textures["DropdownButton"],
+            position: GlobalPosition + new Vector2(8) + new Vector2(Bounds.X - 16, 0)
         );
     }
 }

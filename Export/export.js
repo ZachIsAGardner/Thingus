@@ -1,4 +1,7 @@
 const utility = require("./utility.js");
+const fs = require('fs');
+const moment = require("./moment.js");
+const format = "YYYY-MM-DD.HH_mm_ss";
 
 var architecture = 32;
 
@@ -15,6 +18,15 @@ const winPath = architecture == 32 ? win32Path : win64Path;
 const linPath = `${binPath}/linux-x64/publish`;
 const macPath = `${binPath}/osx-x64/publish`;
 
+const target = "all";
+
+var buildNumber = 0;
+if (fs.existsSync(`${__dirname}/../../build.txt`)) {
+    var build = fs.readFileSync(`${__dirname}/../../build.txt`).toString();
+    buildNumber = build.split("\n")[0];
+}
+buildNumber++;
+fs.writeFileSync(`${__dirname}/../../build.txt`, `${buildNumber}\n${moment().format(format)}\n${target}`);
 
 var progressCount = 0;
 function printProgress() {
@@ -33,7 +45,7 @@ function printProgress() {
 }
 
 async function exportForWindows() {
-    console.log("🪟 Building for Windows...");
+    console.log("🪟  Building for Windows...");
     var go = false;
     var shellError = false;
 
@@ -48,6 +60,7 @@ async function exportForWindows() {
         if (go) break;
     }
     console.log("");
+    console.log("");
 
     utility.copyFolderRecursiveSync(contentEnginePath, winPath);
     utility.copyFolderRecursiveSync(contentGamePath, winPath);
@@ -55,7 +68,7 @@ async function exportForWindows() {
 }
 
 async function exportForLinux() {
-    console.log("🐧 Building for Linux...");
+    console.log("🐧  Building for Linux...");
     var go = false;
     var shellError = false;
 
@@ -70,6 +83,7 @@ async function exportForLinux() {
         if (go) break;
     }
     console.log("");
+    console.log("");
 
     utility.copyFolderRecursiveSync(contentEnginePath, linPath);
     utility.copyFolderRecursiveSync(contentGamePath, linPath);
@@ -77,7 +91,7 @@ async function exportForLinux() {
 }
 
 async function exportForMac() {
-    console.log("🍎 Building for Mac...");
+    console.log("🍎  Building for Mac...");
     var go = false;
     var shellError = false;
 
@@ -92,6 +106,7 @@ async function exportForMac() {
         if (go) break;
     }
     console.log("");
+    console.log("");
 
     utility.copyFolderRecursiveSync(contentEnginePath, macPath);
     utility.copyFolderRecursiveSync(contentGamePath, macPath);
@@ -103,7 +118,7 @@ async function execute() {
     await exportForWindows();
     await exportForLinux();
     await exportForMac();
-    console.log("✌️ Done!");
+    console.log("✌️  Done!");
 }
 
 execute();

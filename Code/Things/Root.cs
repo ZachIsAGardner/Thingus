@@ -34,7 +34,7 @@ public class Root : Thing
         Shared.Name = "Shared";
 
         SongManager = AddChild(new SongManager()) as SongManager;
-        DeveloperTools = AddChild(new DeveloperTools()) as DeveloperTools;
+        if (CONSTANTS.IS_DEBUG) DeveloperTools = AddChild(new DeveloperTools()) as DeveloperTools;
         if (CONSTANTS.START_MAP != null) Load(CONSTANTS.START_MAP);
     }
 
@@ -62,13 +62,12 @@ public class Root : Thing
 
     public void Load(Map map)
     {
-        if (DeveloperTools.Editor != null)
+        if (DeveloperTools?.Editor != null)
         {
             DeveloperTools.Editor.Reset();
         }
 
-        Dynamic.Children.ToList().ForEach(c => c.Destroy());
-        Dynamic.Children = new List<Thing>() { };
+        Dynamic.Clear();
         Thing thing = map.Load(Dynamic);
         Game.LastMap = map;
         Game.Mode = GameMode.Play;

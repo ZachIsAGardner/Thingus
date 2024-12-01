@@ -1,7 +1,13 @@
+using Raylib_cs;
+
 namespace Thingus;
 
 public static class StringExtensions
 {
+    public static int Width(this string str, Font font)
+    {
+        return Raylib.MeasureText(str, font.BaseSize);
+    }
     public static bool HasValue(this string str)
     {
         if (str == null) return false;

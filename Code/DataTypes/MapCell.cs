@@ -14,7 +14,7 @@ public class MapCell
     public int? TileNumber;
     public Vector2 Bounds;
 
-    public List<ThingOption> Options = new List<ThingOption>() { };
+    public List<ThingProperty> Options = new List<ThingProperty>() { };
 
     public MapCell() { }
     public MapCell(string name, string thing = null, Vector2? position = null, int? tileNumber = null, Vector2? bounds = null, string parent = null)
@@ -28,7 +28,25 @@ public class MapCell
     }
 
     [JsonIgnore]
-    public ThingImport Import => import ?? (import = Library.ThingImports.Get(Thing) ?? Library.ThingImports.Get(Name));
+    public ThingImport Import 
+    { 
+        get
+        {
+            if (import != null) return import;
+            ThingImport thingImport = Library.ThingImports.Get(Thing);
+            ThingImport nameImport = Library.ThingImports.Get(Name);
+            if (thingImport == null && nameImport != null) return nameImport;
+            if (thingImport != null && nameImport == null) return thingImport;
+            if (thingImport != null && nameImport != null)
+            {
+                Type thingType = Utility.FindType(thingImport.Name);
+                Type nameType = Utility.FindType(nameImport.Name);
+                if (thingType.IsAssignableFrom(nameType)) return nameImport;
+                if (nameType.IsAssignableFrom(thingType)) return thingImport;
+            }
+            return null;
+        }
+    }
     [JsonIgnore]
     ThingImport import = null;
 
@@ -59,8 +77,20 @@ public class MapCell
         else
         {
             ThingModel model = new ThingModel(this);
-            MethodInfo method = Utility.FindCreateMethod(Thing);
-            if (method == null)  method = Utility.FindCreateMethod(Name);
+
+            MethodInfo thingMethod = Utility.FindCreateMethod(Thing);
+            MethodInfo nameMethod = Utility.FindCreateMethod(Name);
+            MethodInfo method = null;
+            if (thingMethod == null && nameMethod != null) method = nameMethod;
+            if (thingMethod != null && nameMethod == null) method = thingMethod;
+            if (thingMethod != null && nameMethod != null)
+            {
+                Type thingType = Utility.FindType(Thing);
+                Type nameType = Utility.FindType(Name);
+                if (thingType.IsAssignableFrom(nameType)) method = nameMethod;
+                if (nameType.IsAssignableFrom(thingType)) method = thingMethod;
+            }
+
             thing = root.AddChild(method.Invoke(null, new object[] { root, model }) as Thing);
             thing.Map = Map;
             thing.Cell = this;

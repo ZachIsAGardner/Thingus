@@ -15,6 +15,7 @@ public static class Library
     public static Dictionary<string, Shader> Shaders = new Dictionary<string, Shader>(StringComparer.OrdinalIgnoreCase) { };
     public static Dictionary<string, Map> Maps = new Dictionary<string, Map>(StringComparer.OrdinalIgnoreCase) { };
     public static Dictionary<string, ThingImport> ThingImports = new Dictionary<string, ThingImport>(StringComparer.OrdinalIgnoreCase) { };
+    public static Dictionary<string, LangImport> LangImports = new Dictionary<string, LangImport>(StringComparer.OrdinalIgnoreCase) { };
 
     static List<string> ParseDirectory(string path, List<string> result = null)
     {
@@ -43,6 +44,8 @@ public static class Library
         Shaders.Clear();
         Songs.Clear();
         Maps.Clear();
+        ThingImports.Clear();
+        LangImports.Clear();
 
         Import("_Thingus/Content");
         Import("Content");
@@ -69,6 +72,7 @@ public static class Library
                 string contents = File.ReadAllText(file);
                 ThingImports[name] = JsonConvert.DeserializeObject<ThingImport>(contents);
                 ThingImports[name].Name = name;
+                Editor.Categories.Add(ThingImports[name].Category);
             }
             else if ((file.EndsWith(".ogg") || file.EndsWith(".wav")) && file.Contains("/Songs"))
             {
@@ -94,6 +98,10 @@ public static class Library
             {
                 Fonts[name] = new Font(Raylib.LoadFont(file));
                 Raylib.SetTextureFilter(Fonts[name].Texture, TextureFilter.Point);
+            }
+            else if (file.EndsWith(".lang"))
+            {
+                LangImports[name] = new LangImport(file);
             }
         }
     }

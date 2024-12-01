@@ -6,6 +6,7 @@ namespace Thingus;
 public class Control : Thing
 {
     public static Control FocusedControl = null;
+    public static Control TextInputControl = null;
 
     public Vector2 Bounds;
     public Color Color = PaletteBasic.White;
@@ -16,21 +17,46 @@ public class Control : Thing
     public int TileSize = 0;
 
     public bool IsHovered;
+    public bool IsFocused => FocusedControl == this || (Parent as Control)?.IsFocused == true;
     public bool IsHeld;
-    public bool IsFocused;
     public Action Hovered;
     public Action Pressed;
     public Action Released;
+    public Action LostFocus;
 
     public Vector2 Padding;
     public Vector2 TextPadding;
     public Texture2D? Texture;
 
+    public virtual void Focus()
+    {
+        if (FocusedControl != null) FocusedControl.LoseFocus();
+        FocusedControl = this;
+    }
+
+    public virtual void LoseFocus()
+    {
+        if (FocusedControl == this)
+        {
+            if (LostFocus != null) LostFocus();
+            FocusedControl = null;
+        }
+    }
+
     public override void Update()
     {
         base.Update();
 
-        if (Pressed != null && Hovered != null && Released != null)
+        if (IsHeld)
+        {
+            if (!Input.LeftMouseButtonIsHeld)
+            {
+                IsHeld = false;
+                if (Released != null) Released();
+            }
+        }
+
+        if ((FocusedControl != null && !IsFocused) || (Pressed != null && Hovered != null && Released != null))
         {
             IsHovered = false;
             return;
@@ -50,7 +76,6 @@ public class Control : Thing
             if (SubViewport.DrawMode == DrawMode.Absolute) mouse = Input.MousePositionAbsolute() + SubViewport.Scroll - SubViewport.GlobalPosition;
         }
 
-            
         IsHovered = Utility.CheckRectangleOverlap(
             mouse,
             mouse,
@@ -68,14 +93,6 @@ public class Control : Thing
                 if (Pressed != null) Pressed();
             }
 
-        }
-        if (IsHeld)
-        {
-            if (Input.LeftMouseButtonIsReleased)
-            {
-                IsHeld = false;
-                if (Released != null) Released();
-            }
         }
     }
 }

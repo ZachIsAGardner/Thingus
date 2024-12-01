@@ -94,9 +94,9 @@ public class Room : Thing
     {
         base.Update();
 
-        if (Game.Root.DeveloperTools.Cli.Active) return;
+        if (Game.Root.DeveloperTools == null || Game.Root.DeveloperTools?.Cli?.Active == true) return;
 
-        if (Game.Root.DeveloperTools.Editor.Holdup) return;
+        if (Input.Holdup) return;
 
         Hovered = Utility.CheckRectangleOverlap(
             Game.Root.DeveloperTools.Editor.GridPosition - new Vector2(16),
@@ -129,11 +129,10 @@ public class Room : Thing
 
     public void Click()
     {
-        Editor editor = Game.GetThing<Editor>();
-        if (editor != null) editor.Holdup = true;
+        Input.Holdup = true;
 
 
-        if (Game.Root.DeveloperTools.Editor != null) Game.Root.DeveloperTools.Editor.Room = this;
+        if (Game.Root.DeveloperTools?.Editor != null) Game.Root.DeveloperTools.Editor.Room = this;
     }
 
     void DrawGrid()

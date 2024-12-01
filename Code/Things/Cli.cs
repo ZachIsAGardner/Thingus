@@ -23,6 +23,7 @@ public class Cli : Thing
         lines.Add("-----------");
         lines.Add("| THINGUS |");
         lines.Add("-----------");
+        lines.Add($"v{CONSTANTS.FULL_VERSION}");
         Help();
     }
 
@@ -202,9 +203,14 @@ public class Cli : Thing
         lines.Add("`: Toggle CLI");
         lines.Add("1: Toggle Editor");
         lines.Add("2: Toggle Debug Info");
+        lines.Add("L: Refresh Assets");
         lines.Add("");
         lines.Add("F1: Toggle Frame Advance");
         lines.Add("F2: Advance Frame");
+        lines.Add("");
+        lines.Add("In Editor:");
+        lines.Add("WASD: Move Camera");
+        lines.Add("B: Brush, U: Rectangle, G: Fill, Q: Wand, R: Room, E: Edit");
         lines.Add("");
     }
 

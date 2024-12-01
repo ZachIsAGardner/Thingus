@@ -1,1 +1,32 @@
-{"Cells":[{"Name":"Thing","Thing":null,"Position":{"X":0.0,"Y":0.0},"Parent":null,"TileNumber":null,"Bounds":{"X":0.0,"Y":0.0}},{"Name":"=Init_000","Thing":null,"Position":{"X":0.0,"Y":0.0},"Parent":"Thing","TileNumber":null,"Bounds":{"X":0.0,"Y":0.0}}]}
+{
+    "Cells": [
+        {
+            "Name": "Thing",
+            "Thing": null,
+            "Position": {
+                "X": 0.0,
+                "Y": 0.0
+            },
+            "Parent": null,
+            "TileNumber": null,
+            "Bounds": {
+                "X": 0.0,
+                "Y": 0.0
+            }
+        },
+        {
+            "Name": "=Init_000",
+            "Thing": null,
+            "Position": {
+                "X": 0.0,
+                "Y": 0.0
+            },
+            "Parent": "Thing",
+            "TileNumber": null,
+            "Bounds": {
+                "X": 0.0,
+                "Y": 0.0
+            }
+        }
+    ]
+}

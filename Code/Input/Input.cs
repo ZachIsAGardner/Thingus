@@ -35,6 +35,8 @@ public static class Input
 
     public static float MouseWheel => Raylib.GetMouseWheelMove();
 
+    public static bool Holdup = false;
+
     static KeyboardKey currentKey = KeyboardKey.Null;
     public static void Update()
     {
@@ -50,6 +52,11 @@ public static class Input
             {
                 currentKey = KeyboardKey.Null;
             }
+        }
+
+        if (!LeftMouseButtonIsHeld)
+        {
+            Holdup = false;
         }
     }
 

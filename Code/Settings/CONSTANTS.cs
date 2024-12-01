@@ -6,6 +6,8 @@ public class CONSTANTS
 {
     class ConstantsContents
     {
+        public bool? IS_DEBUG;
+        public string VERSION;
         public string TITLE;
         public string NAMESPACE;
         public string START_MAP;
@@ -13,10 +15,15 @@ public class CONSTANTS
         public int? VIRTUAL_HEIGHT;
         public int? DEFAULT_SCREEN_MULTIPLIER;
         public int? TILE_SIZE;
-        public string? PRIMARY_COLOR;
-        public string? PROJECTION_TYPE;
-        public string? SAVE_FOLDER;
+        public string PRIMARY_COLOR;
+        public string PROJECTION_TYPE;
+        public string SAVE_FOLDER;
     }
+
+    public static readonly bool IS_DEBUG = false;
+    public static readonly string VERSION;
+    public static readonly string BUILD = "0";
+    public static string FULL_VERSION => $"{VERSION}_{BUILD}";
 
     public static readonly string TITLE = "Thingus Game";
     public static readonly string NAMESPACE = null;
@@ -33,11 +40,14 @@ public class CONSTANTS
     public static ProjectionType PROJECTION_TYPE = ProjectionType.Grid;
     public static string SAVE_FOLDER = "thingus";
 
+
     static CONSTANTS()
     {
         string contents = File.ReadAllText("CONSTANTS.json");
         ConstantsContents c = JsonConvert.DeserializeObject<ConstantsContents>(contents);
 
+        if (c.VERSION != null) VERSION = c.VERSION;
+        if (c.IS_DEBUG != null) IS_DEBUG = c.IS_DEBUG == true;
         if (c.TITLE != null) TITLE = c.TITLE;
         if (c.NAMESPACE != null) NAMESPACE = c.NAMESPACE;
         if (c.START_MAP != null) START_MAP = c.START_MAP;
@@ -53,5 +63,11 @@ public class CONSTANTS
             if (c.PROJECTION_TYPE.ToLower() == "isometric") PROJECTION_TYPE = ProjectionType.Isometric;
         }
         if (c.SAVE_FOLDER != null) SAVE_FOLDER = c.SAVE_FOLDER;
+
+        if (File.Exists("build.txt"))
+        {
+            string[] build = File.ReadAllLines("build.txt");
+            if (build.Count() > 0) BUILD = build[0];
+        }
     }
 }

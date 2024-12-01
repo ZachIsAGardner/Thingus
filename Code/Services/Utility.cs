@@ -76,10 +76,18 @@ public static class Utility
 
     public static MethodInfo FindCreateMethod(string name)
     {
-        Type type = Type.GetType($"Thingus.{name}");
-        if (type == null) type = Type.GetType($"{CONSTANTS.NAMESPACE}.{name}");
+        if (name == null) return null;
+        Type type = FindType(name);
         if (type == null) return null;
         MethodInfo method = type.GetMethod("Create", new[] { typeof(Thing), typeof(ThingModel) });
         return method;
+    }
+
+    public static Type FindType(string name)
+    {
+        if (name == null) return null;
+        Type type = Type.GetType($"Thingus.{name}");
+        if (type == null) type = Type.GetType($"{CONSTANTS.NAMESPACE}.{name}");
+        return type;
     }
 }

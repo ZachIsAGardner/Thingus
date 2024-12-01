@@ -264,6 +264,12 @@ public class Thing
         Game.PlaySound(name, volume.Value, pitch.Value, pan.Value);
     }
 
+    public void Clear()
+    {
+        Children.ToList().ForEach(c => c.Destroy());
+        Children = new List<Thing>() { };
+    }
+
     public void DrawSprite(Texture2D? texture, Vector2? position = null, int tileNumber = 0, int tileSize = 0, float rotation = 0, Color? color = null, Vector2? scale = null, Vector2? origin = null, bool flipHorizontally = false, bool flipVertically = false, Rectangle? source = null, Rectangle? destination = null)
     {
         Shapes.DrawSprite(texture, position ?? GlobalPosition, tileNumber, tileSize, rotation, color, scale, DrawMode, origin, flipHorizontally, flipVertically, source, destination);

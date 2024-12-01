@@ -160,9 +160,21 @@ public class DeveloperTools : Thing
         {
             Log.Clear();
             Library.Refresh();
-            Editor?.RefreshStamps();
-            Play();
             Game.Root.Load(Game.LastMap);
+            if (Input.ShiftIsHeld)
+            {
+                if (Editor != null)
+                {
+                    Editor.Destroy();
+                    Editor = AddChild(new Editor()) as Editor;
+                }
+
+                ToggleEditor(true);
+            }
+            else
+            {
+                Play();
+            }
         }
     }
 
@@ -199,7 +211,7 @@ public class DeveloperTools : Thing
             color: PaletteBasic.Green
         );
 
-        int height = 1;
+        int height = 2;
         Game.Things.Where(c => c.Parent == null).ToList().ForEach(c =>
         {
             DrawText(

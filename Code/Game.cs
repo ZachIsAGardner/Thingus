@@ -69,6 +69,7 @@ public static class Game
 
         Library.Refresh();
         Viewport.Start();
+        Lang.Start();
 
         // Get platform
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Platform = PlatformType.Windows;
@@ -107,13 +108,16 @@ public static class Game
 
     public static void Update()
     {
-        if (Input.IsPressed(KeyboardKey.F1)) FrameAdvance = !FrameAdvance;
-        if (Input.IsPressed(KeyboardKey.F2)) FrameStep = true;
-
-        if (FrameAdvance)
+        if (CONSTANTS.IS_DEBUG)
         {
-            if (FrameStep) FrameStep = false;
-            else return;
+            if (Input.IsPressed(KeyboardKey.F1)) FrameAdvance = !FrameAdvance;
+            if (Input.IsPressed(KeyboardKey.F2)) FrameStep = true;
+
+            if (FrameAdvance)
+            {
+                if (FrameStep) FrameStep = false;
+                else return;
+            }
         }
 
         Time.Update();

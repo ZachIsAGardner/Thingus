@@ -1,14 +1,14 @@
 TODO
-- better room code behind
-- translation support
 - export
-- edit window dropdown
 
 LATER
+- edit tool: edit multiple
+- edit tool: copy/paste
 
 WAY LATER
 - palette swap
 - branch view
+- super menu
 - toast
 - refactor
     - should absolute and relative be special Things instead of Modes? (Canvas vs. Normal)

@@ -24,7 +24,6 @@ public class ScrollableControl : SubViewport
         base.Start();
 
         scrollHead = new ButtonControl();
-        scrollHead.Pressed = () => Log.Write("Click");
         scrollHead.Texture = Library.Textures["ScrollHead"];
         scrollHead.Bounds = new Vector2(ScrollBarWidth, 12);
         scrollHead.DrawOrder = 10;

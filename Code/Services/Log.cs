@@ -45,7 +45,6 @@ public static class Log
 
     public static void Draw()
     {
-        int i = 0;
         Shapes.DrawSprite(
             texture: Library.Textures["Pixel"],
             position: Viewport.Adjust(new Vector2(CONSTANTS.VIRTUAL_WIDTH - (width / 2f) - 4, CONSTANTS.VIRTUAL_HEIGHT / 2f), AdjustFrom.TopRight),
@@ -60,6 +59,7 @@ public static class Log
             color: PaletteBasic.Green,
             drawMode: DrawMode.Absolute
         );
+        int i = 1;
         logs.Reversed().ForEach(l =>
         {
             Vector2 p = Viewport.Adjust(new Vector2(CONSTANTS.VIRTUAL_WIDTH - (width), 4 + (font.BaseSize + 1) * (i + 1)), AdjustFrom.TopRight);

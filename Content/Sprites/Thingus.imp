@@ -1,5 +1,6 @@
 {
     "Thing": "TheThingus",
+    "Category": "Items",
     "Options": [
         {
             "Name": "Flip",
@@ -9,7 +10,17 @@
         {
             "Name": "Name",
             "Type": "TextInput",
-            "Value": "Default value."
+            "Value": ""
+        },
+        {
+            "Name": "Drop",
+            "Type": "Dropdown",
+            "Value": "2",
+            "Options": [
+                "1",
+                "2",
+                "3"
+            ]
         }
     ]
 }

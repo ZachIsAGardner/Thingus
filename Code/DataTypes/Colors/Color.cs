@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Thingus;
 
 public struct Color
@@ -35,6 +37,16 @@ public struct Color
     public override string ToString()
     {
         return $"{{R:{R} G:{G} B:{B} A:{A}}}";
+    }
+
+    public Color Blend(Color other, float percentage)
+    {
+        return new Color(
+            (byte)(R + ((other.R - R) * percentage)), 
+            (byte)(G + ((other.G - G) * percentage)), 
+            (byte)(B + ((other.B - B) * percentage)), 
+            (byte)(A + ((other.A - A) * percentage))
+        );
     }
 
     public Color WithAlpha(float alpha) => new Color(R, G, B, (byte)(alpha * 255));
