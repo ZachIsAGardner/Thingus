@@ -63,7 +63,7 @@ public static class Game
         Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
         Raylib.SetConfigFlags(ConfigFlags.VSyncHint);
         Raylib.InitWindow(CONSTANTS.VIRTUAL_WIDTH * CONSTANTS.DEFAULT_SCREEN_MULTIPLIER, CONSTANTS.VIRTUAL_HEIGHT * CONSTANTS.DEFAULT_SCREEN_MULTIPLIER, CONSTANTS.TITLE);
-        Raylib.SetWindowIcon(Raylib.LoadImage("Icon.png"));
+        Raylib.SetWindowIcon(Raylib.LoadImage("Content/Icon.png"));
         Raylib.SetTargetFPS(60);
         Raylib.InitAudioDevice();
 
