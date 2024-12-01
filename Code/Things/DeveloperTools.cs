@@ -112,7 +112,7 @@ public class DeveloperTools : Thing
             ToggleCli(!Cli.Active);
         }
 
-        if (Cli.Active) return;
+        if (Cli.Active || Control.FocusedControl != null) return;
 
         if (Input.IsPressed(KeyboardKey.One))
         {

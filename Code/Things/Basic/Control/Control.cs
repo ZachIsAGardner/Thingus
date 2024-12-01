@@ -5,9 +5,13 @@ namespace Thingus;
 
 public class Control : Thing
 {
+    public static Control FocusedControl = null;
+
     public Vector2 Bounds;
     public Color Color = PaletteBasic.White;
     public Color HighlightColor = PaletteBasic.Green;
+    public Color TextColor = PaletteBasic.White;
+    public Color TextHighlightColor = PaletteBasic.Green;
     public int TileNumber = 0;
     public int TileSize = 0;
 
@@ -18,7 +22,8 @@ public class Control : Thing
     public Action Pressed;
     public Action Released;
 
-    public int Padding = 0;
+    public Vector2 Padding;
+    public Vector2 TextPadding;
     public Texture2D? Texture;
 
     public override void Update()
@@ -60,8 +65,6 @@ public class Control : Thing
             if (Input.LeftMouseButtonIsPressed)
             {
                 IsHeld = true;
-                Game.GetThings<Control>().ForEach(c => c.IsFocused = false);
-                IsFocused = true;
                 if (Pressed != null) Pressed();
             }
 

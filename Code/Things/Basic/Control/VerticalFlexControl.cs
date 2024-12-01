@@ -19,7 +19,7 @@ public class VerticalFlexControl : Control
         Vector2 position = new Vector2(0, 0);
         Children.Select(c => c as Control).ToList().ForEach(c =>
         {
-            if (last != null) position.Y += last.Bounds.Y + (last.Padding * 2) + Spacing;
+            if (last != null) position.Y += last.Bounds.Y + (last.Padding.Y * 2) + Spacing;
             c.DrawMode = DrawMode;
             c.DrawOrder = DrawOrder + 1;
             c.SubViewport = SubViewport;
@@ -35,9 +35,9 @@ public class VerticalFlexControl : Control
         DrawNineSlice(
             texture: Texture,
             tileSize: 5,
-            position: GlobalPosition - new Vector2(Padding),
-            width: (int)Bounds.X + (Padding * 2),
-            height: (int)Bounds.Y + (Padding * 2),
+            position: GlobalPosition - Padding,
+            width: (int)(Bounds.X + (Padding.X * 2)),
+            height: (int)(Bounds.Y + (Padding.Y * 2)),
             color: Color
         );
     }

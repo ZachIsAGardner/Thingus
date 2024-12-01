@@ -71,4 +71,9 @@ public class Tool
     {
 
     }
+
+    public virtual void Exit()
+    {
+        
+    }
 }

@@ -55,14 +55,14 @@ public class FillTool : Tool
     {
         if (editor.Room == null || editor.Stamp == null) return;
 
-        if (position.Y < 0 || position.Y >= editor.Room.Bounds.Y || position.X < 0 || position.X >= editor.Room.Bounds.X)
+        if (position.Y < editor.Room.Position.Y || position.Y - CONSTANTS.TILE_SIZE_HALF > editor.Room.Position.Y + editor.Room.Bounds.Y || position.X < editor.Room.Position.X || position.X - CONSTANTS.TILE_SIZE_HALF > editor.Room.Position.X + editor.Room.Bounds.X)
         {
             return;
         }
 
         Stack<Vector2> tiles = new Stack<Vector2>();
         Stack<Vector2> visited = new Stack<Vector2>();
-        MapCell targetCell = editor.Room.Map.Cells.Find(c => c.Position == position);
+        MapCell targetCell = editor.Room.Map.Cells.Find(c => c.Position + editor.Room.Position == position);
         ThingImport targetTextureInfo = null;
         if (targetCell != null) targetTextureInfo = Library.ThingImports.Get(targetCell.Name);
         if (targetCell != null && targetCell.Name == editor.Stamp.Import.Name) return;
@@ -81,10 +81,10 @@ public class FillTool : Tool
 
             Vector2 a = tiles.Pop();
             // make sure we stay within bounds
-            if (a.X < editor.Room.Bounds.X && a.X >= 0 &&
-                    a.Y < editor.Room.Bounds.Y && a.Y >= 0)
+            if (a.X - CONSTANTS.TILE_SIZE_HALF <= editor.Room.Position.X + editor.Room.Bounds.X && a.X >= editor.Room.Position.X &&
+                    a.Y - CONSTANTS.TILE_SIZE_HALF <= editor.Room.Position.Y + editor.Room.Bounds.Y && a.Y >= editor.Room.Position.Y)
             {
-                MapCell cell = editor.Room.Map.Cells.Find(c => c.Position == a);
+                MapCell cell = editor.Room.Map.Cells.Find(c => c.Position + editor.Room.Position == a);
 
                 if (cell?.Name == targetCell?.Name && (targetTextureInfo == null || cell == null || cell.TileNumber == targetCell.TileNumber))
                 {
@@ -107,25 +107,25 @@ public class FillTool : Tool
                         // TODO
                     }
                     
-                    if (left.X >= 0 && !visited.Contains(left))
+                    if (left.X >= editor.Room.Position.X && !visited.Contains(left))
                     {
                         tiles.Push(left);
                         visited.Push(left);
                     }
 
-                    if (right.X < editor.Room.Bounds.X && !visited.Contains(right))
+                    if (right.X - CONSTANTS.TILE_SIZE_HALF <= editor.Room.Position.X + editor.Room.Bounds.X && !visited.Contains(right))
                     {
                         tiles.Push(right);
                         visited.Push(right);
                     }
 
-                    if (up.Y >= 0 && !visited.Contains(up))
+                    if (up.Y >= editor.Room.Position.Y && !visited.Contains(up))
                     {
                         tiles.Push(up);
                         visited.Push(up);
                     }
 
-                    if (down.Y < editor.Room.Bounds.Y && !visited.Contains(down))
+                    if (down.Y - CONSTANTS.TILE_SIZE_HALF <= editor.Room.Position.Y + editor.Room.Bounds.Y && !visited.Contains(down))
                     {
                         tiles.Push(down);
                         visited.Push(down);

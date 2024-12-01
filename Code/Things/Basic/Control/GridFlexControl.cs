@@ -43,9 +43,9 @@ public class GridFlexControl : Control
         DrawNineSlice(
             texture: Texture,
             tileSize: 5,
-            position: GlobalPosition - new Vector2(Padding),
-            width: (int)Bounds.X + (Padding * 2),
-            height: (int)Bounds.Y + (Padding * 2),
+            position: GlobalPosition - Padding,
+            width: (int)(Bounds.X + (Padding.X * 2)),
+            height: (int)(Bounds.Y + (Padding.Y * 2)),
             color: Color
         );
     }

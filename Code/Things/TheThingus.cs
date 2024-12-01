@@ -12,16 +12,18 @@ public class TheThingus : Sprite
             drawMode: DrawMode.Relative,
             tileSize: CONSTANTS.TILE_SIZE,
             tileNumber: model.TileNumber,
-            color: PaletteBasic.White
+            color: PaletteBasic.White,
+            properties: model.Properties
         );
     public TheThingus() { }
     // Create from code
     public TheThingus(
         string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
-        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f
+        int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, List<ThingProperty> properties = null
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {
         Texture = Library.Textures[name];
+        
     }
 
     public override void Update()

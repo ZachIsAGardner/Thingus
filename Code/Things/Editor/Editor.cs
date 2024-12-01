@@ -35,6 +35,7 @@ public class Editor : Thing
     Tool tool = null;
     public Stamp Stamp = null;
     bool hoveringControl = false;
+    bool focusedControl = false;
 
     public override void Init()
     {
@@ -45,11 +46,13 @@ public class Editor : Thing
         {
             new BrushTool(this),
             new RectangleTool(this),
-            new PickerTool(this),
-            new RoomTool(this),
             new FillTool(this),
             new WandTool(this),
+            
+            new RoomTool(this),
             new EditTool(this),
+            // new PickerTool(this),
+            // new HandTool(this)
         };
 
         tool = new BrushTool(this);
@@ -120,7 +123,7 @@ public class Editor : Thing
         scrollable.DrawMode = DrawMode.Absolute;
         scrollable.Texture = Library.Textures["BoxThinSlice"];
         scrollable.TileSize = 5;
-        scrollable.Padding = 3;
+        scrollable.Padding = new Vector2(3);
         verticalFlex.AddChild(scrollable);
         
         GridFlexControl flex = new GridFlexControl();
@@ -152,7 +155,7 @@ public class Editor : Thing
         flex.Bounds = new Vector2(16, Tools.Count * 16);
         flex.Texture = Library.Textures["BoxThinSlice"];
         flex.TileSize = 5;
-        flex.Padding = 3;
+        flex.Padding = new Vector2(3);
         verticalFlex.AddChild(flex);
 
         foreach (Tool tool in Tools)
@@ -177,12 +180,18 @@ public class Editor : Thing
 
         if (Game.Root.DeveloperTools.Cli.Active) return;
         hoveringControl = Game.GetThings<Control>().Any(c => c.IsHovered || c.IsHeld);
+        focusedControl = Game.GetThings<TextInputControl>().Any(c => c.IsFocused);
 
         // Log.Write(Viewport.RelativeLayer.Camera.Zoom);
-        TogglePreview(Input.IsMouseInsideWindow() && Room != null && tool?.ShowPreview == true);
-        UpdateShortcuts();
+        TogglePreview(Input.IsMouseInsideWindow() && Room != null && tool?.ShowPreview == true && !focusedControl);
         UpdatePosition();
+        if (focusedControl)
+        {
+            Mouse.TileNumber = 18;
+            return;
+        }
         UpdateCamera();
+        UpdateShortcuts();
         LastGridPosition = GridPosition;
         if (hoveringControl)
         {
@@ -505,6 +514,7 @@ public class Editor : Thing
 
     public void SelectTool(Tool tool)
     {
+        this.tool.Exit();
         this.tool = tool;
         // Mouse.TileNumber = tool.TileNumber;
     }

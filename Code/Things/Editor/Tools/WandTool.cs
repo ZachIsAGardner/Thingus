@@ -4,7 +4,7 @@ using Thingus;
 public class WandTool : Tool
 {
     public override string Name => "Wand";
-    public override KeyboardKey Shortcut => KeyboardKey.W;
+    public override KeyboardKey Shortcut => KeyboardKey.Q;
     public override int TileNumber => 13;
 
     public WandTool(Editor editor) : base(editor)
@@ -55,12 +55,12 @@ public class WandTool : Tool
     {
         if (editor.Room == null || editor.Stamp == null) return;
 
-        if (position.Y < 0 || position.Y >= editor.Room.Bounds.Y || position.X < 0 || position.X >= editor.Room.Bounds.X)
+        if (position.Y <= editor.Room.Position.Y || position.Y - CONSTANTS.TILE_SIZE_HALF >= editor.Room.Position.Y + editor.Room.Bounds.Y || position.X <= editor.Room.Position.X || position.X - CONSTANTS.TILE_SIZE_HALF >= editor.Room.Position.X + editor.Room.Bounds.X)
         {
             return;
         }
 
-        MapCell targetCell = editor.Room.Map.Cells.Find(c => c.Position == position);
+        MapCell targetCell = editor.Room.Map.Cells.Find(c => c.Position + editor.Room.Position == position);
         if (targetCell == null) return;
         ThingImport targetThingImport = null;
         if (targetCell != null) targetThingImport = Library.ThingImports.Get(targetCell.Name);
@@ -69,7 +69,7 @@ public class WandTool : Tool
         List<MapCell> targetCells = editor.Room.Map.Cells.Where(c => c.Name == targetCell.Name && (targetThingImport == null || targetCell.TileNumber == c.TileNumber)).ToList();
         foreach (MapCell cell in targetCells)
         {
-            editor.AddCell(cell.Position);
+            editor.AddCell(cell.Position + editor.Room.Position);
         }
     }
 }

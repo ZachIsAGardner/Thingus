@@ -16,6 +16,11 @@ public class EditTool : Tool
 
     }
 
+    public override void Exit()
+    {
+        CloseWindow();
+    }
+
     public override void Update()
     {
         if (Input.AltIsHeld)
@@ -52,11 +57,7 @@ public class EditTool : Tool
             if (sprite != null) sprite.Color = PaletteBasic.Green;
             if (Input.LeftMouseButtonIsPressed)
             {
-                if (window != null)
-                {
-                    CloseWindow();
-                }
-
+                CloseWindow();
                 window = Window(thing);
             }
         }
@@ -64,10 +65,7 @@ public class EditTool : Tool
         {
             if (Input.LeftMouseButtonIsPressed)
             {
-                if (window != null)
-                {
-                    CloseWindow();
-                }
+                CloseWindow();
             }
         }
         lastThing = thing;
@@ -78,8 +76,11 @@ public class EditTool : Tool
 
     void CloseWindow()
     {
-        window.Destroy();
-        window = null;
+        if (window != null)
+        {
+            window.Destroy();
+            window = null;
+        }
     }
 
     Thing Window(Thing thing)
@@ -91,13 +92,13 @@ public class EditTool : Tool
         flex.Bounds = new Vector2(width, height);
         flex.Texture = Library.Textures["BoxThinSlice"];
         flex.TileSize = 5;
-        flex.Padding = 3;
+        flex.Padding = new Vector2(3);
         flex.DrawOrder = 100;
 
         HorizontalFlexControl title = new HorizontalFlexControl();
         title.Texture = Library.Textures["BoxThinLightSlice"];
         title.Bounds = new Vector2(width, 8);
-        title.Padding = 3;
+        title.Padding = new Vector2(3);
         title.Justify = FlexJustify.Between;
         title.Offset = new Vector2(2, -3);
         flex.AddChild(title);
@@ -105,7 +106,7 @@ public class EditTool : Tool
         TextControl textControl = new TextControl();
         textControl.Text = thing.Name;
         textControl.Color = PaletteBasic.LightGray;
-        textControl.Padding = 0;
+        textControl.Padding = new Vector2(0);
         title.AddChild(textControl);
 
         ButtonControl close = new ButtonControl();
@@ -119,19 +120,29 @@ public class EditTool : Tool
         close.TileSize = 16;
         title.AddChild(close);
 
-        textControl.Refresh();
-
         foreach (ThingOption option in thing.Cell.Import.Options)
         {
             if (option.Type == "Checkbox") Checkbox(thing, option, flex);
             if (option.Type == "TextInput") TextInput(thing, option, flex);
         }
 
+        textControl.Refresh();
+        title.Refresh();
+        flex.Refresh();
+
         return flex;
     }
 
     Control Checkbox(Thing thing, ThingOption option, Control flex)
     {
+        ThingOption thingOption = thing.Cell.Options.Find(o => o.Name == option.Name);
+        if (thingOption == null)
+        {
+            thingOption = new ThingOption() { Name = option.Name };
+            thingOption.Value = option.Value;
+            thing.Cell.Options.Add(thingOption);
+        }
+
         HorizontalFlexControl h = new HorizontalFlexControl();
         h.Bounds.X = flex.Bounds.X;
         h.Bounds.Y = 16;
@@ -145,6 +156,8 @@ public class EditTool : Tool
         control.Bounds = new Vector2(16);
         control.DrawOrder = 101;
         control.TileSize = 16;
+        if (thingOption.Value == "true") control.TileNumber = 1;
+        else control.TileNumber = 0;
         h.AddChild(control);
 
         TextControl textControl = new TextControl();
@@ -154,17 +167,44 @@ public class EditTool : Tool
         {
             if (control.TileNumber == 1) control.TileNumber = 0;
             else control.TileNumber = 1;
+
+            thingOption.Value = control.TileNumber == 1 ? "true" : "false";
         };
         h.AddChild(textControl);
+
+        textControl.Refresh();
+        h.Refresh();
 
         return control;
     }
 
     Control TextInput(Thing thing, ThingOption option, Control flex)
     {
-        Control control = new TextInputControl(thing, option, flex);
-        control.DrawOrder = 100000;
+        ThingOption thingOption = thing.Cell.Options.Find(o => o.Name == option.Name);
+        if (thingOption == null)
+        {
+            thingOption = new ThingOption() { Name = option.Name };
+            thingOption.Value = option.Value;
+            thing.Cell.Options.Add(thingOption);
+        }
+        TextInputControl control = new TextInputControl(option.Name);
+        control.Bounds.X = flex.Bounds.X;
+        control.Bounds.Y = 16;
+        control.Texture = Library.Textures["WhiteSlice"];
+        control.DrawOrder = 10;
+        control.HighlightColor = PaletteBasic.DarkGreen;
+        control.Color = PaletteBasic.Blank;
+        control.TextPadding.X = 3;
+        control.TextHighlightColor = PaletteBasic.White;
+        control.Text = thingOption.Value;
+        control.LoseFocus = () =>
+        {
+            thingOption.Value = control.Text;
+        };
         flex.AddChild(control);
+
+        control.Refresh();
+
         return control;
     }
 }

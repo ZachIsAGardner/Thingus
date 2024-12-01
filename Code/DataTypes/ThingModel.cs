@@ -27,7 +27,8 @@ public class ThingModel
         TileNumber = cell.TileNumber;
         TileSize = import.TileSize;
         if (import.Tags != null) Tags = import.Tags;
-        Properties = import.Properties;
+        Properties = import.Properties.Concat(cell.Options.Select(o => new ThingProperty() { Name = o.Name, Value = o.Value })).ToList();
+        
         Layer = import.Layer;
         BlendMode = import.BlendMode;
     }
