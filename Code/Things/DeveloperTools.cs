@@ -27,6 +27,8 @@ public class DeveloperTools : Thing
     public override void Init()
     {
         base.Init();
+
+        UpdateInEditMode = true;
     }
 
     public override void Start()
@@ -58,7 +60,6 @@ public class DeveloperTools : Thing
 
             Viewport.RelativeLayer.ClearColor = PaletteBasic.VeryDarkGray;
 
-            Game.Mode = GameMode.Edit;
             if (Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
             playTarget = Viewport.Target;
             Viewport.Target = Editor.CameraTarget;
@@ -66,6 +67,8 @@ public class DeveloperTools : Thing
             Viewport.SetScalePixels(true);
 
             Editor.Focus();
+
+            Game.Mode = GameMode.Edit;
         }
         else
         {
@@ -158,9 +161,11 @@ public class DeveloperTools : Thing
 
         if (Input.IsPressed(KeyboardKey.L))
         {
+            TokenGrid.Reset();
             Log.Clear();
             Library.Refresh();
             Game.Root.Load(Game.LastMap);
+            
             if (Input.ShiftIsHeld)
             {
                 if (Editor != null)

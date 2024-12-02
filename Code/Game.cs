@@ -70,6 +70,7 @@ public static class Game
         Library.Refresh();
         Viewport.Start();
         Lang.Start();
+        TokenGrid.Start();
 
         // Get platform
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Platform = PlatformType.Windows;
@@ -125,13 +126,19 @@ public static class Game
 
         UpdateThings.ForEach(t =>
         {
-            if (!t.DidStart) t.Start();
-            t.Update();
+            if (t.ShouldUpdate)
+            {
+                if (!t.DidStart) t.Start();
+                t.Update();
+            }   
         });
 
         UpdateThings.ForEach(t =>
         {
-            t.LateUpdate();
+            if (t.ShouldUpdate)
+            {
+                t.LateUpdate();
+            }
         });
 
         Viewport.Update();

@@ -25,6 +25,9 @@ public class Thing
     public Vector2 Position;
     public Vector2 GlobalPosition => (Parent?.GlobalPosition ?? new Vector2()) + Position;
 
+    public Vector2 Offset;
+    public Vector2 GlobalOffset => (Parent?.GlobalOffset ?? new Vector2()) + Offset;
+
     // Order
     public float UpdateOrder;
     public float UpdateOrderOffset;
@@ -67,7 +70,7 @@ public class Thing
 
     public static Thing Create(Thing root, ThingModel model) => new Thing(model.Name, model.Position, model.DrawMode, model.DrawOrder, model.UpdateOrder);
     public Thing() : this(null) { }
-    public Thing(string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0)
+    public Thing(string name = null, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0)
     {
         Id = id;
         id++;
@@ -103,7 +106,7 @@ public class Thing
         return result;
     }
 
-    public Thing AddChild(Thing child)
+    public virtual Thing AddChild(Thing child)
     {
         if (child.Parent != null) child.Parent.RemoveChild(child);
         Children.Add(child);
@@ -111,7 +114,7 @@ public class Thing
         return child;
     }
 
-    public Thing RemoveChild(Thing child)
+    public virtual Thing RemoveChild(Thing child)
     {
         Children.Remove(child);
         child.Parent = null;
@@ -161,6 +164,11 @@ public class Thing
     {
 
     }
+
+    public bool UpdateInEditMode = false;
+    public bool ExclusiveUpdateInEditMode = false;
+    public bool GlobalUpdateInEditMode => (Parent != null && Parent.GlobalUpdateInEditMode) || UpdateInEditMode;
+    public bool ShouldUpdate => Available && Game.Mode != GameMode.Edit || GlobalUpdateInEditMode || ExclusiveUpdateInEditMode;
 
     public bool DidStart { get; private set; }
     public virtual void Start()

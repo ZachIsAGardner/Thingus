@@ -1,11 +1,11 @@
 TODO
-- export
 
 LATER
 - edit tool: edit multiple
 - edit tool: copy/paste
 
 WAY LATER
+- better mac export settings
 - palette swap
 - branch view
 - super menu

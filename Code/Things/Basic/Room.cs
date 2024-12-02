@@ -210,5 +210,13 @@ public class Room : Thing
             color: PaletteBasic.LightGray,
             outlineColor: PaletteBasic.Black
         );
+
+        // DrawText(
+        //     text: Game.GetThing<BakedTilemap>()?.TokenGrid?.Select(r => r.Join(", ")).Join("\n"),
+        //     position: GlobalPosition + new Vector2(-400, -120),
+        //     color: PaletteBasic.LightGray,
+        //     outlineColor: PaletteBasic.Black,
+        //     font: Library.FontSmall
+        // );
     }
 }

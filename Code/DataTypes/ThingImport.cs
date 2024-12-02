@@ -16,6 +16,7 @@ public class ThingImport
     public string StampType = "Single";
     public List<string> AutoKeys = new List<string>() { };
     public string Category;
+    public int Token;
 
     public ThingImport() { }
 

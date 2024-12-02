@@ -410,9 +410,9 @@ public class Collider : Thing
         // Log.Clear();
         // Log.Write($"{c}, {r}");
 
-        if (r < 0 || c < 0 || r > BakedTilemap.COLLISION_GRID_SIZE - 1 || c > BakedTilemap.COLLISION_GRID_SIZE - 1) return null;
+        if (r < 0 || c < 0 || r > TokenGrid.Bounds.Y - 1 || c > TokenGrid.Bounds.X - 1) return null;
 
-        if (bakedTilemap.CollisionGrid[r][c] == 1)
+        if (TokenGrid.Get(c, r) == 1)
         {
             return new GridCollision(new Vector2(
                 (c * CONSTANTS.TILE_SIZE) + bakedTilemap.GlobalPosition.X,

@@ -94,7 +94,6 @@ public class Sprite : Thing
     public AnimationState State;
     string lastState;
     int lastFlooredTileNumber;
-    public int Offset = 0;
 
     // Create from Map
     public static Sprite Create(Thing root, ThingModel model)
@@ -222,7 +221,7 @@ public class Sprite : Thing
 
         DrawSprite(
             texture: Texture,
-            position: (DrawMode == DrawMode.Texture ? Position : GlobalPosition)
+            position: (DrawMode == DrawMode.Texture ? (Position + GlobalOffset) : (GlobalPosition + GlobalOffset))
                 + new Vector2(shakeXOffset, shakeYOffset),
             tileSize: TileSize,
             tileNumber: (int)(TileNumber + TileNumberOffset).Floor(),

@@ -42,6 +42,8 @@ public class Editor : Thing
     {
         base.Init();
 
+        UpdateInEditMode = true;
+
         RefreshStamps();
         Tools = new List<Tool>()
         {
@@ -214,6 +216,7 @@ public class Editor : Thing
         base.Update();
 
         if (Game.Root.DeveloperTools.Cli.Active) return;
+        Game.GetThings<Room>().ForEach(r => r.ExclusiveUpdateInEditMode = true);
         hoveringControl = Game.GetThings<Control>().Any(c => c.IsHovered || c.IsHeld);
         focusedControl = Control.TextInputControl != null;
 
@@ -342,14 +345,14 @@ public class Editor : Thing
 
     void UpdateCharacter()
     {
-        if (Input.ShiftIsHeld)
-        {
-            if (Game.CharacterType != null)
-            {
-                Thing player = Game.Things.Find(t => t.TypeName == Game.CharacterType);
-                if (player != null) player.Position = MousePosition;
-            }
-        }
+        // if (Input.ShiftIsHeld)
+        // {
+        //     if (Game.CharacterType != null)
+        //     {
+        //         Thing player = Game.Things.Find(t => t.TypeName == Game.CharacterType);
+        //         if (player != null) player.Position = MousePosition;
+        //     }
+        // }
     }
 
     public void Reset()
@@ -438,7 +441,7 @@ public class Editor : Thing
 
         if (!room.IsPositionInside(position)) return;
 
-        new ParticleEffect(
+        AddChild(new ParticleEffect(
             position: position, 
             amount: 2, 
             texture: Library.Textures.Get("5Star"),
@@ -446,7 +449,7 @@ public class Editor : Thing
             speed: 5,
             time: 0.3f,
             color: PaletteAapSplendor128.NightlyAurora
-        );
+        ));
 
         RemoveCell(position, layer, changeHistory);
         position -= room.Position;

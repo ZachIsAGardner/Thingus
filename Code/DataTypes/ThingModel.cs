@@ -17,6 +17,7 @@ public class ThingModel
     public int UpdateOrder;
     public List<string> Tags = new List<string>() { };
     public List<ThingProperty> Properties = new List<ThingProperty>() { };
+    public int Token;
 
     public ThingModel() { }
     public ThingModel(ThingImport import, MapCell cell)
@@ -28,6 +29,7 @@ public class ThingModel
         TileSize = import.TileSize;
         if (import.Tags != null) Tags = import.Tags;
         Properties = import.Properties.Concat(cell.Options.Select(o => new ThingProperty() { Name = o.Name, Value = o.Value })).ToList();
+        Token = import.Token;
         
         Layer = import.Layer;
         BlendMode = import.BlendMode;

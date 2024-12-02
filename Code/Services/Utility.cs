@@ -90,4 +90,68 @@ public static class Utility
         if (type == null) type = Type.GetType($"{CONSTANTS.NAMESPACE}.{name}");
         return type;
     }
+
+    public static Vector2 WorldToGridPosition(Vector2 position, int height = 0, bool wrap = false)
+    {
+        int r = -1;
+        int c = -1;
+        if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
+        {
+            r = (int)(position.Y / CONSTANTS.TILE_SIZE);
+            c = (int)(position.X / CONSTANTS.TILE_SIZE);
+        }
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
+        {
+            Vector2 p = new Vector2(
+                position.X - (CONSTANTS.TILE_SIZE_THIRD / 2), 
+                position.Y - (CONSTANTS.TILE_SIZE_THIRD / 2)
+            );
+            for (int i = 0; i < height; i++)
+            {
+                p.Y += CONSTANTS.TILE_SIZE_OBLIQUE;
+            }
+            p.X += CONSTANTS.TILE_SIZE_THIRD;
+            r = (int)(p.Y / CONSTANTS.TILE_SIZE_THIRD) - 1;
+            p.X -= CONSTANTS.TILE_SIZE_THIRD * r;
+            p.X += CONSTANTS.TILE_SIZE_OBLIQUE * ((int)(TokenGrid.Bounds.Y / 2) - 1);
+            c = (int)(p.X / CONSTANTS.TILE_SIZE_OBLIQUE);
+            if (wrap)
+            {
+                if (c < 0) c = (int)TokenGrid.Bounds.X + c;
+                if (r < 0) r = (int)TokenGrid.Bounds.Y + r;
+            }
+        }
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
+        {
+            // TODO
+        }
+        return new Vector2(c, r);
+    }
+
+    public static Vector2 GridToWorldPosition(Vector2 position)
+    {
+        Vector2 result = new Vector2(0);
+        
+        if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid)
+        {
+            result = new Vector2(position.X * CONSTANTS.TILE_SIZE, position.Y * CONSTANTS.TILE_SIZE);
+        }
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Oblique)
+        {
+            result = new Vector2(
+            (position.X * CONSTANTS.TILE_SIZE_OBLIQUE)
+                - CONSTANTS.TILE_SIZE_THIRD / 2,
+            (position.Y * CONSTANTS.TILE_SIZE_THIRD)
+                + CONSTANTS.TILE_SIZE_THIRD / 2
+            );
+            result.X += CONSTANTS.TILE_SIZE_THIRD * position.Y;
+            result.X += CONSTANTS.TILE_SIZE_OBLIQUE * -((int)(TokenGrid.Bounds.Y / 2) - 1);
+
+        }
+        else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
+        {
+            // TODO
+        }
+        return result;
+    }
 }

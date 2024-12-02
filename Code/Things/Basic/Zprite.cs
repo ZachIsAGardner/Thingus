@@ -21,7 +21,11 @@ public class Zprite : Sprite
     public override void Update()
     {
         base.Update();
-        DrawOrderOffset = ((GlobalPosition.Y - (Texture.Height / 2f)) / 64f).RoundTo(1);
+        DrawOrderOffset = (
+            ((GlobalPosition.Y - (Texture.Height / 2f)) / 32f)
+                - ((GlobalPosition.X - (Texture.Height / 2f)) / 256f)
+                - (GlobalOffset.Y / 32f)
+        ).RoundTo(1);
         if (lastDrawOrderOffset != DrawOrderOffset) Game.QueueDrawReorder();
         lastDrawOrderOffset = DrawOrderOffset;
     }
@@ -30,6 +34,6 @@ public class Zprite : Sprite
     {
         base.Draw();
 
-        // Shapes.DrawText($"{Name}: {DrawOrder + DrawOrderOffset}", position: GlobalPosition, color: PaletteBasic.White, outlineColor: PaletteBasic.Black);
+        // Shapes.DrawText($"{Name}: {DrawOrder + DrawOrderOffset}", position: GlobalPosition, color: PaletteBasic.White, outlineColor: PaletteBasic.Black, font: Library.FontSmall);
     }
 }

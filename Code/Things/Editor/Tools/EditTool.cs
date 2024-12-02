@@ -100,6 +100,7 @@ public class EditTool : Tool
         if (Input.LeftMouseButtonIsHeld && selection == null)
         {
             selection = new RectangleSelection(editor.GridPosition, () => editor.GridPosition, new Color(0, 255, 0, 50));
+            editor.AddChild(selection);
             Input.Holdup = true;
         }
 

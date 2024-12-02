@@ -195,6 +195,7 @@ public class RoomTool : Tool
         if (Input.LeftMouseButtonIsHeld && editor.LastGridInteractPosition != editor.GridPosition && selection == null)
         {
             selection = new RectangleSelection(editor.GridPosition, () => editor.GridPosition, new Color(0, 255, 0, 50));
+            editor.AddChild(selection);
             Input.Holdup = true;
         }
 

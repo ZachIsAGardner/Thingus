@@ -1,3 +1,4 @@
+using System.Net.WebSockets;
 using System.Numerics;
 using Raylib_cs;
 
@@ -21,8 +22,6 @@ public class BakedTile
 public class BakedTilemap : Thing
 {
     public List<BakedTile> Tiles = new List<BakedTile>() { };
-    public int[][] CollisionGrid = new int[32][];
-    public static readonly int COLLISION_GRID_SIZE = 32;
     public int Layer;
     public BlendMode? BlendMode = null;
 
@@ -37,11 +36,6 @@ public class BakedTilemap : Thing
             bakedTilemap.Layer = model.Layer;
             bakedTilemap.DrawOrder = (model.Layer * 10) - 20;
             bakedTilemap.BlendMode = model.BlendMode;
-
-            for (int r = 0; r < bakedTilemap.CollisionGrid.Count(); r++)
-            {
-                bakedTilemap.CollisionGrid[r] = new int[32];
-            }
         }
 
         bakedTilemap.AddTile(model);
@@ -54,12 +48,13 @@ public class BakedTilemap : Thing
     {
         Tiles = Tiles.Where(t => t.Position != position).ToList();
 
-        int r = (int)(position.Y / CONSTANTS.TILE_SIZE);
-        int c = (int)(position.X / CONSTANTS.TILE_SIZE);
+        Vector2 p = Utility.WorldToGridPosition(position);
+        int r = (int)p.Y;
+        int c = (int)p.X;
 
-        if (r < 0 || c < 0 || r >= BakedTilemap.COLLISION_GRID_SIZE || c >= BakedTilemap.COLLISION_GRID_SIZE) return;
+        if (r < 0 || c < 0 || r >= TokenGrid.Bounds.Y || c >= TokenGrid.Bounds.X) return;
 
-        CollisionGrid[r][c] = 0;
+        TokenGrid.Set(c, r, 0);
 
         queueReorder = true;
     }
@@ -69,12 +64,13 @@ public class BakedTilemap : Thing
         Tiles.Add(new BakedTile(Library.Textures[model.Name], model.Position, model.TileNumber ?? 0));
         Name = "BakedTilemap";
 
-        int r = (int)(model.Position.Y / CONSTANTS.TILE_SIZE);
-        int c = (int)(model.Position.X / CONSTANTS.TILE_SIZE);
+        Vector2 position = Utility.WorldToGridPosition(model.Position, 0, true);
+        int r = (int)position.Y;
+        int c = (int)position.X;
 
-        if (r < 0 || c < 0 || r >= COLLISION_GRID_SIZE || c >= COLLISION_GRID_SIZE) return;
+        if (r < 0 || c < 0 || r >= TokenGrid.Bounds.Y || c >=  TokenGrid.Bounds.X) return;
 
-        CollisionGrid[r][c] = model.Tags.Contains("Collision") ? 1 : 0;
+        TokenGrid.Set(c, r, model.Token);
 
         queueReorder = true;
     }
