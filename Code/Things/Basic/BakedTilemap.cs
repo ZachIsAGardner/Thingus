@@ -27,6 +27,13 @@ public class BakedTilemap : Thing
 
     bool queueReorder = false;
 
+    public override void Init()
+    {
+        base.Init();
+
+        UpdateInEditMode = true;
+    }
+
     public static BakedTilemap Create(Thing root, ThingModel model)
     {
         BakedTilemap bakedTilemap = root.GetThings<BakedTilemap>().Find(b => b.Layer == model.Layer && b.BlendMode == model.BlendMode);
