@@ -5,6 +5,10 @@ namespace Thingus;
 
 public static class Vector2Extensions
 {
+    public static Vector2 Sign(this Vector2 vector2)
+    {
+        return new Vector2(MathF.Sign(vector2.X), MathF.Sign(vector2.Y));
+    }
     public static Vector2 ToNearest(this Vector2 vector2, int nearest)
     {
         return new Vector2(

@@ -108,7 +108,7 @@ public class Sprite : Thing
     public Sprite() { }
     // Create from code
     public Sprite(
-        string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
+        string name = null, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
         int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, Vector2? origin = null
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {

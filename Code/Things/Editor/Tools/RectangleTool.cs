@@ -43,12 +43,14 @@ public class RectangleTool : Tool
         if (Input.LeftMouseButtonIsHeld && editor.LastGridInteractPosition != editor.GridPosition && selection == null)
         {
             selection = new RectangleSelection(editor.GridPosition, () => editor.GridPosition, new Color(0, 255, 0, 50));
+            editor.AddChild(selection);
             erase = false;
         }
 
         if (Input.RightMouseButtonIsHeld && editor.LastGridInteractPosition != editor.GridPosition && selection == null)
         {
             selection = new RectangleSelection(editor.GridPosition, () => editor.GridPosition, new Color(0, 0, 0, 50));
+            editor.AddChild(selection);
             erase = true;
         }
 

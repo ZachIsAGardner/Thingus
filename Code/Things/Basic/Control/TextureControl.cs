@@ -9,7 +9,11 @@ public class TextureControl : Control
     {
         base.Draw();
 
-        Rectangle source = new Rectangle(0, 0, Bounds.X, Bounds.Y);
+        if (Texture == null) return;
+
+        Vector2 coord = Shapes.CoordinatesFromNumber(TileNumber, Texture.Value, TileSize);
+
+        Rectangle source = new Rectangle(coord.X, coord.Y, Bounds.X, Bounds.Y);
         Rectangle destination = new Rectangle(GlobalPosition.X, GlobalPosition.Y, Bounds.X, Bounds.Y);
 
         DrawSprite(

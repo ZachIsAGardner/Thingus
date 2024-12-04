@@ -2,6 +2,17 @@ namespace Thingus;
 
 public static class ListExtensions
 {
+    public static void Preadd<T>(this List<T> list, T item)
+    {
+        list.Insert(0, item);
+    }
+
+    public static List<T> Concat<T>(this List<T> list, List<T> other)
+    {
+        list.AddRange(other);
+        return list;
+    }
+    
     public static Vector2Int? Coordinates<T>(this List<List<T>> matrix, T target)
     {
         int y = 0;
