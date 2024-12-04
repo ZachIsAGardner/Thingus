@@ -1,6 +1,7 @@
 TODO
 
 LATER
+- gamepad support
 - edit tool: edit multiple
 - edit tool: copy/paste
 

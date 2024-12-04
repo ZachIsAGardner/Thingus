@@ -2,6 +2,58 @@ namespace Thingus;
 
 public static class ListExtensions
 {
+    public static Vector2Int? Coordinates<T>(this List<List<T>> matrix, T target)
+    {
+        int y = 0;
+        foreach (List<T> row in matrix)
+        {
+            int x = 0;
+            foreach (T item in row)
+            {
+                if (EqualityComparer<T>.Default.Equals(item, target)) return new Vector2Int(x, y);
+                
+                x++;
+            }
+            y++;
+        }
+
+        return null;
+    }
+
+    public static List<List<T>> Swap<T>(this List<List<T>> matrix, T a, T b)
+    {
+        Vector2Int? coordA = matrix.Coordinates(a);
+        Vector2Int? coordB = matrix.Coordinates(b);
+        if (coordA == null || coordB == null) return matrix;
+        return Swap(matrix, coordA.Value, coordB.Value);
+    }
+
+    public static List<List<T>> Swap<T>(this List<List<T>> matrix, Vector2Int coordA, Vector2Int coordB)
+    {
+        T tmp = matrix[coordA.Y][coordA.X];
+        matrix[coordA.Y][coordA.X] = matrix[coordB.Y][coordB.X];
+        matrix[coordB.Y][coordB.X] = tmp;
+        return matrix;
+    }
+
+    public static List<T> Swap<T>(this List<T> list, T a, T b)
+    {
+        return Swap(list, list.IndexOf(a), list.IndexOf(b));
+    }
+
+    public static List<T> Swap<T>(this List<T> list, int indexA, int indexB)
+    {
+        T tmp = list[indexA];
+        list[indexA] = list[indexB];
+        list[indexB] = tmp;
+        return list;
+    }
+
+    public static T Get<T>(this List<T> list, int index)
+    {
+        if (index < 0 || index >= list.Count) return default(T);
+        return list[index];
+    }
 
     public static T Next<T>(this List<T> list, T current) 
     {

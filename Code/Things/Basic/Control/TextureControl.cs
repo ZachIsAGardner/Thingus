@@ -9,16 +9,16 @@ public class TextureControl : Control
     {
         base.Draw();
 
-        Rectangle rectangle = new Rectangle(GlobalPosition.X, GlobalPosition.Y, Bounds.X, Bounds.Y);
+        Rectangle source = new Rectangle(0, 0, Bounds.X, Bounds.Y);
+        Rectangle destination = new Rectangle(GlobalPosition.X, GlobalPosition.Y, Bounds.X, Bounds.Y);
 
         DrawSprite(
             texture: Texture,
             origin: new Vector2(0),
-            color: Pressed != null && (IsHovered || IsHeld) ? HighlightColor : Color,
+            color: Pressed != null && (IsHovered || IsHeld || IsHighlighted) ? HighlightColor : Color,
 
-            destination: rectangle,
-            tileNumber: TileNumber,
-            tileSize: TileSize
+            source: source,
+            destination: destination
         );
     }
 }

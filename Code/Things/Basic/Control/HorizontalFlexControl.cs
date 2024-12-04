@@ -4,8 +4,6 @@ namespace Thingus;
 
 public class HorizontalFlexControl : Control
 {
-    public int Spacing;
-    public Vector2 Offset;
     public FlexJustify Justify = FlexJustify.Start;
 
     public override void Update()
@@ -23,7 +21,7 @@ public class HorizontalFlexControl : Control
             Vector2 position = new Vector2(0, 0);
             Children.Select(c => c as Control).ToList().ForEach(c =>
             {
-                if (last != null) position.X += last.Bounds.X + Spacing;
+                if (last != null) position.X += last.Bounds.X + (last.Padding.X * 2) + Spacing;
                 c.DrawMode = DrawMode;
                 c.DrawOrder = DrawOrder + 1;
                 c.SubViewport = SubViewport;

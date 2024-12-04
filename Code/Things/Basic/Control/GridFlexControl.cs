@@ -4,8 +4,6 @@ namespace Thingus;
 
 public class GridFlexControl : Control
 {
-    public int Spacing;
-
     public override void Update()
     {
         base.Update();

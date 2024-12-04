@@ -3,9 +3,7 @@ using System.Numerics;
 namespace Thingus;
 
 public class VerticalFlexControl : Control
-{
-    public int Spacing;
-    
+{    
     public override void Update()
     {
         base.Update();
