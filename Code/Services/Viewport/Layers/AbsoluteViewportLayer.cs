@@ -5,8 +5,7 @@ namespace Thingus;
 
 public class AbsoluteViewportLayer : ViewportLayer
 {
-    public AbsoluteViewportLayer() { }
-    public AbsoluteViewportLayer(int index) : base(index) { }
+    public AbsoluteViewportLayer(int order) : base(order) { }
 
     public override void DrawToTexture()
     {

@@ -9,7 +9,7 @@ public class DebugPoint : Thing
     public DebugPoint(Vector2 position, Color? color = null) : base()
     {
         Position = position;
-        AddChild(new Sprite("Pixel", color: color ?? CONSTANTS.PRIMARY_COLOR));
+        AddChild(new Sprite("Pixel", color: color ?? Theme.Primary));
     }
 
     public override void Init()

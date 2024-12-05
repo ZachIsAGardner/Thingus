@@ -80,7 +80,7 @@ public class Room : Thing
                 origin: new Vector2(0),
                 scale: bounds,
                 color: GroupMove
-                    ? PaletteBasic.Green
+                    ? Theme.Primary
                     : Focused 
                         ? PaletteBasic.Gray 
                         : Hovered 
@@ -112,6 +112,7 @@ public class Room : Thing
                 if (Input.LeftMouseButtonIsPressed)
                 {
                     Click();
+                    Game.LastMap = Map;
                 }
             }
         }

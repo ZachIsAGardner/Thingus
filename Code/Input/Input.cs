@@ -60,7 +60,7 @@ public static class Input
         }
     }
 
-    public static Vector2 MousePosition(DrawMode drawMode)
+    public static Vector2 MousePosition(DrawMode drawMode = DrawMode.Relative)
     {
         Vector2 mouse = Vector2.Zero;
         if (drawMode == DrawMode.Relative) mouse = MousePositionRelative();

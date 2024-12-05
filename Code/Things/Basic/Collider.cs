@@ -63,10 +63,12 @@ public class Collider : Thing
     float skin = 0.1f;
     public CollisionMask Mask = CollisionMask.Collision;
 
+    List<Collider> possibleCollisions = new List<Collider>() { };
+
     public CollisionInfo Info = new CollisionInfo() { };
 
-    public Collider() : this(new Vector2(CONSTANTS.TILE_SIZE)) { }
-    public Collider(Vector2 bounds)
+    public Collider() { }
+    public Collider(Vector2 position, Vector2 bounds): base(position: position)
     {
         Bounds = bounds;
         // AddChild(new Sprite("Pixel", color: new Color(0, 255, 0, 100), scale: Bounds, drawOrder: 100)).AddTag("Debug");
@@ -85,6 +87,7 @@ public class Collider : Thing
 
         if (Mask == CollisionMask.Collision)
         {
+            possibleCollisions = Game.GetThings<Collider>().Where(c => c.Tags.Contains("Collision") && c != this).ToList();
             GetBakedTilemapCollisions();
             GetColliderCollisions();
         }
@@ -107,86 +110,80 @@ public class Collider : Thing
 
     void GetBakedTilemapCollisions()
     {
-        List<BakedTilemap> bakedTilemaps = Game.GetThings<BakedTilemap>();
-        bakedTilemaps.ForEach(b =>
+        // Vertical
+
+        List<GridCollision> verticalHits = new List<GridCollision>() { };
+
+        foreach (Vector2 raycast in BuildVerticalRaycasts())
         {
-            // Vertical
-
-            List<GridCollision> verticalHits = new List<GridCollision>() { };
-
-            foreach (Vector2 raycast in BuildVerticalRaycasts())
+            GridCollision hit = CheckGridPoint(raycast);
+            if (hit != null)
             {
-                GridCollision hit = CheckGridPoint(raycast, b);
+                verticalHits.Add(hit);
+                break;
+            }
+        }
+
+        GridCollision verticalHit = null;
+        if (verticalHits.Count >= 1)
+        {
+            verticalHit = verticalHits.First();
+        }
+
+        if (verticalHit != null)
+        {
+            if (Velocity.Y < 0)
+            {
+                Position.Y = verticalHit.GlobalBottom.Y + (Bounds.Y / 2f) + (Position.Y - GlobalPosition.Y);
+                Info.Up = true;
+            }
+            else
+            {
+                Position.Y = verticalHit.GlobalTop.Y - (Bounds.Y / 2f) + (Position.Y - GlobalPosition.Y);
+                Info.Down = true;
+            }
+        }
+
+        // Horizontal
+
+        if (Velocity.X != 0)
+        {
+            List<GridCollision> horizontalHits = new List<GridCollision>() { };
+
+            foreach (var raycast in BuildHorizontalRaycasts())
+            {
+                GridCollision hit = CheckGridPoint(raycast);
                 if (hit != null)
                 {
-                    verticalHits.Add(hit);
+                    horizontalHits.Add(hit);
                     break;
                 }
             }
 
-            GridCollision verticalHit = null;
-            if (verticalHits.Count >= 1)
+            GridCollision horizontalHit = null;
+            if (horizontalHits.Count >= 1)
             {
-                verticalHit = verticalHits.First();
+                horizontalHit = horizontalHits.First();
             }
 
-            if (verticalHit != null)
+            if (horizontalHit != null && horizontalHit != verticalHit)
             {
-                if (Velocity.Y < 0)
+                if (Velocity.X < 0)
                 {
-                    Position.Y = verticalHit.GlobalBottom.Y + (Bounds.Y / 2f);
-                    Info.Up = true;
+                    Position.X = horizontalHit.GlobalRight.X + (Bounds.X / 2f) + (Position.X - GlobalPosition.X);
+                    Info.Left = true;
                 }
                 else
                 {
-                    Position.Y = verticalHit.GlobalTop.Y - (Bounds.Y / 2f);
-                    Info.Down = true;
+                    Position.X = horizontalHit.GlobalLeft.X - (Bounds.X / 2f) + (Position.X - GlobalPosition.X);
+                    Info.Right = true;
                 }
             }
-
-            // Horizontal
-
-            if (Velocity.X != 0)
-            {
-                List<GridCollision> horizontalHits = new List<GridCollision>() { };
-
-                foreach (var raycast in BuildHorizontalRaycasts())
-                {
-                    GridCollision hit = CheckGridPoint(raycast, b);
-                    if (hit != null)
-                    {
-                        horizontalHits.Add(hit);
-                        break;
-                    }
-                }
-
-                GridCollision horizontalHit = null;
-                if (horizontalHits.Count >= 1)
-                {
-                    horizontalHit = horizontalHits.First();
-                }
-
-                if (horizontalHit != null && horizontalHit != verticalHit)
-                {
-                    if (Velocity.X < 0)
-                    {
-                        Position.X = horizontalHit.GlobalRight.X + (Bounds.X / 2f);
-                        Info.Left = true;
-                    }
-                    else
-                    {
-                        Position.X = horizontalHit.GlobalLeft.X - (Bounds.X / 2f);
-                        Info.Right = true;
-                    }
-                }
-            }
-        });
+        }
     }
 
     private void GetColliderCollisions()
     {
-        List<Collider> possibleCollisions = Game.GetThings<Collider>().Where(c => c.Tags.Contains("Collision") && c != this).ToList();
-
         // Vertical
 
         List<Collider> verticalHits = new List<Collider>() { };
@@ -401,10 +398,10 @@ public class Collider : Thing
         }
     }
 
-    public GridCollision CheckGridPoint(Vector2 point, BakedTilemap bakedTilemap)
+    public GridCollision CheckGridPoint(Vector2 point)
     {
-        int r = (int)Math.Round((point.Y - bakedTilemap.GlobalPosition.Y) / CONSTANTS.TILE_SIZE);
-        int c = (int)Math.Round((point.X - bakedTilemap.GlobalPosition.X) / CONSTANTS.TILE_SIZE);
+        int r = (int)Math.Round((point.Y - CONSTANTS.TILE_SIZE_HALF) / CONSTANTS.TILE_SIZE);
+        int c = (int)Math.Round((point.X - CONSTANTS.TILE_SIZE_HALF) / CONSTANTS.TILE_SIZE);
 
         // new DebugPoint(point);
         // Log.Clear();
@@ -415,13 +412,27 @@ public class Collider : Thing
         if (TokenGrid.Get(c, r) == 1)
         {
             return new GridCollision(new Vector2(
-                (c * CONSTANTS.TILE_SIZE) + bakedTilemap.GlobalPosition.X,
-                (r * CONSTANTS.TILE_SIZE) + bakedTilemap.GlobalPosition.Y
+                ((c * CONSTANTS.TILE_SIZE) + CONSTANTS.TILE_SIZE_HALF),
+                ((r * CONSTANTS.TILE_SIZE) + CONSTANTS.TILE_SIZE_HALF)
             ));
         }
         else
         {
             return null;
         }
+    }
+
+    public bool CheckPoint(Vector2 point)
+    {
+        bool hit = CheckGridPoint(point) != null;
+        if (hit) return true;
+
+        foreach (var other in possibleCollisions)
+        {
+            hit = CheckColliderPoint(point, other);
+            if (hit) return true;
+        }
+
+        return false;
     }
 }

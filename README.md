@@ -75,7 +75,7 @@ class Program
 ```
 {
     "NAMESPACE": "MyCoolGame",
-    "START_ROOM": "Init",
+    "START_MAP": "Init",
     "VIRTUAL_WIDTH": 320,
     "VIRTUAL_HEIGHT": 180,
     "DEFAULT_SCREEN_MULTIPLIER": 3,

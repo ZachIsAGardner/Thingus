@@ -1,9 +1,21 @@
+using System.Numerics;
 using Raylib_cs;
 
 namespace Thingus;
 
 public static class StringExtensions
 {
+    public static Vector2 ToVector2(this string str)
+    {
+        if (str == null) return Vector2.Zero;
+        
+        if (str.ToLower() == "up") return new Vector2(0, -1);
+        if (str.ToLower() == "down") return new Vector2(0, 1);
+        if (str.ToLower() == "left") return new Vector2(-1, 0);
+        if (str.ToLower() == "right") return new Vector2(1, 0);
+        return Vector2.Zero;
+    }
+
     public static int Width(this string str, Font font)
     {
         return Raylib.MeasureText(str, font.BaseSize);

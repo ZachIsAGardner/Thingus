@@ -50,7 +50,7 @@ public class DropdownControl : Control
             control.Bounds.Y = 16;
             control.Text = option;
             control.TextPadding.X = 3;
-            control.HighlightColor = PaletteBasic.DarkGreen;
+            control.HighlightColor = Theme.Dark;
             control.TextHighlightColor = PaletteBasic.White;
             control.Pressed = () =>
             {

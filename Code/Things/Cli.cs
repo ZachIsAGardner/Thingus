@@ -102,7 +102,7 @@ public class Cli : Thing
             pastCommandIndex = -1;
         }
 
-        while (lines.Count >= (CONSTANTS.VIRTUAL_HEIGHT - 8) / Library.Font.BaseSize)
+        while (lines.Count >= (CONSTANTS.VIRTUAL_HEIGHT - 24) / Library.Font.BaseSize)
         {
             lines.RemoveAt(0);
         }
@@ -114,9 +114,10 @@ public class Cli : Thing
 
         DrawSprite(
             texture: Library.Textures["Pixel"],
-            position: Viewport.Adjust(new Vector2(CONSTANTS.VIRTUAL_WIDTH / 2f, CONSTANTS.VIRTUAL_HEIGHT / 2f)),
-            scale: new Vector2(CONSTANTS.VIRTUAL_WIDTH - 8, CONSTANTS.VIRTUAL_HEIGHT - 8),
-            color: new Color(0, 50, 0, 245)
+            position: Viewport.Adjust(new Vector2(4)),
+            scale: new Vector2(CONSTANTS.VIRTUAL_WIDTH - 8, CONSTANTS.VIRTUAL_HEIGHT - 24),
+            color: Theme.Dark.WithAlpha(0.8f),
+            origin: new Vector2(0)
         );
 
         int i = 0;
@@ -125,7 +126,7 @@ public class Cli : Thing
             DrawText(
                 text: $"* {line}",
                 position: Viewport.Adjust(new Vector2(6, 4 + (Library.Font.BaseSize * i))),
-                color: PaletteAapSplendor128.NightlyAurora
+                color: Theme.Primary
             );
             i++;
         }
@@ -133,7 +134,7 @@ public class Cli : Thing
         DrawText(
             text: $"$ {current}{(caret ? "|" : "")}",
             position: Viewport.Adjust(new Vector2(6, 4 + (Library.Font.BaseSize * i))),
-            color: PaletteBasic.Green
+            color: Theme.Primary
         );
     }
 

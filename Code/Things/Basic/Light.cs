@@ -46,6 +46,8 @@ public class Light : Thing
         else
         {
             Flicker = MathF.Sin((flickerOffset + Time.Elapsed) * 1) * 5;
+            
+            if (Radius == 0) Flicker = 0;
         }
     }
 

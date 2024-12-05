@@ -6,7 +6,7 @@ public static class Lang
 
     public static void Start()
     {
-        import = Library.LangImports["English"];
+        import = Library.LangImports.Get("English");
     } 
 
     public static string Key(string key)

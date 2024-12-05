@@ -62,7 +62,8 @@ public class Text : Thing
             font: Font,
             text: Content,
             position: GlobalPosition
-                + new Vector2(shakeXOffset, shakeYOffset),
+                + new Vector2(shakeXOffset, shakeYOffset)
+                + GlobalOffset,
             color: Color,
             outlineColor: OutlineColor
         );

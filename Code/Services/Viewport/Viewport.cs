@@ -110,12 +110,10 @@ public static class Viewport
 
         RelativeLayer = new RelativeViewportLayer(0);
         Layers.Add(RelativeLayer);
-        LightLayer = new LightViewportLayer(1);
+        LightLayer = new LightViewportLayer(5);
         Layers.Add(LightLayer);
-        AbsoluteLayer = new AbsoluteViewportLayer(2);
+        AbsoluteLayer = new AbsoluteViewportLayer(10);
         Layers.Add(AbsoluteLayer);
-
-        Layers.ForEach(l => l.RefreshProjection());
     }
 
     public static void Update()
@@ -152,7 +150,8 @@ public static class Viewport
             Raylib.BeginShaderMode(Shader.ToRaylib());
             Shader.Update();
         }
-        Layers.Where(l => l.Visible).ToList().ForEach(l => l.DrawToWindow());
+        Layers.Where(l => l.Visible).OrderBy(l => l.Order).ToList().ForEach(l => l.DrawToWindow());
+
         if (Shader != null) Raylib.EndShaderMode();
     }
 

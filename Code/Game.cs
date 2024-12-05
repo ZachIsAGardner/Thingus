@@ -43,6 +43,30 @@ public static class Game
 
     public static PlatformType Platform;
 
+    public static List<T> GetThingsWithName<T>(string name) where T : Thing
+    {
+        return GetThings<T>().Where(t => t.Name.ToLower() == name.ToLower()).ToList();
+    }
+    public static List<Thing> GetThingsWithName(string name) => Things.Where(t => t.Name == name).ToList();
+
+    public static T GetThingWithName<T>(string name) where T : Thing
+    {
+        return GetThings<T>().Where(t => t.Name.ToLower() == name.ToLower()).FirstOrDefault();
+    }
+    public static Thing GetThingWithName(string name) => Things.Find(t => t.Name == name);
+
+    public static List<T> GetThingsWithTag<T>(string tag) where T : Thing
+    {
+        return GetThings<T>().Where(t => t.Tags.Contains(tag)).ToList();
+    }
+    public static List<Thing> GetThingsWithTag(string tag) => Things.Where(t => t.Tags.Contains(tag)).ToList();
+
+    public static T GetThingWithTag<T>(string tag) where T : Thing
+    {
+        return GetThings<T>().Where(t => t.Tags.Contains(tag)).FirstOrDefault();
+    }
+    public static Thing GetThingWithTag(string tag) => Things.Find(t => t.Tags.Contains(tag));
+
     public static List<T> GetThings<T>() where T : Thing
     {
         TypeThings.TryGetValue(typeof(T).Name, out List<Thing> entry);

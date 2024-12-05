@@ -5,8 +5,7 @@ namespace Thingus;
 
 public class RelativeViewportLayer : ViewportLayer
 {
-    public RelativeViewportLayer() { }
-    public RelativeViewportLayer(int index) : base(index) { }
+    public RelativeViewportLayer(int order) : base(order) { }
 
     public override void Update()
     {

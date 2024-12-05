@@ -36,7 +36,6 @@ public class CONSTANTS
     public static int TILE_SIZE_THIRD => TILE_SIZE / 3;
     public static int TILE_SIZE_QUARTER => TILE_SIZE / 4;
     public static int TILE_SIZE_OBLIQUE => TILE_SIZE - TILE_SIZE_THIRD;
-    public static readonly Color PRIMARY_COLOR = PaletteBasic.Gray;
     public static ProjectionType PROJECTION_TYPE = ProjectionType.Grid;
     public static string SAVE_FOLDER = "thingus";
 
@@ -55,7 +54,6 @@ public class CONSTANTS
         if (c.VIRTUAL_HEIGHT != null) VIRTUAL_HEIGHT = c.VIRTUAL_HEIGHT.Value;
         if (c.DEFAULT_SCREEN_MULTIPLIER != null) DEFAULT_SCREEN_MULTIPLIER = c.DEFAULT_SCREEN_MULTIPLIER.Value;
         if (c.TILE_SIZE != null) TILE_SIZE = c.TILE_SIZE.Value;
-        if (c.PRIMARY_COLOR != null) PRIMARY_COLOR = Color.HexToColor(c.PRIMARY_COLOR);
         if (c.PROJECTION_TYPE != null)
         {
             if (c.PROJECTION_TYPE.ToLower() == "grid") PROJECTION_TYPE = ProjectionType.Grid;

@@ -6,17 +6,17 @@ namespace Thingus;
 public class ViewportLayer
 {
     public bool Visible = true;
-    public int Index = 0;
+    public int Order = 0;
     public Rectangle Rectangle = new Rectangle();
     public Camera2D Camera = new Camera2D() { Zoom = 1f };
     public RenderTexture2D Texture;
     public bool FollowsTarget = false;
     public Color ClearColor = PaletteBasic.Black;
 
-    public ViewportLayer() { }
-    public ViewportLayer(int index)
+    public ViewportLayer(int order)
     {
-        Index = index;
+        Order = order;
+        RefreshProjection();
     }
 
     public virtual void RefreshProjection()

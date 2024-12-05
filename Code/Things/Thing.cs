@@ -55,6 +55,7 @@ public class Thing
     public List<Thing> Children = new List<Thing>() { };
 
     public MapCell Cell;
+    public ThingImport Import;
     public Map Map;
     // This Thing was created from a sub-resource map.
     public MapCell ParentCell;
@@ -168,12 +169,17 @@ public class Thing
     public bool UpdateInEditMode = false;
     public bool ExclusiveUpdateInEditMode = false;
     public bool GlobalUpdateInEditMode => (Parent != null && Parent.GlobalUpdateInEditMode) || UpdateInEditMode;
-    public bool ShouldUpdate => Available && Game.Mode != GameMode.Edit || GlobalUpdateInEditMode || ExclusiveUpdateInEditMode;
+    public bool ShouldUpdate => Available && Game.Mode != GameMode.Edit && Game.Root.DeveloperTools?.Cli?.Active != true || GlobalUpdateInEditMode || ExclusiveUpdateInEditMode;
 
     public bool DidStart { get; private set; }
     public virtual void Start()
     {
         DidStart = true;
+
+        if (Import?.VisibleOnlyInEditor == true && Game.Mode == GameMode.Play)
+        {
+            SetVisible(false);
+        }
     }
 
     public virtual void Update()
@@ -264,7 +270,7 @@ public class Thing
                 - ((0.5f - ((Position.Y - Viewport.CameraPosition.Y) / CONSTANTS.VIRTUAL_HEIGHT)).Abs() * 0.5f)
             ) + Chance.Range(-0.125f, 0.125f);
         }
-        Log.Write(volume);
+
         if (volume < 0) volume = 0;
         if (volume > 1) volume = 1;
 

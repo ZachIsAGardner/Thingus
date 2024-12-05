@@ -11,12 +11,13 @@ public class ThingImport
     public int Layer = 0;
     public BlendMode? BlendMode = null;
     public List<string> Tags = new List<string>() { };
-    public List<ThingProperty> Properties = new List<ThingProperty>() { };
+    public Dictionary<string, string> Properties = new Dictionary<string, string>() { };
     public List<ThingOption> Options = new List<ThingOption>() { };
     public string StampType = "Single";
     public List<string> AutoKeys = new List<string>() { };
     public string Category;
     public int Token;
+    public bool VisibleOnlyInEditor;
 
     public ThingImport() { }
 

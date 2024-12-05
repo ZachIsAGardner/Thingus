@@ -91,7 +91,7 @@ public static class Utility
         return type;
     }
 
-    public static Vector2 WorldToGridPosition(Vector2 position, int height = 0, bool wrap = false)
+    public static Vector2 WorldToGridPosition(Vector2 position)
     {
         int r = -1;
         int c = -1;
@@ -106,20 +106,20 @@ public static class Utility
                 position.X - (CONSTANTS.TILE_SIZE_THIRD / 2), 
                 position.Y - (CONSTANTS.TILE_SIZE_THIRD / 2)
             );
-            for (int i = 0; i < height; i++)
-            {
-                p.Y += CONSTANTS.TILE_SIZE_OBLIQUE;
-            }
+            // for (int i = 0; i < height; i++)
+            // {
+            //     p.Y += CONSTANTS.TILE_SIZE_OBLIQUE;
+            // }
             p.X += CONSTANTS.TILE_SIZE_THIRD;
             r = (int)(p.Y / CONSTANTS.TILE_SIZE_THIRD) - 1;
             p.X -= CONSTANTS.TILE_SIZE_THIRD * r;
             p.X += CONSTANTS.TILE_SIZE_OBLIQUE * ((int)(TokenGrid.Bounds.Y / 2) - 1);
             c = (int)(p.X / CONSTANTS.TILE_SIZE_OBLIQUE);
-            if (wrap)
-            {
-                if (c < 0) c = (int)TokenGrid.Bounds.X + c;
-                if (r < 0) r = (int)TokenGrid.Bounds.Y + r;
-            }
+            // if (wrap)
+            // {
+            //     if (c < 0) c = (int)TokenGrid.Bounds.X + c;
+            //     if (r < 0) r = (int)TokenGrid.Bounds.Y + r;
+            // }
         }
         else if (CONSTANTS.PROJECTION_TYPE == ProjectionType.Isometric)
         {

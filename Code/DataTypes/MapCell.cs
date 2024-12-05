@@ -72,21 +72,35 @@ public class MapCell
             thing = Import.Create(root, this);
             thing.Map = Map;
             thing.Cell = this;
+            thing.Import = Import;
         }
         // No Import
         else
         {
             ThingModel model = new ThingModel(this);
 
+            string thingTypeName = Thing;
+            string nameTypeName = Name;
+            
             MethodInfo thingMethod = Utility.FindCreateMethod(Thing);
+            if (thingMethod == null && Thing?.Contains("_") == true)
+            {
+                thingMethod = Utility.FindCreateMethod(Thing.Split("_").First());
+                thingTypeName = Thing.Split("_").First();
+            }
             MethodInfo nameMethod = Utility.FindCreateMethod(Name);
+            if (nameMethod == null && Name?.Contains("_") == true)
+            {
+                nameMethod = Utility.FindCreateMethod(Name.Split("_").First());
+                nameTypeName = Name.Split("_").First();
+            }
             MethodInfo method = null;
             if (thingMethod == null && nameMethod != null) method = nameMethod;
             if (thingMethod != null && nameMethod == null) method = thingMethod;
             if (thingMethod != null && nameMethod != null)
             {
-                Type thingType = Utility.FindType(Thing);
-                Type nameType = Utility.FindType(Name);
+                Type thingType = Utility.FindType(thingTypeName);
+                Type nameType = Utility.FindType(nameTypeName);
                 if (thingType.IsAssignableFrom(nameType)) method = nameMethod;
                 if (nameType.IsAssignableFrom(thingType)) method = thingMethod;
             }

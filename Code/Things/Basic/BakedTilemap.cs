@@ -43,6 +43,7 @@ public class BakedTilemap : Thing
             bakedTilemap.Layer = model.Layer;
             bakedTilemap.DrawOrder = (model.Layer * 10) - 20;
             bakedTilemap.BlendMode = model.BlendMode;
+            root.AddChild(bakedTilemap);
         }
 
         bakedTilemap.AddTile(model);
@@ -55,12 +56,11 @@ public class BakedTilemap : Thing
     {
         Tiles = Tiles.Where(t => t.Position != position).ToList();
 
-        Vector2 p = Utility.WorldToGridPosition(position);
+        // Update TokenGrid
+        Vector2 p = Utility.WorldToGridPosition(position + GlobalPosition);
         int r = (int)p.Y;
         int c = (int)p.X;
-
         if (r < 0 || c < 0 || r >= TokenGrid.Bounds.Y || c >= TokenGrid.Bounds.X) return;
-
         TokenGrid.Set(c, r, 0);
 
         queueReorder = true;
@@ -71,12 +71,11 @@ public class BakedTilemap : Thing
         Tiles.Add(new BakedTile(Library.Textures[model.Name], model.Position, model.TileNumber ?? 0));
         Name = "BakedTilemap";
 
-        Vector2 position = Utility.WorldToGridPosition(model.Position, 0, true);
+        // Update TokenGrid
+        Vector2 position = Utility.WorldToGridPosition(model.Position + GlobalPosition);
         int r = (int)position.Y;
         int c = (int)position.X;
-
         if (r < 0 || c < 0 || r >= TokenGrid.Bounds.Y || c >=  TokenGrid.Bounds.X) return;
-
         TokenGrid.Set(c, r, model.Token);
 
         queueReorder = true;

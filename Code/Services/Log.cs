@@ -49,14 +49,14 @@ public static class Log
             texture: Library.Textures["Pixel"],
             position: Viewport.Adjust(new Vector2(CONSTANTS.VIRTUAL_WIDTH - (width / 2f) - 4, CONSTANTS.VIRTUAL_HEIGHT / 2f), AdjustFrom.TopRight),
             scale: new Vector2(width, height),
-            color: new Color(0, 50, 0, 245),
+            color: Theme.Dark.WithAlpha(0.8f),
             drawMode: DrawMode.Absolute
         );
         Shapes.DrawText(
             font: font,
             text: "LOG",
             position: Viewport.Adjust(new Vector2(CONSTANTS.VIRTUAL_WIDTH - (width), 4), AdjustFrom.TopRight),
-            color: PaletteBasic.Green,
+            color: Theme.Primary,
             drawMode: DrawMode.Absolute
         );
         int i = 1;
@@ -67,7 +67,7 @@ public static class Log
                 font: font, 
                 text: l.Index + ": " + l.Message, 
                 position: p, 
-                color: l.Index % 2 == 0 ? PaletteBasic.White : PaletteAapSplendor128.NightlyAurora,
+                color: l.Index % 2 == 0 ? PaletteBasic.White : Theme.Light,
                 drawMode: DrawMode.Absolute
             );
             i++;

@@ -16,7 +16,7 @@ public class ThingModel
     public int DrawOrder;
     public int UpdateOrder;
     public List<string> Tags = new List<string>() { };
-    public List<ThingProperty> Properties = new List<ThingProperty>() { };
+    public Dictionary<string, string> Properties = new Dictionary<string, string>() { };
     public int Token;
 
     public ThingModel() { }
@@ -28,7 +28,8 @@ public class ThingModel
         TileNumber = cell.TileNumber;
         TileSize = import.TileSize;
         if (import.Tags != null) Tags = import.Tags;
-        Properties = import.Properties.Concat(cell.Options.Select(o => new ThingProperty() { Name = o.Name, Value = o.Value })).ToList();
+        Properties = import.Properties;
+        cell.Options.ForEach(o => Properties[o.Name] = o.Value);
         Token = import.Token;
         
         Layer = import.Layer;

@@ -11,9 +11,9 @@ public class Control : Thing
 
     public Vector2 Bounds;
     public Color Color = PaletteBasic.White;
-    public Color HighlightColor = PaletteBasic.Green;
+    public Color HighlightColor = Theme.Primary;
     public Color TextColor = PaletteBasic.White;
-    public Color TextHighlightColor = PaletteBasic.Green;
+    public Color TextHighlightColor = Theme.Primary;
     public int TileNumber = 0;
     public int TileSize = 0;
 

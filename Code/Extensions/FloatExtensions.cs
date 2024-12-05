@@ -11,7 +11,11 @@ public static class FloatExtensions
         {
             result += "0";
         }
-        return "$" + result;
+        bool minus = result.Contains("-");
+        result = result.Replace("-", "");
+
+
+        return  (minus ? "-" : "") + "$" + result;
     }
 
     public static float ToNearest(this float i, float nearest)

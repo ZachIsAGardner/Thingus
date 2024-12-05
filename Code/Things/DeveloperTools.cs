@@ -55,20 +55,22 @@ public class DeveloperTools : Thing
     {
         if (show)
         {
+            Game.Root.Load(Game.LastMap);
+            Game.Mode = GameMode.Edit;
+            
             Editor.SetActive(true);
             Editor.SetVisible(true);
 
             Viewport.RelativeLayer.ClearColor = PaletteBasic.VeryDarkGray;
 
-            if (Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
-            playTarget = Viewport.Target;
-            Viewport.Target = Editor.CameraTarget;
+            // if (Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
+            // playTarget = Viewport.Target;
+            // Viewport.Target = Editor.CameraTarget;
             Viewport.LightLayer.Visible = false;
             Viewport.SetScalePixels(true);
 
             Editor.Focus();
 
-            Game.Mode = GameMode.Edit;
         }
         else
         {
@@ -100,10 +102,12 @@ public class DeveloperTools : Thing
         Cli.SetActive(false);
         Cli.SetVisible(false);
         Game.Mode = GameMode.Play;
-        if (playTarget != null) Viewport.Target = playTarget;
+
+        // if (playTarget != null) Viewport.Target = playTarget;
+        // if (Editor.CameraTarget != null && Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
         Viewport.Zoom = 1;
         Viewport.RelativeLayer.Camera.Offset = Vector2.Zero;
-        if (Editor.CameraTarget != null && Viewport.Target != null) Editor.CameraTarget.Position = Viewport.Target.Position;
+
         Viewport.LightLayer.Visible = true;
         Viewport.SetScalePixels(false);
     }
@@ -193,7 +197,7 @@ public class DeveloperTools : Thing
                 font: font,
                 text: $"{c.Id}: {c.Name} ({c.TypeName})",
                 position: Viewport.Adjust(new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth) + (depth * 6), 4 + (height * (font.BaseSize + fontOffset))), AdjustFrom.TopRight),
-                color: depth % 2 == 0 ? PaletteBasic.White : PaletteAapSplendor128.NightlyAurora
+                color: depth % 2 == 0 ? PaletteBasic.White : Theme.Light
             );
             height++;
             CrawlTree(c, depth, ref height);
@@ -206,14 +210,14 @@ public class DeveloperTools : Thing
             texture: Library.Textures["Pixel"],
             position: Viewport.Adjust(new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth / 2f) - 4, CONSTANTS.VIRTUAL_HEIGHT / 2f), AdjustFrom.TopRight),
             scale: new Vector2(interfaceWidth, interfaceHeight),
-            color: new Color(0, 50, 0, 245)
+            color: Theme.Dark.WithAlpha(0.8f)
         );
 
         DrawText(
             font: font,
             text: "TREE",
             position: Viewport.Adjust(new Vector2((CONSTANTS.VIRTUAL_WIDTH) - (interfaceWidth), 4), AdjustFrom.TopRight),
-            color: PaletteBasic.Green
+            color: Theme.Primary
         );
 
         int height = 2;

@@ -56,12 +56,14 @@ public class Root : Thing
 
     public void Load(string name)
     {
-        Map map = Library.Maps[name];
+        Map map = Library.Maps.Get(name);
         Load(map);
     }
 
     public void Load(Map map)
     {
+        if (map == null) return;
+        
         if (DeveloperTools?.Editor != null)
         {
             DeveloperTools.Editor.Reset();

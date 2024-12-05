@@ -68,7 +68,7 @@ public class EditTool : Tool
         {
             editor.Mouse.TileNumber = 1;
             Sprite sprite = thing.GetThing<Sprite>();
-            if (sprite != null) sprite.Color = PaletteBasic.Green;
+            if (sprite != null) sprite.Color = Theme.Primary;
             if (Input.LeftMouseButtonIsPressed)
             {
                 CloseWindow();
@@ -239,6 +239,8 @@ public class EditTool : Tool
         title.Refresh();
         flex.Refresh();
 
+        editor.AddChild(root);
+
         return root;
     }
 
@@ -257,7 +259,7 @@ public class EditTool : Tool
         h.Bounds.Y = 16;
         h.Texture = Library.Textures["WhiteSlice"];
         h.Color = PaletteBasic.Blank;
-        h.HighlightColor = PaletteBasic.DarkGreen;
+        h.HighlightColor = Theme.Dark;
         flex.AddChild(h);
 
         ButtonControl control = new ButtonControl();
@@ -301,7 +303,7 @@ public class EditTool : Tool
         control.Bounds.Y = 16;
         control.Texture = Library.Textures["BoxInsideSlice"];
         control.DrawOrder = 10;
-        control.HighlightColor = PaletteBasic.DarkGreen;
+        control.HighlightColor = Theme.Dark;
         control.Color = PaletteBasic.White;
         control.TextPadding.X = 3;
         control.Padding = new Vector2(1, 0);
@@ -332,7 +334,7 @@ public class EditTool : Tool
         control.Bounds.Y = 16;
         control.Texture = Library.Textures["BoxInsideSlice"];
         control.DrawOrder = 10;
-        control.HighlightColor = PaletteBasic.DarkGreen;
+        control.HighlightColor = Theme.Dark;
         control.Color = PaletteBasic.White;
         control.TextPadding.X = 3;
         control.TextHighlightColor = PaletteBasic.White;

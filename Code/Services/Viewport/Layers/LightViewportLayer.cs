@@ -5,8 +5,7 @@ namespace Thingus;
 
 public class LightViewportLayer : ViewportLayer
 {
-    public LightViewportLayer() { }
-    public LightViewportLayer(int index) : base(index) { }
+    public LightViewportLayer(int order) : base(order) { }
 
     List<Light> lights = new List<Light>() { };
     RenderTexture2D lightTextureSheet;
@@ -25,48 +24,48 @@ public class LightViewportLayer : ViewportLayer
     {
         base.RefreshProjection();
 
-        lightTextureSheet = Raylib.LoadRenderTexture(tileSize * 32, tileSize);
+        lightTextureSheet = Raylib.LoadRenderTexture(tileSize * 64, tileSize);
     }
 
     public override void DrawToTexture()
     {
         base.DrawToTexture();
 
+        // Make light texture sheet
         Raylib.BeginTextureMode(lightTextureSheet);
         Raylib.ClearBackground(PaletteBasic.Blank.ToRaylib());
-        int i = 0;
+        int x = 0;
+        int y = 0;
         lights.ForEach(l =>
         {
             float radius = l.Radius + l.Flicker;
             if (radius > tileSize)
             {
-                // ...
+                radius = tileSize;
             }
             Raylib.DrawCircleGradient(
-                centerX: (tileSize / 2) + (tileSize * i),
-                centerY: tileSize / 2,
+                centerX: (tileSize / 2) + (tileSize * x),
+                centerY: (tileSize / 2) + (tileSize * y),
                 radius: radius,
                 color1: l.Color.ToRaylib(),
                 color2: PaletteBasic.Blank.ToRaylib()
             );
-            i++;
+            // if (x >= 16)
+            // {
+            //     y++;
+            //     x = 0;
+            // }
+            x++;
         });
         Raylib.EndTextureMode();
 
-        int lightness = 255 - (int)(Darkness);
-
+        // Draw to Texture
+        int lightness = 255 - (int)(Darkness * 255);
         Raylib.BeginTextureMode(Texture);
-        // Raylib.ClearBackground(new Color(
-        //     255 - (int)Darkness,
-        //     255 - (int)Darkness,
-        //     255 - (int)Darkness,
-        //     255
-        // ));
         Raylib.ClearBackground(new Raylib_cs.Color(lightness, lightness, lightness, 255));
         Raylib.BeginMode2D(Camera);
 
-        // Shapes.DrawSprite(Library.Textures["Vignette"], origin: new Vector2(0), position: new Vector2(-32), scale: new Vector2(1), color: new Color(255, 255, 255, lightness));
-        i = 0;
+        int i = 0;
         lights.ForEach(l =>
         {
             Vector2 position = new Vector2(l.GlobalPosition.X, l.GlobalPosition.Y)

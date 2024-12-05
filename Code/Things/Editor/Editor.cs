@@ -101,8 +101,8 @@ public class Editor : Thing
 
         Stamp = stamps.First();
         previewBackground = AddChild(new Sprite("Pixel", drawOrder: 108, color: PaletteBasic.Black, scale: new Vector2(18), drawMode: DrawMode.Absolute)) as Sprite;
-        preview = AddChild(new Sprite(Stamp.Name, drawOrder: 109, tileSize: CONSTANTS.TILE_SIZE, color: CONSTANTS.PRIMARY_COLOR, drawMode: DrawMode.Absolute)) as Sprite;
-        previewText = AddChild(new Text(Stamp.Name, position: new Vector2(0), Library.Font, color: CONSTANTS.PRIMARY_COLOR, outlineColor: PaletteBasic.Black, order: 111, drawMode: DrawMode.Absolute)) as Text;
+        preview = AddChild(new Sprite(Stamp.Name, drawOrder: 109, tileSize: CONSTANTS.TILE_SIZE, color: Theme.Primary, drawMode: DrawMode.Absolute)) as Sprite;
+        previewText = AddChild(new Text(Stamp.Name, position: new Vector2(0), Library.Font, color: Theme.Primary, outlineColor: PaletteBasic.Black, order: 111, drawMode: DrawMode.Absolute)) as Text;
         SelectStamp(Stamp);
 
         CameraTarget = AddChild(new Thing("CameraTarget"));
@@ -130,7 +130,7 @@ public class Editor : Thing
         categoryControl.Bounds.Y = 16;
         categoryControl.Texture = Library.Textures["BoxInsideSlice"];
         categoryControl.DrawOrder = 20;
-        categoryControl.HighlightColor = PaletteBasic.DarkGreen;
+        categoryControl.HighlightColor = Theme.Dark;
         categoryControl.Color = PaletteBasic.White;
         // categoryControl.TextPadding.X = 3;
         categoryControl.Padding = new Vector2(2);
@@ -221,6 +221,7 @@ public class Editor : Thing
         focusedControl = Control.TextInputControl != null;
 
         // Log.Write(Viewport.RelativeLayer.Camera.Zoom);
+        Viewport.Target = CameraTarget;
         TogglePreview(Input.IsMouseInsideWindow() && Room != null && tool?.ShowPreview == true && !focusedControl);
         UpdatePosition();
         if (focusedControl)
@@ -345,14 +346,14 @@ public class Editor : Thing
 
     void UpdateCharacter()
     {
-        // if (Input.ShiftIsHeld)
-        // {
-        //     if (Game.CharacterType != null)
-        //     {
-        //         Thing player = Game.Things.Find(t => t.TypeName == Game.CharacterType);
-        //         if (player != null) player.Position = MousePosition;
-        //     }
-        // }
+        if (Input.ShiftIsHeld)
+        {
+            if (Game.CharacterType != null)
+            {
+                Thing player = Game.Things.Find(t => t.TypeName == Game.CharacterType);
+                if (player != null) player.Position = MousePosition;
+            }
+        }
     }
 
     public void Reset()
@@ -421,21 +422,21 @@ public class Editor : Thing
     {
         if (Room == null) return;
         
-        Room.Map.Cells.ToList().ForEach(c =>
+        Room.Map.Cells.ToList().ForEach(cell =>
         {
-            if (positions != null && !positions.Contains(c.Position)) return;
+            if (positions != null && !positions.Contains(cell.Position)) return;
 
-            MapCell cell = Room.Map.GetCell(c.Position, c.Import.Layer);
-            if (cell == null || cell.Name != c.Name)
+            int newTileNumber = GetTileNumber(cell);
+            if (cell == null || newTileNumber != cell.TileNumber)
             {
-                AddCell(c.Position + Room.Position, c.Name, c.Import.Layer);
+                AddCell(cell.Position + Room.Position, cell.Name, cell.Import.Layer, tileNumber: newTileNumber);
             }
         });
     }
 
-    public void AddCell(MapCell cell, bool changeHistory = true, Room room = null) => AddCell(cell.Position + (room ?? Room).Position, cell.Name, cell.Import.Layer, changeHistory, room);
-    public void AddCell(Vector2 position, bool changeHistory = true, Room room = null) => AddCell(position, Stamp.Name, Stamp.Import.Layer, changeHistory, room);
-    public void AddCell(Vector2 position, string name, int layer, bool changeHistory = true, Room room = null)
+    public void AddCell(MapCell cell, bool changeHistory = true, Room room = null) => AddCell(cell.Position + (room ?? Room).Position, cell.Name, cell.Import.Layer, changeHistory, room, cell.TileNumber ?? 0);
+    public void AddCell(Vector2 position, bool changeHistory = true, Room room = null, int tileNumber = 0) => AddCell(position, Stamp.Name, Stamp.Import.Layer, changeHistory, room, tileNumber);
+    public void AddCell(Vector2 position, string name, int layer, bool changeHistory = true, Room room = null, int tileNumber = 0)
     {
         if (room == null) room = Room;
 
@@ -443,12 +444,12 @@ public class Editor : Thing
 
         AddChild(new ParticleEffect(
             position: position, 
-            amount: 2, 
+            amount: 1, 
             texture: Library.Textures.Get("5Star"),
             dampening: 0.001f,
             speed: 5,
             time: 0.3f,
-            color: PaletteAapSplendor128.NightlyAurora
+            color: Theme.Primary
         ));
 
         RemoveCell(position, layer, changeHistory);
@@ -457,11 +458,11 @@ public class Editor : Thing
         MapCell cell = new MapCell(
             name: name,
             position: position,
-            tileNumber: 0,
+            tileNumber: tileNumber,
             parent: room.Name
         );
         room.Map.AddCell(cell);
-        cell.TileNumber = GetTileNumber(cell);
+        // cell.TileNumber = GetTileNumber(cell);
         cell.Create(room);
 
         recentGridInteractionPositions.AddRange(PositionWithNeighbors(position));
