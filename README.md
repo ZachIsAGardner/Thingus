@@ -1,4 +1,4 @@
-![Logo](Content/Sprites/Logo.png "Logo")
+![Logo](Documents/Logo.png "Logo")
 
 Everything is a Thing.
 
