@@ -26,6 +26,7 @@ public class RelativeViewportLayer : ViewportLayer
         Raylib.BeginMode2D(Camera);
         // Children.ForEach(x => x.Draw());
         Game.DrawThings.Where(x => x.DrawMode == DrawMode.Relative).ToList().ForEach(x => x.Draw());
+        Game.DrawThings.Where(x => x.DrawMode == DrawMode.Relative).ToList().ForEach(x => x.LateDraw());
         Raylib.EndMode2D();
 
         Raylib.EndTextureMode();

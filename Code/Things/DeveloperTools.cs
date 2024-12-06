@@ -246,6 +246,13 @@ public class DeveloperTools : Thing
             font: Library.FontSmall
         );
 
+        // DrawText(
+        //     Raylib.GetFPS(), 
+        //     color: PaletteBasic.White, 
+        //     outlineColor: PaletteBasic.Black,
+        //     position: new Vector2((CONSTANTS.VIRTUAL_WIDTH / 2f), 4)
+        // );
+
         if (display == DeveloperDisplay.Tree) DrawThingTree();
         else if (display == DeveloperDisplay.Log) Log.Draw();
     }

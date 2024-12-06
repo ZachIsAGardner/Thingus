@@ -16,9 +16,8 @@ public class Editor : Thing
     public Sprite Mouse;
     public Thing CameraTarget;
     Sprite gridMouse;
-    Sprite previewBackground;
-    Sprite preview;
-    Text previewText;
+    TextureControl preview;
+    TextControl previewText;
     VerticalFlexControl verticalFlex;
 
     Vector2 cameraVelocity;
@@ -99,12 +98,6 @@ public class Editor : Thing
 
         Mouse = AddChild(new Sprite("Mouse", tileSize: 16, tileNumber: 0, drawOrder: 110, drawMode: DrawMode.Absolute)) as Sprite;
 
-        Stamp = stamps.First();
-        previewBackground = AddChild(new Sprite("Pixel", drawOrder: 108, color: PaletteBasic.Black, scale: new Vector2(18), drawMode: DrawMode.Absolute)) as Sprite;
-        preview = AddChild(new Sprite(Stamp.Name, drawOrder: 109, tileSize: CONSTANTS.TILE_SIZE, color: Theme.Primary, drawMode: DrawMode.Absolute)) as Sprite;
-        previewText = AddChild(new Text(Stamp.Name, position: new Vector2(0), Library.Font, color: Theme.Primary, outlineColor: PaletteBasic.Black, order: 111, drawMode: DrawMode.Absolute)) as Text;
-        SelectStamp(Stamp);
-
         CameraTarget = AddChild(new Thing("CameraTarget"));
 
         Focus();
@@ -118,11 +111,28 @@ public class Editor : Thing
         adjuster.AddChild(verticalFlex);
         TilesetUi();
         ToolsUi();
+
+        Stamp = stamps.First();
+        SelectStamp(Stamp);
     }
 
     void TilesetUi()
     {
         int width = 64;
+
+        HorizontalFlexControl horizontalFlexControl = new HorizontalFlexControl();
+        horizontalFlexControl.Bounds = new Vector2(width, 16);
+        horizontalFlexControl.Texture = Library.Textures["BoxThinSlice"];
+        horizontalFlexControl.Padding = new Vector2(3);
+
+        preview = new TextureControl();
+        preview.Bounds = new Vector2(16, 16);
+        horizontalFlexControl.AddChild(preview);
+
+        previewText = new TextControl();
+        previewText.Bounds = new Vector2(48, 16);
+        horizontalFlexControl.AddChild(previewText);
+        verticalFlex.AddChild(horizontalFlexControl);
 
         DropdownControl categoryControl = new DropdownControl("", Categories.ToList());
         categoryControl.DrawMode = DrawMode.Absolute;
@@ -168,6 +178,7 @@ public class Editor : Thing
                 control.DrawOrder = 10;
                 control.Texture = stamp.Texture;
                 control.Bounds = new Vector2(16);
+                control.TileSize = stamp.Texture.Height;
                 control.Name = stamp.Name;
                 flex.AddChild(control);
             }
@@ -222,7 +233,6 @@ public class Editor : Thing
 
         // Log.Write(Viewport.RelativeLayer.Camera.Zoom);
         Viewport.Target = CameraTarget;
-        TogglePreview(Input.IsMouseInsideWindow() && Room != null && tool?.ShowPreview == true && !focusedControl);
         UpdatePosition();
         if (focusedControl)
         {
@@ -294,10 +304,6 @@ public class Editor : Thing
         }
         gridMouse.Position = GridPosition;
         gridMouse.SetVisible(!hoveringControl && Input.IsMouseInsideWindow() && Room != null && tool?.ShowPreview == true);
-
-        preview.Position = preview.Position.MoveOverTime(Mouse.Position + new Vector2((previewBackground.Scale.X / 2f) + 8, -4), 0.00001f);
-        previewText.Position = preview.Position + new Vector2(-7, preview.TileSize / 2f);
-        previewBackground.Position = preview.Position;
     }
 
     void UpdateCamera()
@@ -368,13 +374,6 @@ public class Editor : Thing
         if (Target?.Map != null) Target.Map.Save();
         if (Room?.Map != null) Room.Map.Save();
         if (changeHistory) IncrementHistory();
-    }
-
-    public void TogglePreview(bool show)
-    {
-        preview.SetVisible(show);
-        previewBackground.SetVisible(show);
-        previewText.SetVisible(show);
     }
 
     public void RefreshStamps()
@@ -554,12 +553,11 @@ public class Editor : Thing
 
     public void SelectStamp(Stamp stamp)
     {
-        this.Stamp = stamp;
-        preview.Texture = stamp.Texture;
-        previewText.Content = stamp.Name;
+        Stamp = stamp;
 
+        preview.Texture = stamp.Texture;
         preview.TileSize = Library.ThingImports[stamp.Name].TileSize ?? stamp.Texture.Height;
-        previewBackground.Scale = new Vector2(preview.TileSize + 2);
+        previewText.Text = stamp.Name;
     }
 
     public void AddHistoryAction(HistoryAction historyAction)

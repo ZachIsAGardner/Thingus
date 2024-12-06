@@ -31,7 +31,7 @@ public class Text : Thing
     float shakeStepDuration = 0.01f;
 
     public Text() { }
-    public Text(string content, Vector2 position, Font? font = null, DrawMode drawMode = DrawMode.Relative, Color? color = null, Color? outlineColor = null, int order = 0)
+    public Text(string content, Vector2 position, Font? font = null, DrawMode drawMode = DrawMode.Relative, Color? color = null, Color? outlineColor = null, int drawOrder = 0)
     {
         this.Content = content;
         Position = position;
@@ -39,7 +39,7 @@ public class Text : Thing
         OutlineColor = outlineColor;
         Font = font ?? Library.Font;
         DrawMode = drawMode;
-        DrawOrder = order;
+        DrawOrder = drawOrder;
     }
 
     public override void Start()

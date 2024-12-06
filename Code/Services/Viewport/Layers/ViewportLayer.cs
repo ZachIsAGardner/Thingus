@@ -61,8 +61,13 @@ public class ViewportLayer
         Raylib.DrawTexturePro(
             texture: Texture.Texture,
             source: Rectangle,
-            dest: Viewport.Rectangle,
-            origin: new Vector2(0f, 0f),
+            dest: new Rectangle(
+                (Viewport.Rectangle.X + Viewport.Rectangle.Width / 2f) + Viewport.Offset.X,
+                (Viewport.Rectangle.Y + Viewport.Rectangle.Height / 2f) + Viewport.Offset.Y,
+                Viewport.Rectangle.Width,
+                Viewport.Rectangle.Height
+            ),
+            origin: new Vector2(Viewport.Rectangle.Width / 2f, Viewport.Rectangle.Height / 2f),
             rotation: Viewport.Rotation,
             tint: PaletteBasic.White.ToRaylib()
         );

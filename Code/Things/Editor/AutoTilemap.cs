@@ -46,7 +46,7 @@ public class AutoTilemap
 
     private bool DoesCellExist(MapCell cell, Vector2 offset)
     {
-        MapCell other = cell.Map.GetCell(cell.Position + (offset * CONSTANTS.TILE_SIZE));
+        MapCell other = cell.Map.GetCell(cell.Position + (offset * CONSTANTS.TILE_SIZE), cell.Import.Layer);
 
         // Found neighbor
         if (other != null)

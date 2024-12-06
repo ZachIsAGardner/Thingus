@@ -167,6 +167,7 @@ public class Thing
     }
 
     public bool UpdateInEditMode = false;
+    public bool VisibleOnlyInDebug = false;
     public bool ExclusiveUpdateInEditMode = false;
     public bool GlobalUpdateInEditMode => (Parent != null && Parent.GlobalUpdateInEditMode) || UpdateInEditMode;
     public bool ShouldUpdate => Available && Game.Mode != GameMode.Edit && Game.Root.DeveloperTools?.Cli?.Active != true || GlobalUpdateInEditMode || ExclusiveUpdateInEditMode;
@@ -184,7 +185,10 @@ public class Thing
 
     public virtual void Update()
     {
-
+        if (VisibleOnlyInDebug)
+        {
+            if (Game.Mode == GameMode.Play) SetVisible(false);
+        }
     }
 
     public virtual void LateUpdate()
@@ -204,6 +208,16 @@ public class Thing
     public virtual void Draw()
     {
 
+    }
+
+    public virtual void LateDraw()
+    {
+        if (Game.Mode == GameMode.Edit && !GlobalUpdateInEditMode)
+        {
+            // DrawSprite(
+            //     Library.Textures["GizmoPoint"]
+            // );
+        }
     }
 
     public virtual void RefreshProjection()
@@ -249,15 +263,15 @@ public class Thing
 
     public void PlaySound(string name, float? volume = null, float? pitch = null, float? pan = null)
     {
-        if (pan == null) pan = 1 - ((Position.X - Viewport.CameraPosition.X) / CONSTANTS.VIRTUAL_WIDTH);
+        if (pan == null) pan = 1 - ((GlobalPosition.X - Viewport.CameraPosition.X) / CONSTANTS.VIRTUAL_WIDTH);
         if (pan < 0) pan = 0;
         if (pan > 1) pan = 1;
 
         if (pitch == null)
         {
             pitch = (1f
-                - ((0.5f - ((Position.X - Viewport.CameraPosition.X) / CONSTANTS.VIRTUAL_WIDTH)).Abs() * 0.5f)
-                - ((0.5f - ((Position.Y - Viewport.CameraPosition.Y) / CONSTANTS.VIRTUAL_HEIGHT)).Abs() * 0.5f)
+                - ((0.5f - ((GlobalPosition.X - Viewport.CameraPosition.X) / CONSTANTS.VIRTUAL_WIDTH)).Abs() * 0.5f)
+                - ((0.5f - ((GlobalPosition.Y - Viewport.CameraPosition.Y) / CONSTANTS.VIRTUAL_HEIGHT)).Abs() * 0.5f)
             ) + Chance.Range(-0.125f, 0.125f);
         }
         if (pitch < 1) pitch = 1;
@@ -266,8 +280,8 @@ public class Thing
         if (volume == null)
         {
             volume = (1f
-                - ((0.5f - ((Position.X - Viewport.CameraPosition.X) / CONSTANTS.VIRTUAL_WIDTH)).Abs() * 0.5f)
-                - ((0.5f - ((Position.Y - Viewport.CameraPosition.Y) / CONSTANTS.VIRTUAL_HEIGHT)).Abs() * 0.5f)
+                - ((0.5f - ((GlobalPosition.X - Viewport.CameraPosition.X) / CONSTANTS.VIRTUAL_WIDTH)).Abs() * 0.5f)
+                - ((0.5f - ((GlobalPosition.Y - Viewport.CameraPosition.Y) / CONSTANTS.VIRTUAL_HEIGHT)).Abs() * 0.5f)
             ) + Chance.Range(-0.125f, 0.125f);
         }
 

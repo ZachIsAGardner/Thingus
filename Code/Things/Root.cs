@@ -56,6 +56,7 @@ public class Root : Thing
 
     public void Load(string name)
     {
+        TokenGrid.Reset();
         Map map = Library.Maps.Get(name);
         Load(map);
     }

@@ -5,6 +5,7 @@ namespace Thingus;
 public class SongManager : Thing
 {
     public List<Music> Tracks = new List<Music>() { };
+    public static float Pitch = 1f;
 
     public void Play(string name)
     {
@@ -31,6 +32,7 @@ public class SongManager : Thing
 
         Tracks.ForEach(t =>
         {
+            Raylib.SetMusicPitch(t, Pitch);
             Raylib.UpdateMusicStream(t);
         });
     }

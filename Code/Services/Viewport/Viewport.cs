@@ -13,6 +13,7 @@ public static class Viewport
     public static Vector2 Position;
     public static Vector2 Scale;
     public static float Rotation;
+    public static Vector2 Offset;
 
     public static ViewportMode Mode = ViewportMode.FitToScreen;
     public static Color ClearColor = PaletteBasic.Black;

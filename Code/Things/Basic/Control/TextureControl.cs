@@ -13,7 +13,7 @@ public class TextureControl : Control
 
         Vector2 coord = Shapes.CoordinatesFromNumber(TileNumber, Texture.Value, TileSize);
 
-        Rectangle source = new Rectangle(coord.X, coord.Y, Bounds.X, Bounds.Y);
+        Rectangle source = new Rectangle(coord.X, coord.Y, (TileSize > 0 ? TileSize : Bounds.X), (TileSize > 0 ? TileSize : Bounds.Y));
         Rectangle destination = new Rectangle(GlobalPosition.X, GlobalPosition.Y, Bounds.X, Bounds.Y);
 
         DrawSprite(

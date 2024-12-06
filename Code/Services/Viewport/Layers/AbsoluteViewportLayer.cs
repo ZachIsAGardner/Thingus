@@ -17,6 +17,7 @@ public class AbsoluteViewportLayer : ViewportLayer
 
         Raylib.BeginMode2D(Camera);
         Game.DrawThings.Where(x => x.DrawMode == DrawMode.Absolute).ToList().ForEach(x => x.Draw());
+        Game.DrawThings.Where(x => x.DrawMode == DrawMode.Absolute).ToList().ForEach(x => x.LateDraw());
         Raylib.EndMode2D();
 
         Raylib.EndTextureMode();

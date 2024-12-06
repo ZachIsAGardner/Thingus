@@ -8,7 +8,7 @@ public class Drawer : Thing
 
     public Drawer() { }
     public Drawer(
-        string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
+        string name = null, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
         Action<Drawer> action = null
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {

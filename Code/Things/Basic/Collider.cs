@@ -71,7 +71,8 @@ public class Collider : Thing
     public Collider(Vector2 position, Vector2 bounds): base(position: position)
     {
         Bounds = bounds;
-        // AddChild(new Sprite("Pixel", color: new Color(0, 255, 0, 100), scale: Bounds, drawOrder: 100)).AddTag("Debug");
+        Sprite sprite = AddChild(new Sprite("Pixel", color: new Color(0, 255, 0, 100), scale: Bounds, drawOrder: 100)) as Sprite;
+        sprite.VisibleOnlyInDebug = true;
     }
 
     public override void Start()

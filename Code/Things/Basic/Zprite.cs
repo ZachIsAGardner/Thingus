@@ -22,9 +22,7 @@ public class Zprite : Sprite
     {
         base.Update();
         DrawOrderOffset = (
-            ((GlobalPosition.Y - (Texture.Height / 2f)) / 32f)
-                - ((GlobalPosition.X - (Texture.Height / 2f)) / 256f)
-                - (GlobalOffset.Y / 32f)
+            ((GlobalPosition.Y - Position.Y) / 32f)
         ).RoundTo(1);
         if (lastDrawOrderOffset != DrawOrderOffset) Game.QueueDrawReorder();
         lastDrawOrderOffset = DrawOrderOffset;
