@@ -37,10 +37,8 @@ public class Editor : Thing
     bool hoveringControl = false;
     bool focusedControl = false;
 
-    public override void Init()
+    public Editor()
     {
-        base.Init();
-
         UpdateInEditMode = true;
 
         RefreshStamps();

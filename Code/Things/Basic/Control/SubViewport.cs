@@ -19,11 +19,6 @@ public class SubViewport : Control
         RenderTexture = Raylib.LoadRenderTexture((int)area.X, (int)area.Y);
     }
 
-    public override void Init()
-    {
-        base.Init();
-    }
-
     public override void Update()
     {
         base.Update();

@@ -97,8 +97,6 @@ public class Thing
             type = type.BaseType;
         }
 
-        Init();
-
         Game.QueueReorder();
     }
 
@@ -164,11 +162,6 @@ public class Thing
     public void RemoveTag(string tag)
     {
         Tags.Remove(tag);
-    }
-
-    public virtual void Init()
-    {
-
     }
 
     public virtual void AfterCreatedFromMap()

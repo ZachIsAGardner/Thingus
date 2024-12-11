@@ -27,13 +27,6 @@ public class BakedTilemap : Thing
 
     bool queueReorder = false;
 
-    public override void Init()
-    {
-        base.Init();
-
-        UpdateInEditMode = true;
-    }
-
     public static BakedTilemap Create(ThingModel model)
     { 
         BakedTilemap bakedTilemap = model.Root.GetThings<BakedTilemap>().Find(b => b.Layer == model.Layer && b.BlendMode == model.BlendMode);
@@ -51,6 +44,7 @@ public class BakedTilemap : Thing
 
     public BakedTilemap(ThingModel model)
     {
+        UpdateInEditMode = true;
         Layer = model.Layer;
         DrawOrder = Game.Layers[Layer];
         BlendMode = model.BlendMode;
@@ -64,7 +58,8 @@ public class BakedTilemap : Thing
         Vector2 p = Utility.WorldToGridPosition(position + GlobalPosition);
         int r = (int)p.Y;
         int c = (int)p.X;
-        if (r < 0 || c < 0 || r >= TokenGrid.Bounds.Y || c >= TokenGrid.Bounds.X) return;
+        // if (r < 0 || c < 0) return;
+        // if (r < 0 || c < 0 || r >= TokenGrid.Bounds.Y || c >= TokenGrid.Bounds.X) return;
         TokenGrid.Set(c, r, 0);
 
         queueReorder = true;
@@ -79,7 +74,7 @@ public class BakedTilemap : Thing
         Vector2 position = Utility.WorldToGridPosition(model.Position + GlobalPosition);
         int r = (int)position.Y;
         int c = (int)position.X;
-        if (r < 0 || c < 0 || r >= TokenGrid.Bounds.Y || c >=  TokenGrid.Bounds.X) return;
+        // if (r < 0 || c < 0 || r >= TokenGrid.Bounds.Y || c >=  TokenGrid.Bounds.X) return;
         TokenGrid.Set(c, r, model.Token);
 
         queueReorder = true;

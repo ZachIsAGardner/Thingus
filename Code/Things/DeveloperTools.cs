@@ -24,10 +24,8 @@ public class DeveloperTools : Thing
     int interfaceWidth = 180;
     int interfaceHeight = CONSTANTS.VIRTUAL_HEIGHT - 4;
 
-    public override void Init()
+    public DeveloperTools()
     {
-        base.Init();
-
         UpdateInEditMode = true;
     }
 
@@ -168,7 +166,7 @@ public class DeveloperTools : Thing
             TokenGrid.Reset();
             Log.Clear();
             Library.Refresh();
-            Game.Root.Load(Game.LastMap);
+            Game.Root.Load(Game.LastFocusedMap);
             
             if (Input.ShiftIsHeld)
             {

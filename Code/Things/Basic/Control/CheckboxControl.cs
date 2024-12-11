@@ -43,9 +43,4 @@ public class CheckboxControl : HorizontalFlexControl
         textControl.Refresh();
         Refresh();
     }
-
-    public override void Init()
-    {
-        base.Init();
-    }
 }

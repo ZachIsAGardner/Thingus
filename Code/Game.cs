@@ -191,6 +191,8 @@ public static class Game
             queueUpdateReorder = false;
             UpdateThings = Things.Where(t => t.GlobalActive).OrderBy(t => t.UpdateOrder + t.UpdateOrderOffset).ToList();
         }
+
+        Input.LateUpdate();
     }
 
     public static void Draw()

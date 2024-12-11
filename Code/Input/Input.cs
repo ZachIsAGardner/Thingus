@@ -21,23 +21,30 @@ public static class Input
     public static bool ShiftIsHeld => IsHeld(KeyboardKey.LeftShift) || IsHeld(KeyboardKey.RightShift);
     public static bool ShiftIsReleased => IsReleased(KeyboardKey.LeftShift) || IsReleased(KeyboardKey.RightShift);
 
-    public static bool LeftMouseButtonIsPressed => Raylib.IsMouseButtonPressed(MouseButton.Left);
-    public static bool LeftMouseButtonIsHeld => Raylib.IsMouseButtonDown(MouseButton.Left);
-    public static bool LeftMouseButtonIsReleased => Raylib.IsMouseButtonReleased(MouseButton.Left);
+    public static bool LeftMouseButtonIsPressed => Raylib.IsMouseButtonPressed((Raylib_cs.MouseButton)MouseButton.Left);
+    public static bool LeftMouseButtonIsHeld => Raylib.IsMouseButtonDown((Raylib_cs.MouseButton)MouseButton.Left);
+    public static bool LeftMouseButtonIsReleased => Raylib.IsMouseButtonReleased((Raylib_cs.MouseButton)MouseButton.Left);
 
-    public static bool RightMouseButtonIsPressed => Raylib.IsMouseButtonPressed(MouseButton.Right);
-    public static bool RightMouseButtonIsHeld => Raylib.IsMouseButtonDown(MouseButton.Right);
-    public static bool RightMouseButtonIsReleased => Raylib.IsMouseButtonReleased(MouseButton.Right);
+    public static bool RightMouseButtonIsPressed => Raylib.IsMouseButtonPressed((Raylib_cs.MouseButton)MouseButton.Right);
+    public static bool RightMouseButtonIsHeld => Raylib.IsMouseButtonDown((Raylib_cs.MouseButton)MouseButton.Right);
+    public static bool RightMouseButtonIsReleased => Raylib.IsMouseButtonReleased((Raylib_cs.MouseButton)MouseButton.Right);
 
-    public static bool MiddleMouseButtonIsPressed => Raylib.IsMouseButtonPressed(MouseButton.Middle);
-    public static bool MiddleMouseButtonIsHeld => Raylib.IsMouseButtonDown(MouseButton.Middle);
-    public static bool MiddleMouseButtonIsReleased => Raylib.IsMouseButtonReleased(MouseButton.Middle);
+    public static bool MiddleMouseButtonIsPressed => Raylib.IsMouseButtonPressed((Raylib_cs.MouseButton)MouseButton.Middle);
+    public static bool MiddleMouseButtonIsHeld => Raylib.IsMouseButtonDown((Raylib_cs.MouseButton)MouseButton.Middle);
+    public static bool MiddleMouseButtonIsReleased => Raylib.IsMouseButtonReleased((Raylib_cs.MouseButton)MouseButton.Middle);
 
     public static float MouseWheel => Raylib.GetMouseWheelMove();
 
+    public static bool IsGamepadFocused = true;
+    public static float Deadzone = 0.1f;
+
     public static bool Holdup = false;
 
+    static Vector2 lastAbsoluteMousePosition;
+    static float mouseSwitchSensitivity = 7.5f;
+
     static KeyboardKey currentKey = KeyboardKey.Null;
+    
     public static void Update()
     {
         KeyboardKey newKey = (KeyboardKey)Raylib.GetKeyPressed();
@@ -46,7 +53,7 @@ public static class Input
         {
             currentKey = newKey;
         }
-        else 
+        else
         {
             if (IsReleased(currentKey))
             {
@@ -58,6 +65,27 @@ public static class Input
         {
             Holdup = false;
         }
+
+        Vector2 difference = lastAbsoluteMousePosition - MousePositionAbsolute();
+        if (difference.X.Abs() > mouseSwitchSensitivity || difference.Y.Abs() > mouseSwitchSensitivity)
+        {
+            IsGamepadFocused = false;
+            lastAbsoluteMousePosition = MousePositionAbsolute();
+        }
+
+        axisDirectionHeld.ToList().ForEach(b =>
+        {
+            if (!IsHeld(b.Button))
+            {
+                axisDirectionReleased.Add(b);
+                axisDirectionHeld.Remove(b);
+            }
+        });
+    }
+
+    public static void LateUpdate()
+    {
+        axisDirectionReleased.Clear();
     }
 
     public static Vector2 MousePosition(DrawMode drawMode = DrawMode.Relative)
@@ -87,9 +115,334 @@ public static class Input
             );
     }
 
+    public static bool IsPressed(GamepadButton button, int index = -1)
+    {
+        if (index == -1)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                bool value = false;
+                if (Raylib.IsGamepadAvailable(i) && Raylib.IsGamepadButtonPressed(i, (Raylib_cs.GamepadButton)button)) value = true;
+                if (value)
+                {
+                    IsGamepadFocused = true;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        else
+        {
+            if (Raylib.IsGamepadAvailable(index))
+            {
+                bool value = Raylib.IsGamepadButtonPressed(index, (Raylib_cs.GamepadButton)button);
+                if (value) IsGamepadFocused = true;
+                return value;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public static bool IsHeld(GamepadButton button, int index = -1)
+    {
+        if (index == -1)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                bool value = false;
+                if (Raylib.IsGamepadAvailable(i) && Raylib.IsGamepadButtonDown(i, (Raylib_cs.GamepadButton)button)) value = true;
+                if (value)
+                {
+                    IsGamepadFocused = true;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        else
+        {
+            if (Raylib.IsGamepadAvailable(index))
+            {
+                bool value = Raylib.IsGamepadButtonDown(index, (Raylib_cs.GamepadButton)button);
+                if (value) IsGamepadFocused = true;
+                return value;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public static bool IsReleased(GamepadButton button, int index = -1)
+    {
+        if (index == -1)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (Raylib.IsGamepadAvailable(i) && Raylib.IsGamepadButtonReleased(i, (Raylib_cs.GamepadButton)button)) return true;
+            }
+
+            return false;
+        }
+        else
+        {
+            if (Raylib.IsGamepadAvailable(index)) return Raylib.IsGamepadButtonReleased(index, (Raylib_cs.GamepadButton)button);
+            else return false;
+        }
+    }
+
+    public static float Axis(GamepadAxis axis, int index = -1)
+    {
+        if (index == -1)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (Raylib.IsGamepadAvailable(i))
+                {
+                    float result = Raylib.GetGamepadAxisMovement(i, (Raylib_cs.GamepadAxis)axis);
+                    if (result.Abs() < Deadzone) result = 0;
+                    if (result != 0)
+                    {
+                        IsGamepadFocused = true;
+                        return result;
+                    }
+                } 
+            }
+
+            return 0;
+        }
+        else
+        {
+            if (Raylib.IsGamepadAvailable(index))
+            {
+                float result = Raylib.GetGamepadAxisMovement(index, (Raylib_cs.GamepadAxis)axis);
+                if (result.Abs() < Deadzone) result = 0;
+                if (result != 0) IsGamepadFocused = true;
+                return result;
+            }
+
+            return 0;
+        }
+    }
+
+    public static Vector2 Daxis(GamepadDaxis axis, int index = -1)
+    {
+        Raylib_cs.GamepadAxis axisX = (Raylib_cs.GamepadAxis)GamepadAxis.LeftStickX;
+        Raylib_cs.GamepadAxis axisY = (Raylib_cs.GamepadAxis)GamepadAxis.LeftStickY;
+
+        if (axis == GamepadDaxis.LeftStick)
+        {
+            axisX = (Raylib_cs.GamepadAxis)GamepadAxis.LeftStickX;
+            axisY = (Raylib_cs.GamepadAxis)GamepadAxis.LeftStickY;
+        }
+        if (axis == GamepadDaxis.RightStick)
+        {
+            axisX = (Raylib_cs.GamepadAxis)GamepadAxis.RightStickX;
+            axisY = (Raylib_cs.GamepadAxis)GamepadAxis.RightStickY;
+        }
+
+        if (index == -1)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (Raylib.IsGamepadAvailable(i))
+                {
+                    Vector2 result = new Vector2(
+                        Raylib.GetGamepadAxisMovement(i, axisX), 
+                        Raylib.GetGamepadAxisMovement(i, axisY)
+                    );
+                    if (result.X.Abs() < Deadzone && result.Y.Abs() < Deadzone) result = Vector2.Zero;
+                    if (result != Vector2.Zero)
+                    {
+                        IsGamepadFocused = true;
+                        return result;
+                    }
+                } 
+            }
+
+            return Vector2.Zero;
+        }
+        else
+        {
+            if (Raylib.IsGamepadAvailable(index))
+            {
+                Vector2 result = new Vector2(
+                    Raylib.GetGamepadAxisMovement(index, axisX),
+                    Raylib.GetGamepadAxisMovement(index, axisY)
+                );
+
+                if (result.X.Abs() < Deadzone && result.Y.Abs() < Deadzone) result = Vector2.Zero;
+
+                if (result != Vector2.Zero) IsGamepadFocused = true;
+
+                return result;
+            }
+            else
+            {
+                return Vector2.Zero;
+            } 
+        }
+    }
+
+    static List<(GamepadAxisDirection Button, int Index)> axisDirectionHeld = new List<(GamepadAxisDirection Button, int Index)>() { };
+    static List<(GamepadAxisDirection Button, int Index)> axisDirectionReleased = new List<(GamepadAxisDirection Button, int Index)>() { };
+
+    static (GamepadAxis? Axis, int Direction) SplitGamePadAxisDirection(GamepadAxisDirection button)
+    {
+        GamepadAxis? axis = null;
+        int direction = 0;
+
+        if (button == GamepadAxisDirection.LeftStickLeft)
+        {
+            axis = GamepadAxis.LeftStickX;
+            direction = -1;
+        }
+        if (button == GamepadAxisDirection.LeftStickRight)
+        {
+            axis = GamepadAxis.LeftStickX;
+            direction = 1;
+        }
+        if (button == GamepadAxisDirection.LeftStickUp)
+        {
+            axis = GamepadAxis.LeftStickY;
+            direction = -1;
+        }
+        if (button == GamepadAxisDirection.LeftStickDown)
+        {
+            axis = GamepadAxis.LeftStickY;
+            direction = 1;
+        }
+        if (button == GamepadAxisDirection.RightStickLeft)
+        {
+            axis = GamepadAxis.RightStickX;
+            direction = -1;
+        }
+        if (button == GamepadAxisDirection.RightStickRight)
+        {
+            axis = GamepadAxis.RightStickX;
+            direction = 1;
+        }
+        if (button == GamepadAxisDirection.RightStickUp)
+        {
+            axis = GamepadAxis.RightStickY;
+            direction = -1;
+        }
+        if (button == GamepadAxisDirection.RightStickDown)
+        {
+            axis = GamepadAxis.RightStickY;
+            direction = 1;
+        }
+
+        return (axis, direction);
+    }
+
+    public static bool IsPressed(GamepadAxisDirection button, int index = -1)
+    {
+        var split = SplitGamePadAxisDirection(button);
+        
+        if (split.Axis == null) return false;
+        if (axisDirectionHeld.Any(b => b.Button == button)) return false;
+
+        if (index == -1)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                float value = 0;
+                if (Raylib.IsGamepadAvailable(i))
+                {
+                    value = Axis(split.Axis.Value);
+                    if (value.Sign() != split.Direction) value = 0;
+                } 
+                if (value != 0)
+                {
+                    axisDirectionHeld.Add((button, index));
+                    IsGamepadFocused = true;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        else
+        {
+            if (Raylib.IsGamepadAvailable(index))
+            {
+                float value = Axis(split.Axis.Value);
+                if (value.Sign() != split.Direction) value = 0;
+                if (value != 0)
+                {
+                    axisDirectionHeld.Add((button, index));
+                    IsGamepadFocused = true;
+                }
+                return value != 0;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public static bool IsHeld(GamepadAxisDirection button, int index = -1)
+    {
+        var split = SplitGamePadAxisDirection(button);
+        
+        if (split.Axis == null) return false;
+
+        if (index == -1)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                float value = 0;
+                if (Raylib.IsGamepadAvailable(i))
+                {
+                    value = Axis(split.Axis.Value);
+                    if (value.Sign() != split.Direction) value = 0;
+                } 
+                if (value != 0)
+                {
+                    IsGamepadFocused = true;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        else
+        {
+            if (Raylib.IsGamepadAvailable(index))
+            {
+                float value = Axis(split.Axis.Value);
+                if (value.Sign() != split.Direction) value = 0;
+                if (value != 0)
+                {
+                    IsGamepadFocused = true;
+                }
+                return value != 0;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public static bool IsReleased(GamepadAxisDirection button, int index = -1)
+    {
+        return axisDirectionReleased.Any(b => b.Button == button && index == -1 || b.Index == index);
+    }
+
     public static bool IsPressed(KeyboardKey key)
     {
-        return Raylib.IsKeyPressed((Raylib_cs.KeyboardKey)key);
+        bool value = Raylib.IsKeyPressed((Raylib_cs.KeyboardKey)key);
+        if (value) IsGamepadFocused = false;
+        return value;
     }
 
     public static bool IsHeld(KeyboardKey key)
@@ -100,6 +453,23 @@ public static class Input
     public static bool IsReleased(KeyboardKey key)
     {
         return Raylib.IsKeyReleased((Raylib_cs.KeyboardKey)key);
+    }
+
+    public static bool IsPressed(MouseButton button)
+    {
+        bool value = Raylib.IsMouseButtonPressed((Raylib_cs.MouseButton)button);
+        if (value) IsGamepadFocused = false;
+        return value;
+    }
+
+    public static bool IsHeld(MouseButton button)
+    {
+        return Raylib.IsMouseButtonDown((Raylib_cs.MouseButton)button);
+    }
+
+    public static bool IsReleased(MouseButton button)
+    {
+        return Raylib.IsMouseButtonReleased((Raylib_cs.MouseButton)button);
     }
 
     public static bool IsRepeating(KeyboardKey key)

@@ -18,11 +18,6 @@ public class Root : Thing
         DrawMode = DrawMode.Absolute;
     }
 
-    public override void Init()
-    {
-        base.Init();
-    }
-
     public override void Start()
     {
         base.Start();

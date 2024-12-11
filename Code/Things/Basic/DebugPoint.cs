@@ -10,12 +10,6 @@ public class DebugPoint : Thing
     {
         Position = position;
         AddChild(new Sprite("Pixel", color: color ?? Theme.Primary));
-    }
-
-    public override void Init()
-    {
-        base.Init();
-
         DrawOrder = 200;
     }
 

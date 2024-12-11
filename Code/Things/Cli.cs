@@ -14,10 +14,8 @@ public class Cli : Thing
 
     float cooldown = 0.05f;
 
-    public override void Init()
+    public Cli()
     {
-        base.Init();
-
         DrawMode = DrawMode.Absolute;
         DrawOrder = 9999;
         lines.Add("-----------");

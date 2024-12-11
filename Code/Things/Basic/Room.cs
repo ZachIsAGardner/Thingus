@@ -25,11 +25,6 @@ public class Room : Thing
         Bounds = bounds;
     }
 
-    public override void Init()
-    {
-        base.Init();
-    }
-
     public override void Start()
     {
         base.Start();

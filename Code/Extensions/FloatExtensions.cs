@@ -3,6 +3,16 @@ namespace Thingus;
 
 public static class FloatExtensions
 {
+    public static float ToRadians(this float degrees)
+    {
+        return degrees * (MathF.PI / 180);
+    }
+
+    public static float ToDegrees(this float radians)
+    {
+        return (float)(radians * (180 / Math.PI));
+    }
+    
     public static string ToMoney(this float num)
     {
         string result = RoundTo(num, 2).ToString();

@@ -1,11 +1,6 @@
 ** TODO
-- better layer support
-- edit tool: implement move with baked tiles
-- beter load then edit support
-- don't edit individiul rooms are disable room tool
 
 ** LATER
-- gamepad support
 - edit tool: edit multiple
 - edit tool: copy/paste
 

@@ -58,9 +58,4 @@ public class LayerControl : HorizontalFlexControl
     {
         base.Update();
     }
-
-    public override void Init()
-    {
-        base.Init();
-    }
 }

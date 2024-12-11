@@ -61,7 +61,7 @@ public class Collider : Thing
     public int RaycastCount = 3;
     public int RaycastStep = 0;
     float skin = 0.1f;
-    public CollisionMask Mask = CollisionMask.Collision;
+    public bool CheckForCollisions = true;
 
     List<Collider> possibleCollisions = new List<Collider>() { };
 
@@ -71,12 +71,6 @@ public class Collider : Thing
     public Collider(Vector2 position, Vector2 bounds): base(position: position)
     {
         Bounds = bounds;
-    }
-
-    public override void Init()
-    {
-        base.Init();
-
         // Sprite sprite = AddChild(new Sprite("Pixel", color: new Color(0, 255, 0, 100), scale: Bounds, drawOrder: 100)) as Sprite;
         // sprite.VisibleOnlyInDebug = true;
     }
@@ -92,7 +86,7 @@ public class Collider : Thing
 
         if (Velocity == Vector2.Zero) return;
 
-        if (Mask == CollisionMask.Collision)
+        if (CheckForCollisions)
         {
             possibleCollisions = Game.GetThings<Collider>().Where(c => c.Tags.Contains("Collision") && c != this).ToList();
             GetBakedTilemapCollisions();
@@ -105,6 +99,7 @@ public class Collider : Thing
 
     public virtual void LandedHit()
     {
+        Log.Write(Id);
         Destroy();
     }
 
@@ -217,12 +212,12 @@ public class Collider : Thing
         {
             if (Velocity.Y < 0)
             {
-                Position.Y = verticalHit.GlobalBottom.Y + (Bounds.Y / 2f);
+                Position.Y = verticalHit.GlobalBottom.Y + (Bounds.Y / 2f) + (Position.Y - GlobalPosition.Y);
                 Info.Up = true;
             }
             else
             {
-                Position.Y = verticalHit.GlobalTop.Y - (Bounds.Y / 2f);
+                Position.Y = verticalHit.GlobalTop.Y - (Bounds.Y / 2f) + (Position.Y - GlobalPosition.Y);
                 Info.Down = true;
             }
         }
@@ -256,12 +251,12 @@ public class Collider : Thing
             {
                 if (Velocity.X < 0)
                 {
-                    Position.X = horizontalHit.GlobalRight.X + (Bounds.X / 2f);
+                    Position.X = horizontalHit.GlobalRight.X + (Bounds.X / 2f) + (Position.X - GlobalPosition.X);
                     Info.Left = true;
                 }
                 else
                 {
-                    Position.X = horizontalHit.GlobalLeft.X - (Bounds.X / 2f);
+                    Position.X = horizontalHit.GlobalLeft.X - (Bounds.X / 2f) + (Position.X - GlobalPosition.X);
                     Info.Right = true;
                 }
             }
