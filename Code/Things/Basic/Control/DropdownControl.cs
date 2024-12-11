@@ -23,7 +23,7 @@ public class DropdownControl : Control
     {
         base.Start();
 
-        Pressed = () => { };
+        OnPressed += () => { };
     }
 
     public override void Destroy()
@@ -52,7 +52,7 @@ public class DropdownControl : Control
             control.TextPadding.X = 3;
             control.HighlightColor = Theme.Dark;
             control.TextHighlightColor = PaletteBasic.White;
-            control.Pressed = () =>
+            control.OnPressed += () =>
             {
                 Input.Holdup = true;
                 Text = option;
@@ -111,7 +111,7 @@ public class DropdownControl : Control
             position: GlobalPosition - Padding,
             width: (int)(Bounds.X + (Padding.X * 2)),
             height: (int)(Bounds.Y + (Padding.Y * 2)),
-            color: Pressed != null && IsHovered ? HighlightColor : PaletteBasic.Blank
+            color: ShouldShowHighlight ? HighlightColor : PaletteBasic.Blank
         );
 
 
@@ -125,12 +125,12 @@ public class DropdownControl : Control
             position: new Vector2(length, 0) + GlobalPosition - Padding,
             width: (int)(Bounds.X + (Padding.X * 2)) - length,
             height: (int)(Bounds.Y + (Padding.Y * 2)),
-            color: Pressed != null && IsHovered ? Color.Blend(HighlightColor, 0.35f) : Color
+            color: ShouldShowHighlight ? Color.Blend(HighlightColor, 0.35f) : Color
         );
 
         DrawText(
             text: $"{title}{Text}",
-            color: Pressed != null && IsHovered ? TextHighlightColor : TextColor,
+            color: ShouldShowHighlight ? TextHighlightColor : TextColor,
             font: Font,
             position: GlobalPosition + TextPadding
         );

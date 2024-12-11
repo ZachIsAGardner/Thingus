@@ -111,14 +111,16 @@ public class Editor : Thing
         adjuster.AddChild(verticalFlex);
         TilesetUi();
         ToolsUi();
+        LayersUi();
 
         Stamp = stamps.First();
         SelectStamp(Stamp);
     }
 
+    int width = 64;
+
     void TilesetUi()
     {
-        int width = 64;
 
         HorizontalFlexControl horizontalFlexControl = new HorizontalFlexControl();
         horizontalFlexControl.Bounds = new Vector2(width, 16);
@@ -171,7 +173,7 @@ public class Editor : Thing
             foreach (Stamp stamp in Library.ThingImports.Where(t => t.Value.Category?.ToLower() == category?.ToLower()).Select(t => new Stamp(t.Key)).ToList())
             {
                 ButtonControl control = new ButtonControl();
-                control.Pressed = () => 
+                control.OnPressed += () => 
                 {
                     SelectStamp(stamp);
                 };
@@ -196,20 +198,23 @@ public class Editor : Thing
 
     void ToolsUi()
     {
-        int width = 64;
+        AdjusterControl adjuster = new AdjusterControl();
+        adjuster.AdjustFrom = AdjustFrom.TopRight;
+        AddChild(adjuster);
 
-        GridFlexControl flex = new GridFlexControl();
+        VerticalFlexControl flex = new VerticalFlexControl();
         flex.DrawMode = DrawMode.Absolute;
-        flex.Bounds = new Vector2(width, 32);
+        flex.Bounds = new Vector2(16, 6 * 16);
         flex.Texture = Library.Textures["BoxThinSlice"];
         flex.TileSize = 5;
+        flex.Position = new Vector2(CONSTANTS.VIRTUAL_WIDTH - 16 - 4 - 3, 8);
         flex.Padding = new Vector2(3);
-        verticalFlex.AddChild(flex);
+        adjuster.AddChild(flex);
 
         foreach (Tool tool in Tools)
         {
             ButtonControl control = new ButtonControl();
-            control.Pressed = () => 
+            control.OnPressed += () => 
             {
                 SelectTool(tool);
             };
@@ -219,6 +224,32 @@ public class Editor : Thing
             control.TileNumber = tool.TileNumber;
             control.TileSize = 16;
             flex.AddChild(control);
+        }
+    }
+
+    void LayersUi()
+    {
+        ScrollableControl scrollable = new ScrollableControl(new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 64), new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 160));
+        scrollable.DrawMode = DrawMode.Absolute;
+        scrollable.Texture = Library.Textures["BoxThinSlice"];
+        scrollable.TileSize = 5;
+        scrollable.Padding = new Vector2(3);
+        verticalFlex.AddChild(scrollable);
+
+        VerticalFlexControl flex = new VerticalFlexControl();
+        flex.DrawMode = DrawMode.Texture;
+        flex.Bounds = new Vector2(width, 200);
+        flex.TileSize = 5;
+        flex.Padding = new Vector2(3);
+        AddChild(flex);
+        flex.SubViewport = scrollable;
+
+        List<string> layers = Game.Layers.Select(kv => kv.Key).ToList();
+
+        foreach (string layer in layers)
+        {
+            LayerControl checkbox = new LayerControl(layer, true, (int)flex.Bounds.X);
+            flex.AddChild(checkbox);
         }
     }
 
@@ -249,7 +280,7 @@ public class Editor : Thing
         }
         UpdateZoom();
         if (tool != null) tool.Update();
-        UpdateCharacter();
+        // UpdateCharacter();
     }
 
     void UpdateShortcuts()
@@ -383,7 +414,8 @@ public class Editor : Thing
 
     public void Focus()
     {
-        Room = Game.GetThing<Room>();
+        if (Room == null) Room = Game.GetThings<Room>().Find(r => r.Map?.Name == Game.LastFocusedMap?.Name);
+        if (Room == null) Room = Game.GetThing<Room>();
         if (Room != null)
         {
             CameraTarget.Position = Room.TopLeft;
@@ -421,7 +453,7 @@ public class Editor : Thing
     {
         if (Room == null) return;
         
-        Room.Map.Cells.ToList().ForEach(cell =>
+        Room.Map.Cells.Where(c => c.Import != null && c.Import.Layer == LayerControl.CurrentLayer).ToList().ForEach(cell =>
         {
             if (positions != null && !positions.Contains(cell.Position)) return;
 
@@ -435,8 +467,9 @@ public class Editor : Thing
 
     public void AddCell(MapCell cell, bool changeHistory = true, Room room = null) => AddCell(cell.Position + (room ?? Room).Position, cell.Name, cell.Import.Layer, changeHistory, room, cell.TileNumber ?? 0);
     public void AddCell(Vector2 position, bool changeHistory = true, Room room = null, int tileNumber = 0) => AddCell(position, Stamp.Name, Stamp.Import.Layer, changeHistory, room, tileNumber);
-    public void AddCell(Vector2 position, string name, int layer, bool changeHistory = true, Room room = null, int tileNumber = 0)
+    public void AddCell(Vector2 position, string name, string layer, bool changeHistory = true, Room room = null, int tileNumber = 0)
     {
+        if (layer == null) layer = LayerControl.CurrentLayer;
         if (room == null) room = Room;
 
         if (!room.IsPositionInside(position)) return;
@@ -488,8 +521,9 @@ public class Editor : Thing
 
 
     public void RemoveCell(MapCell cell, bool changeHistory = true, Room room = null) => RemoveCell(cell.Position + (room ?? Room).Position, cell.Import.Layer, changeHistory, room);
-    public void RemoveCell(Vector2 position, int? layer = null, bool changeHistory = true, Room room = null)
+    public void RemoveCell(Vector2 position, string layer = null, bool changeHistory = true, Room room = null)
     {
+        if (layer == null) layer = LayerControl.CurrentLayer;
         if (room == null) room = Room;
 
         position -= room.Position;
@@ -538,7 +572,7 @@ public class Editor : Thing
     {
         position -= Room.Position;
 
-        MapCell cell = Room.Map.GetCell(position);
+        MapCell cell = Room.Map.GetCell(position, LayerControl.CurrentLayer);
         if (cell == null) return;
 
         SelectStamp(stamps.Find(s => s.Name == cell.Name));
@@ -554,6 +588,8 @@ public class Editor : Thing
     public void SelectStamp(Stamp stamp)
     {
         Stamp = stamp;
+
+        LayerControl.CurrentLayer = stamp?.Import?.Layer ?? "Main";
 
         preview.Texture = stamp.Texture;
         preview.TileSize = Library.ThingImports[stamp.Name].TileSize ?? stamp.Texture.Height;

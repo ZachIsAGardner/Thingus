@@ -40,6 +40,8 @@ public static class Game
     public static bool Mute = true;
 
     public static Map LastMap = null;
+    public static Map LastFocusedMap = null;
+    public static Map EditingMap = null;
 
     public static PlatformType Platform;
 
@@ -81,6 +83,10 @@ public static class Game
     }
 
     public static T GetThing<T>() where T : Thing => GetThings<T>().FirstOrDefault();
+
+    public static Dictionary<string, int> Layers = new Dictionary<string, int>()
+    {
+    };
 
     public static void Start()
     {
@@ -163,6 +169,7 @@ public static class Game
             {
                 t.LateUpdate();
             }
+            t.PersistentUpdate();
         });
 
         Viewport.Update();

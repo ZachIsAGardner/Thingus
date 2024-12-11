@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using System.Numerics;
 using Thingus;
 
@@ -11,6 +12,7 @@ public class EditTool : Tool
     Action state;
     RectangleSelection selection;
     List<(Thing Thing, Vector2 StartPosition)> moveThings = new List<(Thing Thing, Vector2 StartPosition)>() { };
+    List<(BakedTile BakedTile, Vector2 StartPosition, BakedTilemap BakedTilemap, MapCell MapCell)> moveBakedTiles = new List<(BakedTile BakedTile, Vector2 StartPosition, BakedTilemap BakedTilemap, MapCell MapCell)>() { };
 
     Vector2? actionMousePositionStart = null;
 
@@ -106,10 +108,19 @@ public class EditTool : Tool
 
         if (Input.LeftMouseButtonIsReleased && selection != null)
         {
-            List<Thing> things = editor.Room.Children.Where(t => selection.Positions.Any(p => t.GlobalPosition == p)).ToList();
-
+            List<Thing> things = editor.Room.Children.Where(t => selection.Positions.Any(p => t.GlobalPosition == p && t.Layer == LayerControl.CurrentLayer)).ToList();
+            List<(BakedTile BakedTile, BakedTilemap BakedTilemap, MapCell MapCell)> bakedTiles = new List<(BakedTile BakedTile, BakedTilemap BakedTilemap, MapCell MapCell)>() { };
+            foreach (var bakedTilemap in editor.Room.GetThings<BakedTilemap>())
+            {
+                bakedTiles.AddRange(
+                    bakedTilemap.Tiles.Where(t => selection.Positions.Any(p => bakedTilemap.GlobalPosition + t.Position == p && bakedTilemap.Layer == LayerControl.CurrentLayer))
+                        .Select(t => (t, bakedTilemap, editor.Room.Map.GetCell(t.Position)))
+                        .ToList()
+                );
+            }
+        
             actionMousePositionStart = editor.GridPosition;
-            if (things.Count <= 0)
+            if (things.Count <= 0 && bakedTiles.Count <= 0)
             {
                 Reset();
             } 
@@ -117,6 +128,7 @@ public class EditTool : Tool
             {
                 selection.ChangeState(selection.Move);
                 moveThings = things.Select(r => (r, r.Position)).ToList();
+                moveBakedTiles = bakedTiles.Select(t => (t.BakedTile, t.BakedTile.Position, t.BakedTilemap, t.MapCell)).ToList();
                 // things.ForEach(r => r.GroupMove = true);
                 state = MoveThings;
             }
@@ -127,16 +139,25 @@ public class EditTool : Tool
     {
         editor.Mouse.TileNumber = 1;
 
+        Vector2 difference = editor.GridPosition - actionMousePositionStart.Value;
+
         moveThings.ForEach(m =>
         {
-            Vector2 difference = editor.GridPosition - actionMousePositionStart.Value;
             m.Thing.Position = m.Thing.Cell.Position = m.StartPosition + difference;
+        });
+
+        moveBakedTiles.ForEach(m =>
+        {
+            m.BakedTile.Position = m.MapCell.Position = m.StartPosition + difference;
         });
 
         if (Input.LeftMouseButtonIsPressed)
         {
             List<(Thing Thing, Vector2 StartPosition, Vector2 Destination)> storedMoveThings = new List<(Thing Thing, Vector2 StartPosition, Vector2 Destination)>() { };
             moveThings.ForEach(m => storedMoveThings.Add((m.Thing, m.StartPosition, m.Thing.Position)));
+
+            List<(BakedTile BakedTile, Vector2 StartPosition, BakedTilemap BakedTilemap, MapCell MapCell, Vector2 Destination)> storedMoveBakedTiles = new List<(BakedTile BakedTile, Vector2 StartPosition, BakedTilemap BakedTilemap, MapCell MapCell, Vector2 Destination)>() { };
+            moveBakedTiles.ForEach(m => storedMoveBakedTiles.Add((m.BakedTile, m.StartPosition, m.BakedTilemap, m.MapCell, m.BakedTile.Position)));
 
             editor.AddHistoryAction(new HistoryAction(
                 "MoveThings",
@@ -145,7 +166,13 @@ public class EditTool : Tool
                     storedMoveThings.ForEach(s =>
                     {
                         if (s.Thing.GlobalRemoved) s.Thing = Game.GetThings<Thing>().Find(t => t.Name == s.Thing.Name);
-                        s.Thing.Position = s.StartPosition;
+                        s.Thing.Position = s.Thing.Cell.Position = s.StartPosition;
+                    });
+
+                    storedMoveBakedTiles.ForEach(s =>
+                    {
+                        if (s.BakedTilemap.GlobalRemoved) s.BakedTilemap = Game.GetThings<BakedTilemap>().Find(t => t.Name == s.BakedTilemap.Name);
+                        s.BakedTile.Position = s.MapCell.Position = s.StartPosition;
                     });
                 },
                 () =>
@@ -153,7 +180,13 @@ public class EditTool : Tool
                     storedMoveThings.ForEach(s =>
                     {
                         if (s.Thing.GlobalRemoved) s.Thing = Game.GetThings<Thing>().Find(t => t.Name == s.Thing.Name);
-                        s.Thing.Position = s.Destination;
+                        s.Thing.Position = s.Thing.Cell.Position = s.Destination;
+                    });
+
+                    storedMoveBakedTiles.ForEach(s =>
+                    {
+                        if (s.BakedTilemap.GlobalRemoved) s.BakedTilemap = Game.GetThings<BakedTilemap>().Find(t => t.Name == s.BakedTilemap.Name);
+                        s.BakedTile.Position = s.MapCell.Position = s.Destination;
                     });
                 }
             ));
@@ -167,6 +200,7 @@ public class EditTool : Tool
         actionMousePositionStart = null;
         state = Normal;
         moveThings.Clear();
+        moveBakedTiles.Clear();
         selection?.Destroy();
         selection = null;
     }
@@ -218,7 +252,7 @@ public class EditTool : Tool
         title.AddChild(textControl);
 
         ButtonControl close = new ButtonControl();
-        close.Pressed = () => 
+        close.OnPressed += () => 
         {
             CloseWindow();
         };
@@ -254,39 +288,14 @@ public class EditTool : Tool
             thing.Cell.Options.Add(thingOption);
         }
 
-        HorizontalFlexControl h = new HorizontalFlexControl();
-        h.Bounds.X = flex.Bounds.X;
-        h.Bounds.Y = 16;
-        h.Texture = Library.Textures["WhiteSlice"];
-        h.Color = PaletteBasic.Blank;
-        h.HighlightColor = Theme.Dark;
-        flex.AddChild(h);
-
-        ButtonControl control = new ButtonControl();
-        control.Texture = Library.Textures["Checkbox"];
-        control.Bounds = new Vector2(16);
-        control.DrawOrder = 101;
-        control.TileSize = 16;
-        if (thingOption.Value == "true") control.TileNumber = 1;
-        else control.TileNumber = 0;
-        h.AddChild(control);
-
-        TextControl textControl = new TextControl();
-        textControl.Text = option.Name;
-
-        h.Pressed = () => 
+        CheckboxControl checkbox = new CheckboxControl(option.Name, option.Value?.ToLower() == "true", (int)flex.Bounds.X);
+        checkbox.OnPressed += () =>
         {
-            if (control.TileNumber == 1) control.TileNumber = 0;
-            else control.TileNumber = 1;
-
-            thingOption.Value = control.TileNumber == 1 ? "true" : "false";
+            thingOption.Value = checkbox.Value.ToString().ToLower();
         };
-        h.AddChild(textControl);
+        flex.AddChild(checkbox);
 
-        textControl.Refresh();
-        h.Refresh();
-
-        return control;
+        return checkbox;
     }
 
     Control TextInput(Thing thing, ThingOption option, Control flex)

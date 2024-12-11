@@ -31,12 +31,12 @@ public class TextControl : Control
             position: GlobalPosition - Padding,
             width: (int)(Bounds.X + (Padding.X * 2)),
             height: (int)(Bounds.Y + (Padding.Y * 2)),
-            color: Pressed != null && IsHovered ? HighlightColor : PaletteBasic.Blank
+            color: ShouldShowHighlight ? HighlightColor : PaletteBasic.Blank
         );
 
         DrawText(
             text: Text,
-            color: Pressed != null && IsHovered ? TextHighlightColor : TextColor,
+            color: ShouldShowHighlight ? TextHighlightColor : TextColor,
             font: Font,
             position: GlobalPosition + TextPadding
         );

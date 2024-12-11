@@ -57,7 +57,7 @@ public class HorizontalFlexControl : Control
             position: GlobalPosition - Padding,
             width: (int)(Bounds.X + (Padding.X * 2)),
             height: (int)(Bounds.Y + (Padding.Y * 2)),
-            color: Pressed != null && IsHovered ? HighlightColor : Color
+            color: ShouldShowHighlight ? HighlightColor : Color
         );
     }
 }

@@ -22,8 +22,8 @@ public class BakedTile
 public class BakedTilemap : Thing
 {
     public List<BakedTile> Tiles = new List<BakedTile>() { };
-    public int Layer;
     public BlendMode? BlendMode = null;
+    public Color Color = PaletteBasic.White;
 
     bool queueReorder = false;
 
@@ -34,22 +34,26 @@ public class BakedTilemap : Thing
         UpdateInEditMode = true;
     }
 
-    public static BakedTilemap Create(Thing root, ThingModel model)
-    {
-        BakedTilemap bakedTilemap = root.GetThings<BakedTilemap>().Find(b => b.Layer == model.Layer && b.BlendMode == model.BlendMode);
+    public static BakedTilemap Create(ThingModel model)
+    { 
+        BakedTilemap bakedTilemap = model.Root.GetThings<BakedTilemap>().Find(b => b.Layer == model.Layer && b.BlendMode == model.BlendMode);
         if (bakedTilemap == null)
         {
-            bakedTilemap = new BakedTilemap();
-            bakedTilemap.Layer = model.Layer;
-            bakedTilemap.DrawOrder = (model.Layer * 10) - 20;
-            bakedTilemap.BlendMode = model.BlendMode;
-            root.AddChild(bakedTilemap);
+            bakedTilemap = new BakedTilemap(model);
+            model.Root.AddChild(bakedTilemap);
         }
 
         bakedTilemap.AddTile(model);
 
         bakedTilemap.Name = $"BakedTilemap_{bakedTilemap.Layer}";
         return bakedTilemap;
+    }
+
+    public BakedTilemap(ThingModel model)
+    {
+        Layer = model.Layer;
+        DrawOrder = Game.Layers[Layer];
+        BlendMode = model.BlendMode;
     }
 
     public void RemoveTile(Vector2 position)
@@ -107,6 +111,9 @@ public class BakedTilemap : Thing
     {
         base.Draw();
 
+        Color color = Color;
+        if (GlobalAlphaOverride != null) color = color.WithAlpha(GlobalAlphaOverride.Value);
+
         if (BlendMode != null) Raylib.BeginBlendMode(BlendMode.Value);
         Tiles.ForEach(t =>
         {
@@ -114,7 +121,8 @@ public class BakedTilemap : Thing
                 texture: t.Texture,
                 tileNumber: t.TileNumber,
                 tileSize: CONSTANTS.TILE_SIZE,
-                position: GlobalPosition + t.Position
+                position: GlobalPosition + t.Position,
+                color: color
             );
         });
         if (BlendMode != null) Raylib.EndBlendMode();

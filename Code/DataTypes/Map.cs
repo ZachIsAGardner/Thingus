@@ -38,7 +38,7 @@ public class Map
         cell.Map = this;
     }
 
-    public MapCell GetCell(Vector2 position, int? layer = null)
+    public MapCell GetCell(Vector2 position, string layer = null)
     {
         return layer != null
             ? Cells.Find(c => c.Position == position && c.Import.Layer == layer)

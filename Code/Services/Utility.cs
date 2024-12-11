@@ -79,7 +79,7 @@ public static class Utility
         if (name == null) return null;
         Type type = FindType(name);
         if (type == null) return null;
-        MethodInfo method = type.GetMethod("Create", new[] { typeof(Thing), typeof(ThingModel) });
+        MethodInfo method = type.GetMethod("Create", new[] { typeof(ThingModel) });
         return method;
     }
 

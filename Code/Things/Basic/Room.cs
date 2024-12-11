@@ -18,7 +18,7 @@ public class Room : Thing
     public bool Focused => Game.Root.DeveloperTools.Editor.Room == this;
     public bool GroupMove = false;
 
-    public static Room Create(Thing root, ThingModel model) => new Room(model.Name, model.Position, model.Bounds);
+    public static Room Create(ThingModel model) => new Room(model.Name, model.Position, model.Bounds);
     public Room() { }
     public Room(string name, Vector2 position, Vector2 bounds) : base(name, position)
     {
@@ -28,23 +28,22 @@ public class Room : Thing
     public override void Init()
     {
         base.Init();
-        DrawOrder = 100;
     }
 
     public override void Start()
     {
         base.Start();
 
-        AddChild(new Drawer("RoomBackground", drawOrder: -110, action: d =>
+        AddChild(new Drawer("RoomBackground", drawOrder: -190, action: d =>
         {
             if (Game.Mode == GameMode.Play) return;
             if (Focused)
             {
-                d.DrawOrder = -100;
+                d.DrawOrder = -190;
             }
             else
             {
-                d.DrawOrder = -110;
+                d.DrawOrder = -200;
             }
             Vector2 bounds = Bounds;
             bounds += (CONSTANTS.PROJECTION_TYPE == ProjectionType.Grid
@@ -112,9 +111,24 @@ public class Room : Thing
                 if (Input.LeftMouseButtonIsPressed)
                 {
                     Click();
+                    Game.LastFocusedMap = Map;
                     Game.LastMap = Map;
                 }
             }
+        }
+    }
+
+    public override void PersistentUpdate()
+    {
+        base.PersistentUpdate();
+
+        if (Game.Mode == GameMode.Play)
+        {
+            DrawOrder = 0;
+        }
+        else if (Game.Mode == GameMode.Edit)
+        {
+            DrawOrder = 100;
         }
     }
 

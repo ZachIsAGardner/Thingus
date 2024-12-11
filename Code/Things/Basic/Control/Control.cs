@@ -24,7 +24,7 @@ public class Control : Thing
     public bool IsHighlighted => HighlightedControl == this || (Parent as Control)?.IsHighlighted == true;
     public bool IsHeld;
     public Action Hovered;
-    public Action Pressed;
+    public event Action OnPressed;
     public Action Highlighting;
     public Action Released;
     public Action LostFocus;
@@ -78,6 +78,8 @@ public class Control : Thing
         if (CheckMouse) Mouse();
     }
 
+    public virtual bool ShouldShowHighlight => OnPressed != null && (IsHovered || IsHeld || IsHighlighted);
+    
     void Mouse()
     {
         if (IsHeld)
@@ -89,7 +91,7 @@ public class Control : Thing
             }
         }
 
-        if ((FocusedControl != null && !IsFocused) || (Pressed != null && Hovered != null && Released != null))
+        if ((FocusedControl != null && !IsFocused) || (OnPressed != null && Hovered != null && Released != null))
         {
             IsHovered = false;
             return;
@@ -123,7 +125,7 @@ public class Control : Thing
             if (Input.LeftMouseButtonIsPressed)
             {
                 IsHeld = true;
-                if (Pressed != null) Pressed();
+                if (OnPressed != null) OnPressed.Invoke();
             }
         }
     }

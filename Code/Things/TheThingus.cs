@@ -5,7 +5,7 @@ namespace Thingus;
 public class TheThingus : Sprite
 {
      // Create from Map
-    public static TheThingus Create(Thing root, ThingModel model)
+    public static TheThingus Create(ThingModel model)
         => new TheThingus(
             name: model.Name,
             position: model.Position,
@@ -15,7 +15,7 @@ public class TheThingus : Sprite
             color: PaletteBasic.White,
             properties: model.Properties
         );
-    public TheThingus() { }
+
     // Create from code
     public TheThingus(
         string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
@@ -23,7 +23,6 @@ public class TheThingus : Sprite
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {
         Texture = Library.Textures[name];
-        
     }
 
     public override void Update()

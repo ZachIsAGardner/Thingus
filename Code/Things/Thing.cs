@@ -17,6 +17,8 @@ public class Thing
     public int Id;
     static int id;
     public string Name;
+    public HashSet<string> Tags = new HashSet<string>() { };
+    public string Layer;
 
     public DrawMode DrawMode = DrawMode.Relative;
     public SubViewport SubViewport = null;
@@ -42,7 +44,7 @@ public class Thing
     public bool GlobalActive => (Parent == null || Parent.GlobalActive) && Active;
 
     public bool Visible { get; private set; } = true;
-    public bool GlobalVisible => (Parent == null || Parent.GlobalVisible) && Visible;
+    public bool GlobalVisible => (Parent == null || Parent.GlobalVisible) && Visible && (!VisibleOnlyInDebug || Game.Mode == GameMode.Edit);
 
     public bool Removed = false;
     public bool GlobalRemoved => (Parent == null || Parent.GlobalRemoved) && Removed;
@@ -61,15 +63,14 @@ public class Thing
     public MapCell ParentCell;
     public Map ParentMap;
 
-    public List<string> Tags = new List<string>() { };
-
     public string TypeName;
 
     float lastUpdateOrder;
     float lastDrawOrder;
     bool lastActive = true;
 
-    public static Thing Create(Thing root, ThingModel model) => new Thing(model.Name, model.Position, model.DrawMode, model.DrawOrder, model.UpdateOrder);
+    public static Thing Create(ThingModel model) => new Thing(model.Name, model.Position, model.DrawMode);
+
     public Thing() : this(null) { }
     public Thing(string name = null, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0)
     {
@@ -80,7 +81,8 @@ public class Thing
         if (Game.Root?.Dynamic != null) Game.Root?.Dynamic.AddChild(this);
 
         TypeName = GetType().Name;
-        Name = name ?? TypeName;
+        Name = name;
+        if (Name?.HasValue() != true) Name = TypeName;
         Position = position ?? Vector2.Zero;
         DrawMode = drawMode;
         DrawOrder = drawOrder;
@@ -98,6 +100,14 @@ public class Thing
         Init();
 
         Game.QueueReorder();
+    }
+
+    public void ApplyImport(ThingImport import)
+    {
+        Import = import;
+        AddTags(import.Tags);
+        Layer = import.Layer;
+        if (Name?.HasValue() != true || Name == TypeName) Name = import.Name;
     }
 
     public T Downcast<T>()
@@ -172,6 +182,9 @@ public class Thing
     public bool GlobalUpdateInEditMode => (Parent != null && Parent.GlobalUpdateInEditMode) || UpdateInEditMode;
     public bool ShouldUpdate => Available && Game.Mode != GameMode.Edit && Game.Root.DeveloperTools?.Cli?.Active != true || GlobalUpdateInEditMode || ExclusiveUpdateInEditMode;
 
+    public float? AlphaOverride = null;
+    public float? GlobalAlphaOverride => AlphaOverride ?? (Parent != null ? Parent?.AlphaOverride : null);
+
     public bool DidStart { get; private set; }
     public virtual void Start()
     {
@@ -185,19 +198,37 @@ public class Thing
 
     public virtual void Update()
     {
-        if (VisibleOnlyInDebug)
-        {
-            if (Game.Mode == GameMode.Play) SetVisible(false);
-        }
+
     }
 
     public virtual void LateUpdate()
     {
+
+    }
+
+    public virtual void PersistentUpdate()
+    {
+        if (Layer != null && Game.Mode == GameMode.Edit)
+        {
+            // Focused
+            if (Layer == LayerControl.CurrentLayer)
+            {
+                AlphaOverride = null;
+                // DrawOrder = 100;
+            }
+            // Not Focused
+            else
+            {
+                AlphaOverride = 0.1f;
+                // DrawOrder = Game.Layers[Layer];
+            }
+        }
+
         if (lastUpdateOrder != UpdateOrder) Game.QueueUpdateReorder();
         lastUpdateOrder = UpdateOrder;
 
-        if (lastDrawOrder != DrawOrder) Game.QueueDrawReorder();
-        lastDrawOrder = DrawOrder;
+        if (lastDrawOrder != DrawOrder + DrawOrderOffset) Game.QueueDrawReorder();
+        lastDrawOrder = DrawOrder + DrawOrderOffset;
     }
 
     public virtual void DrawToTexture()
@@ -212,11 +243,11 @@ public class Thing
 
     public virtual void LateDraw()
     {
-        if (Game.Mode == GameMode.Edit && !GlobalUpdateInEditMode)
+        if (Game.Mode == GameMode.Edit && Layer != null && Layer == LayerControl.CurrentLayer)
         {
-            // DrawSprite(
-            //     Library.Textures["GizmoPoint"]
-            // );
+            DrawSprite(
+                Library.Textures["GizmoPoint"]
+            );
         }
     }
 

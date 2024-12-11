@@ -72,12 +72,13 @@ public class MapCell
             thing = Import.Create(root, this);
             thing.Map = Map;
             thing.Cell = this;
-            thing.Import = Import;
+            thing.ApplyImport(Import);
         }
         // No Import
         else
         {
             ThingModel model = new ThingModel(this);
+            model.Root = root;
 
             string thingTypeName = Thing;
             string nameTypeName = Name;
@@ -105,7 +106,7 @@ public class MapCell
                 if (nameType.IsAssignableFrom(thingType)) method = thingMethod;
             }
 
-            thing = root.AddChild(method.Invoke(null, new object[] { root, model }) as Thing);
+            thing = root.AddChild(method.Invoke(null, new object[] { model }) as Thing);
             thing.Map = Map;
             thing.Cell = this;
         }

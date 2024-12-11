@@ -96,19 +96,18 @@ public class Sprite : Thing
     int lastFlooredTileNumber;
 
     // Create from Map
-    public static Sprite Create(Thing root, ThingModel model)
-        => new Sprite(
-            name: model.Name,
-            position: model.Position,
-            drawMode: DrawMode.Relative,
-            tileSize: CONSTANTS.TILE_SIZE,
-            tileNumber: model.TileNumber,
-            color: PaletteBasic.White
-        );
-    public Sprite() { }
+    public static Sprite Create(ThingModel model) => new Sprite(
+        name: model.Name,
+        position: model.Position,
+        drawMode: DrawMode.Relative,
+        tileSize: CONSTANTS.TILE_SIZE,
+        tileNumber: model.TileNumber,
+        color: PaletteBasic.White
+    );
+
     // Create from code
     public Sprite(
-        string name = null, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
+        string name, Vector2? position = null, DrawMode drawMode = DrawMode.Relative, float drawOrder = 0, float updateOrder = 0,
         int? tileSize = null, int? tileNumber = null, Color? color = null, Vector2? scale = null, float rotation = 0f, Vector2? origin = null
     ) : base(name, position, drawMode, drawOrder, updateOrder)
     {
@@ -219,6 +218,9 @@ public class Sprite : Thing
     {
         base.Draw();
 
+        Color color = Color;
+        if (GlobalAlphaOverride != null) color = color.WithAlpha(GlobalAlphaOverride.Value);
+
         DrawSprite(
             texture: Texture,
             position: (DrawMode == DrawMode.Texture ? (Position + GlobalOffset) : (GlobalPosition + GlobalOffset))
@@ -227,7 +229,7 @@ public class Sprite : Thing
             tileNumber: (int)(TileNumber + TileNumberOffset).Floor(),
             rotation: Rotation,
             scale: Scale,
-            color: Color,
+            color: color,
             flipHorizontally: FlipHorizontally,
             flipVertically: FlipVertically,
             origin: Origin

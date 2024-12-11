@@ -1,11 +1,15 @@
-TODO
+** TODO
+- better layer support
+- edit tool: implement move with baked tiles
+- beter load then edit support
+- don't edit individiul rooms are disable room tool
 
-LATER
+** LATER
 - gamepad support
 - edit tool: edit multiple
 - edit tool: copy/paste
 
-WAY LATER
+** WAY LATER
 - better mac export settings
 - palette swap
 - branch view

@@ -220,7 +220,7 @@ public class RoomTool : Tool
 
     Room AddRoom()
     {
-        Thing child = editor.Target.Children.OrderByDescending(c => c.Map.Name).FirstOrDefault();
+        Thing child = editor.Target.Children.OrderByDescending(c => c.Map?.Name).FirstOrDefault();
         string index = child == null ? "000" : (child.Map.Name.Split("_").Last().ToInt() + 1).ToString().PadLeft(3, '0');
         string mapName = $"{editor.Target.Map.Name}_{index}";
         int width = CONSTANTS.VIRTUAL_WIDTH;
@@ -278,7 +278,8 @@ public class RoomTool : Tool
 
     void RemoveRoom(Room room, bool changeHistory = true)
     {
-        editor.Target.Map.RemoveCell(room.ParentCell);
+        MapCell cell = room.ParentCell ?? room.Cell;
+        editor.Target.Map.RemoveCell(cell);
         editor.Room = null;
         room.Children.Where(c => c.Cell != null).ToList().ForEach(c =>
         {
@@ -315,7 +316,7 @@ public class RoomTool : Tool
         moveRooms.ForEach(m =>
         {
             Vector2 difference = editor.GridPosition - actionMousePositionStart.Value;
-            m.Room.Position = m.Room.ParentCell.Position = m.StartPosition + difference;
+            m.Room.Position = (m.Room.ParentCell ?? m.Room.Cell).Position = m.StartPosition + difference;
         });
 
         if (Input.LeftMouseButtonIsPressed)
@@ -350,7 +351,8 @@ public class RoomTool : Tool
     void MoveRoom()
     {
         Vector2 difference = editor.GridPosition - actionMousePositionStart.Value;
-        actionRoom.Position = actionRoom.ParentCell.Position = actionRoomPositionStart.Value + difference;
+        MapCell cell = actionRoom.ParentCell ?? actionRoom.Cell;
+        actionRoom.Position = cell.Position = actionRoomPositionStart.Value + difference;
 
         if (Input.LeftMouseButtonIsReleased)
         {
@@ -380,9 +382,10 @@ public class RoomTool : Tool
         if (editor.GridPosition == editor.LastGridInteractPosition && Input.LeftMouseButtonIsHeld) return;
 
         Vector2 difference = editor.GridPosition - actionMousePositionStart.Value;
+        MapCell cell = actionRoom.ParentCell ?? actionRoom.Cell;
         if (resizeReverse)
         {
-            actionRoom.Position.X = actionRoom.ParentCell.Position.X = actionRoomPositionStart.Value.X + difference.X;
+            actionRoom.Position.X = cell.Position.X = actionRoomPositionStart.Value.X + difference.X;
             actionRoom.Bounds.X = actionRoom.Cell.Bounds.X = actionRoomBoundsStart.Value.X - difference.X;
             actionRoom.Children.ForEach(c =>
             {
@@ -425,6 +428,7 @@ public class RoomTool : Tool
             });
 
             Room storedRoom = actionRoom;
+            MapCell storedCell = cell;
             Vector2 storedDestination = actionRoom.Position;
             Vector2 storedStart = actionRoomPositionStart.Value;
             Vector2 storedBoundsStart = actionRoomBoundsStart.Value;
@@ -436,7 +440,11 @@ public class RoomTool : Tool
                 "ResizeRoomHorizontal",
                 () =>
                 {
-                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    if (storedRoom.GlobalRemoved)
+                    {
+                        storedCell = storedRoom.ParentCell ?? storedRoom.Cell;
+                        storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    }
                     if (storedResizeReverse)
                     {
                         storedRoom.Children.ForEach(c =>
@@ -450,12 +458,16 @@ public class RoomTool : Tool
                             c.Position.X += storedDifference.X;
                         });
                     }
-                    storedRoom.Position = storedRoom.ParentCell.Position = storedStart;
+                    storedRoom.Position = storedCell.Position = storedStart;
                     storedRoom.Bounds = storedRoom.Cell.Bounds = storedBoundsStart;
                 },
                 () =>
                 {
-                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    if (storedRoom.GlobalRemoved)
+                    {
+                        storedCell = storedRoom.ParentCell ?? storedRoom.Cell;
+                        storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    }
                     if (storedResizeReverse)
                     {
                         storedRoom.Children.ForEach(c =>
@@ -469,7 +481,7 @@ public class RoomTool : Tool
                             c.Position.X -= storedDifference.X;
                         });
                     }
-                    storedRoom.Position = storedRoom.ParentCell.Position = storedDestination;
+                    storedRoom.Position = storedCell.Position = storedDestination;
                     storedRoom.Bounds = storedRoom.Cell.Bounds = storedBoundsDestination;
                 }
             ));
@@ -481,9 +493,10 @@ public class RoomTool : Tool
     void ResizeRoomVertical()
     {
         Vector2 difference = editor.GridPosition - actionMousePositionStart.Value;
+        MapCell cell = actionRoom.ParentCell ?? actionRoom.Cell;
         if (resizeReverse)
         {
-            actionRoom.Position.Y = actionRoom.ParentCell.Position.Y = actionRoomPositionStart.Value.Y + difference.Y;
+            actionRoom.Position.Y = cell.Position.Y = actionRoomPositionStart.Value.Y + difference.Y;
             actionRoom.Bounds.Y = actionRoom.Cell.Bounds.Y = actionRoomBoundsStart.Value.Y - difference.Y;
             actionRoom.Children.ForEach(c =>
             {
@@ -526,6 +539,7 @@ public class RoomTool : Tool
             });
 
             Room storedRoom = actionRoom;
+            MapCell storedCell = cell;
             Vector2 storedDestination = actionRoom.Position;
             Vector2 storedStart = actionRoomPositionStart.Value;
             Vector2 storedBoundsStart = actionRoomBoundsStart.Value;
@@ -537,7 +551,11 @@ public class RoomTool : Tool
                 "ResizeRoomVertical",
                 () =>
                 {
-                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    if (storedRoom.GlobalRemoved)
+                    {
+                        storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                        storedCell = actionRoom.ParentCell ?? actionRoom.Cell;
+                    }
                     if (storedResizeReverse)
                     {
                         storedRoom.Children.ForEach(c =>
@@ -551,12 +569,16 @@ public class RoomTool : Tool
                             c.Position.Y += storedDifference.Y;
                         });
                     }
-                    storedRoom.Position = storedRoom.ParentCell.Position = storedStart;
+                    storedRoom.Position = storedCell.Position = storedStart;
                     storedRoom.Bounds = storedRoom.Cell.Bounds = storedBoundsStart;
                 },
                 () =>
                 {
-                    if (storedRoom.GlobalRemoved) storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                    if (storedRoom.GlobalRemoved)
+                    {
+                        storedRoom = Game.GetThings<Room>().Find(t => t.Name == storedRoom.Name);
+                        storedCell = actionRoom.ParentCell ?? actionRoom.Cell;
+                    }
                     if (storedResizeReverse)
                     {
                         storedRoom.Children.ForEach(c =>
@@ -570,7 +592,7 @@ public class RoomTool : Tool
                             c.Position.Y -= storedDifference.Y;
                         });
                     }
-                    storedRoom.Position = storedRoom.ParentCell.Position = storedDestination;
+                    storedRoom.Position = storedCell.Position = storedDestination;
                     storedRoom.Bounds = storedRoom.Cell.Bounds = storedBoundsDestination;
                 }
             ));

@@ -24,8 +24,6 @@ public class Zprite : Sprite
         DrawOrderOffset = (
             ((GlobalPosition.Y - Position.Y) / 32f)
         ).RoundTo(1);
-        if (lastDrawOrderOffset != DrawOrderOffset) Game.QueueDrawReorder();
-        lastDrawOrderOffset = DrawOrderOffset;
     }
 
     public override void Draw()

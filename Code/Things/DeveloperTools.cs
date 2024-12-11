@@ -55,7 +55,7 @@ public class DeveloperTools : Thing
     {
         if (show)
         {
-            Game.Root.Load(Game.LastMap);
+            Game.Root.Load(Game.EditingMap);
             Game.Mode = GameMode.Edit;
             
             Editor.SetActive(true);

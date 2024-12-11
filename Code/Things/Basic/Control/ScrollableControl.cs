@@ -29,7 +29,7 @@ public class ScrollableControl : SubViewport
         scrollHead.DrawOrder = 10;
         scrollHead.DrawMode = DrawMode;
         scrollHead.Position.X = Bounds.X - scrollHead.Bounds.X;
-        scrollHead.Pressed = () =>
+        scrollHead.OnPressed += () =>
         {
             scrolling = true;
             scrollHeadStart = scrollHead.Position;

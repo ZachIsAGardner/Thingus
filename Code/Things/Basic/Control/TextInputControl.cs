@@ -23,7 +23,7 @@ public class TextInputControl : Control
     {
         base.Start();
 
-        Pressed = () => { };
+        OnPressed += () => { };
     }
 
     public override void Destroy()
@@ -95,7 +95,7 @@ public class TextInputControl : Control
             position: GlobalPosition - Padding,
             width: (int)(Bounds.X + (Padding.X * 2)),
             height: (int)(Bounds.Y + (Padding.Y * 2)),
-            color: Pressed != null && IsHovered ? HighlightColor : PaletteBasic.Blank
+            color: ShouldShowHighlight ? HighlightColor : PaletteBasic.Blank
         );
 
         string title = Title;
@@ -108,12 +108,12 @@ public class TextInputControl : Control
             position: new Vector2(length, 0) + GlobalPosition - Padding,
             width: (int)(Bounds.X + (Padding.X * 2)) - length,
             height: (int)(Bounds.Y + (Padding.Y * 2)),
-            color: Pressed != null && IsHovered ? Color.Blend(HighlightColor, 0.35f) : Color
+            color: ShouldShowHighlight ? Color.Blend(HighlightColor, 0.35f) : Color
         );
 
         DrawText(
             text: $"{title}{Text}{(caret ? "|" : "")}",
-            color: Pressed != null && IsHovered ? TextHighlightColor : TextColor,
+            color: ShouldShowHighlight ? TextHighlightColor : TextColor,
             font: Font,
             position: GlobalPosition + TextPadding
         );

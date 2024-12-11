@@ -72,6 +72,7 @@ public static class Library
                 string contents = File.ReadAllText(file);
                 ThingImports[name] = JsonConvert.DeserializeObject<ThingImport>(contents);
                 ThingImports[name].Name = name;
+                if (ThingImports[name].Layer != null) Game.Layers[ThingImports[name].Layer] = 0;
                 Editor.Categories.Add(ThingImports[name].Category);
             }
             else if ((file.EndsWith(".ogg") || file.EndsWith(".wav")) && file.Contains("/Songs"))

@@ -60,15 +60,68 @@ public static class ListExtensions
         return list;
     }
 
+    public static void Resize<T>(this List<T> list, int index)
+    {
+        while (list.Count() < index)
+        {
+            list.Add(default(T));
+        }
+    }
+
+    public static void Resize<T>(this List<List<T>> matrix, int row, int column)
+    {
+        while (matrix.Count() <= row)
+        {
+            matrix.Add(new List<T>(column) { });
+        }
+
+        for (int r = 0; r < matrix.Count(); r++)
+        {
+            while (matrix[r].Count() <= column)
+            {
+                matrix[r].Add(default(T));
+            }
+        }
+    }
+
     public static T Get<T>(this List<T> list, int index)
     {
-        if (index < 0 || index >= list.Count) return default(T);
+        if (index < 0) return  default(T);
+        if (index >= list.Count) list.Resize(index);
+
         return list[index];
+    }
+
+    public static T Get<T>(this List<List<T>> list, int row, int column)
+    {
+        if (row < 0 || column < 0) return default(T);
+        if (row >= list.Count || column >= list[row].Count) list.Resize(row, column);
+        
+        return list[row][column];
+    }
+
+    public static void Set<T>(this List<T> list, int index, T value)
+    {
+        if (index < 0) return;
+        if (index >= list.Count) list.Resize(index);
+
+        list[index] = value;
+    }
+
+    public static void Set<T>(this List<List<T>> list, int row, int column, T value)
+    {
+        if (row < 0 || column < 0) return;
+        if (row >= list.Count || column >= list[row].Count) list.Resize(row, column);
+        
+        list[row][column] = value;
     }
 
     public static T Next<T>(this List<T> list, T current) 
     {
-        if (list == null || list.Count <= 0 || !list.Contains(current)) return default(T);
+        if (list == null || list.Count <= 0 || !list.Contains(current)) 
+        {
+            return default(T);
+        };
         int index = list.IndexOf(current);
         index++;
         if (index >= list.Count) index = 0;

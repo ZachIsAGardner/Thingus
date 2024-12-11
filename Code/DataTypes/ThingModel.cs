@@ -6,15 +6,15 @@ namespace Thingus;
 public class ThingModel
 {
     public string Name;
+    public Thing Root;
     public Vector2 Position;
     public Vector2 Bounds;
     public int? TileNumber = null;
     public int? TileSize = null;
-    public int Layer = 0;
+    public string Layer = "Main";
     public BlendMode? BlendMode = null;
     public DrawMode DrawMode;
-    public int DrawOrder;
-    public int UpdateOrder;
+
     public List<string> Tags = new List<string>() { };
     public Dictionary<string, string> Properties = new Dictionary<string, string>() { };
     public int Token;
@@ -25,13 +25,13 @@ public class ThingModel
         Name = cell.Name;
         Position = cell.Position;
         Bounds = cell.Bounds;
+
         TileNumber = cell.TileNumber;
         TileSize = import.TileSize;
         if (import.Tags != null) Tags = import.Tags;
         Properties = import.Properties;
         cell.Options.ForEach(o => Properties[o.Name] = o.Value);
         Token = import.Token;
-        
         Layer = import.Layer;
         BlendMode = import.BlendMode;
     }

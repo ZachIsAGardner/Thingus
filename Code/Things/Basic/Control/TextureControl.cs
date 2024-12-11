@@ -19,7 +19,7 @@ public class TextureControl : Control
         DrawSprite(
             texture: Texture,
             origin: new Vector2(0),
-            color: Pressed != null && (IsHovered || IsHeld || IsHighlighted) ? HighlightColor : Color,
+            color: ShouldShowHighlight ? HighlightColor : Color,
 
             source: source,
             destination: destination
