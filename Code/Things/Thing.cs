@@ -49,7 +49,7 @@ public class Thing
     public bool Removed = false;
     public bool GlobalRemoved => (Parent == null || Parent.GlobalRemoved) && Removed;
 
-    public bool Available => !GlobalRemoved;
+    public bool IsAvailable => !GlobalRemoved;
 
     // Extra
 
@@ -173,10 +173,10 @@ public class Thing
     public bool VisibleOnlyInDebug = false;
     public bool ExclusiveUpdateInEditMode = false;
     public bool GlobalUpdateInEditMode => (Parent != null && Parent.GlobalUpdateInEditMode) || UpdateInEditMode;
-    public bool ShouldUpdate => Available && Game.Mode != GameMode.Edit && Game.Root.DeveloperTools?.Cli?.Active != true || GlobalUpdateInEditMode || ExclusiveUpdateInEditMode;
+    public bool ShouldUpdate => IsAvailable && Game.Mode != GameMode.Edit && Game.Root.DeveloperTools?.Cli?.Active != true || GlobalUpdateInEditMode || ExclusiveUpdateInEditMode;
 
     public float? AlphaOverride = null;
-    public float? GlobalAlphaOverride => AlphaOverride ?? (Parent != null ? Parent?.AlphaOverride : null);
+    public float? GlobalAlphaOverride => (Parent != null ? Parent?.AlphaOverride : null) ?? AlphaOverride;
 
     public bool DidStart { get; private set; }
     public virtual void Start()

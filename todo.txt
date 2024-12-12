@@ -3,6 +3,9 @@
 ** LATER
 - edit tool: edit multiple
 - edit tool: copy/paste
+- select multiple layers
+    - edit tool: drag multiple layers
+- editor clearer room focus
 
 ** WAY LATER
 - better mac export settings

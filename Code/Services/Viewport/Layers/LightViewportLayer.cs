@@ -69,7 +69,8 @@ public class LightViewportLayer : ViewportLayer
         lights.ForEach(l =>
         {
             Vector2 position = new Vector2(l.GlobalPosition.X, l.GlobalPosition.Y)
-                - new Vector2(Viewport.CameraPosition.X, Viewport.CameraPosition.Y);
+                // - new Vector2(l.GlobalOffset.X, l.GlobalOffset.Y)
+                + new Vector2(Viewport.CameraPosition.X, Viewport.CameraPosition.Y);
             Shapes.DrawSprite(
                 texture: lightTextureSheet.Texture,
                 position: position,

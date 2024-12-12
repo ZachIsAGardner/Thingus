@@ -17,6 +17,14 @@ public static class Vector2Extensions
         );
     }
 
+    public static Vector2 RoundTo(this Vector2 v2, int place = 1)
+    {
+        return  new Vector2(
+            (float)Math.Round(v2.X, place),
+            (float)Math.Round(v2.Y, place)
+        );
+    }
+
     public static Vector2 MoveOverTime(this Vector2 v2, Vector2 destination, float time, bool useModifiedDelta = true, float max = 0, float min = 0.1f)
     {
         return new Vector2(

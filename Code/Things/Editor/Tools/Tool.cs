@@ -45,7 +45,7 @@ public class Tool
     {
         editor.Mouse.TileNumber = 2;
 
-        if (Input.LeftMouseButtonIsHeld && editor.LastGridInteractPosition != editor.GridPosition)
+        if (Input.LeftMouseButtonIsPressed && editor.LastGridInteractPosition != editor.GridPosition)
         {
             editor.PickCell(editor.GridPosition);
         }

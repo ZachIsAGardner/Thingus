@@ -34,11 +34,27 @@ public class TextControl : Control
             color: ShouldShowHighlight ? HighlightColor : PaletteBasic.Blank
         );
 
-        DrawText(
-            text: Text,
-            color: ShouldShowHighlight ? TextHighlightColor : TextColor,
-            font: Font,
-            position: GlobalPosition + TextPadding
-        );
+        if (Font != null && Text != null)
+        {
+            int x = 0;
+            int y = 0;
+            foreach (char character in Text)
+            {
+                if (x == 0 && character == ' ') continue;
+
+                DrawText(
+                    text: character,
+                    color: ShouldShowHighlight ? TextHighlightColor : TextColor,
+                    font: Font,
+                    position: GlobalPosition + TextPadding + new Vector2(x, y)
+                );
+                x += 6;
+                if (x > Bounds.X && character == ' ')
+                {
+                    x = 0;
+                    y += Font.Value.BaseSize;
+                }
+            }
+        }
     }
 }

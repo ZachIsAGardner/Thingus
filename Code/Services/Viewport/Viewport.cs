@@ -210,7 +210,7 @@ public static class Viewport
     public static void SetScalePixels(bool value)
     {
         ScalePixels = value;
-        Log.Write("ScalePixels: " + ScalePixels);
+        // Log.Write("ScalePixels: " + ScalePixels);
         RefreshProjection();
     }
 }

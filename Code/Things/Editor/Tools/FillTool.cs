@@ -84,7 +84,7 @@ public class FillTool : Tool
             if (a.X - CONSTANTS.TILE_SIZE_HALF <= editor.Room.Position.X + editor.Room.Bounds.X && a.X >= editor.Room.Position.X &&
                     a.Y - CONSTANTS.TILE_SIZE_HALF <= editor.Room.Position.Y + editor.Room.Bounds.Y && a.Y >= editor.Room.Position.Y)
             {
-                MapCell cell = editor.Room.Map.Cells.Find(c => c.Position + editor.Room.Position == a);
+                MapCell cell = editor.Room.Map.Cells.Find(c => c.Position + editor.Room.Position == a && c.Import.Layer == LayerControl.CurrentLayer);
 
                 if (cell?.Name == targetCell?.Name && (targetTextureInfo == null || cell == null || cell.TileNumber == targetCell.TileNumber))
                 {

@@ -154,4 +154,9 @@ public static class Utility
         }
         return result;
     }
+
+    public static Vector2 WorldToScreenPosition(Vector2 position)
+    {
+        return position - Viewport.CameraPosition;
+    }
 }

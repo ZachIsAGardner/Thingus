@@ -170,7 +170,8 @@ public class Cli : Thing
         }
         else
         {
-            Game.EditingMap = map;
+            Game.EditingMap = map?.Name;
+            Game.LastFocusedMap = map?.Name;
             Game.Root.Load(map);
             lines.Add($"loaded {mapName}.map");
         }
@@ -192,7 +193,7 @@ public class Cli : Thing
         map.Cells.Add(root);
         map.Save();
         Library.Maps[mapName] = map;
-        Game.EditingMap = map;
+        Game.EditingMap = map?.Name;
         Game.Root.Load(map);
         lines.Add($"created {mapName}.map");
     }

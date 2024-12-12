@@ -63,6 +63,8 @@ public class Collider : Thing
     float skin = 0.1f;
     public bool CheckForCollisions = true;
 
+    public int Power = 1;
+
     List<Collider> possibleCollisions = new List<Collider>() { };
 
     public CollisionInfo Info = new CollisionInfo() { };
@@ -99,7 +101,6 @@ public class Collider : Thing
 
     public virtual void LandedHit()
     {
-        Log.Write(Id);
         Destroy();
     }
 

@@ -38,8 +38,8 @@ public class DeveloperTools : Thing
         Editor.SetActive(false);
         Editor.SetVisible(false);
         Cli = AddChild(new Cli()) as Cli;
-        // Cli.SetActive(false);
-        // Cli.SetVisible(false);
+        Cli.SetActive(false);
+        Cli.SetVisible(false);
     }
 
     public override void Update()
@@ -53,7 +53,7 @@ public class DeveloperTools : Thing
     {
         if (show)
         {
-            Game.Root.Load(Game.EditingMap);
+            Game.Root.Load(Library.Maps[Game.EditingMap]);
             Game.Mode = GameMode.Edit;
             
             Editor.SetActive(true);
@@ -72,7 +72,7 @@ public class DeveloperTools : Thing
         }
         else
         {
-            Play();
+            LoadLastMap();
         }
     }
 
@@ -136,6 +136,14 @@ public class DeveloperTools : Thing
             Game.Mute = !Game.Mute;
         }
 
+        if (Input.IsPressed(KeyboardKey.Eight))
+        {
+            Raylib.SetWindowSize(
+                (int)((CONSTANTS.VIRTUAL_WIDTH * Viewport.VirtualRatio.Value) * Viewport.Allowance), 
+                (int)((CONSTANTS.VIRTUAL_HEIGHT * Viewport.VirtualRatio.Value) * Viewport.Allowance)
+            );
+        }
+
         if (Input.IsPressed(KeyboardKey.Nine))
         {
             int ratio = Viewport.VirtualRatio.Value - 1;
@@ -163,25 +171,30 @@ public class DeveloperTools : Thing
 
         if (Input.IsPressed(KeyboardKey.L))
         {
-            TokenGrid.Reset();
-            Log.Clear();
-            Library.Refresh();
-            Game.Root.Load(Game.LastFocusedMap);
-            
-            if (Input.ShiftIsHeld)
-            {
-                if (Editor != null)
-                {
-                    Editor.Destroy();
-                    Editor = AddChild(new Editor()) as Editor;
-                }
+            LoadLastMap();
+        }
+    }
 
-                ToggleEditor(true);
-            }
-            else
+    void LoadLastMap()
+    {
+        TokenGrid.Reset();
+        Log.Clear();
+        Library.Refresh();
+        Game.Root.Load(Library.Maps[Game.LastFocusedMap]);
+        
+        if (Input.ShiftIsHeld)
+        {
+            if (Editor != null)
             {
-                Play();
+                Editor.Destroy();
+                Editor = AddChild(new Editor()) as Editor;
             }
+
+            ToggleEditor(true);
+        }
+        else
+        {
+            Play();
         }
     }
 

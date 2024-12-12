@@ -88,9 +88,7 @@ public class Room : Thing
     {
         base.Update();
 
-        if (Game.Root.DeveloperTools == null || Game.Root.DeveloperTools?.Cli?.Active == true) return;
-
-        if (Input.Holdup) return;
+        if (Game.Root.DeveloperTools == null || Game.Root.DeveloperTools?.Cli?.Active == true || Input.Holdup || Game.Mode != GameMode.Edit) return;
 
         Hovered = Utility.CheckRectangleOverlap(
             Game.Root.DeveloperTools.Editor.GridPosition - new Vector2(16),
@@ -106,7 +104,7 @@ public class Room : Thing
                 if (Input.LeftMouseButtonIsPressed)
                 {
                     Click();
-                    Game.LastFocusedMap = Map;
+                    Game.LastFocusedMap = Map?.Name;
                     Game.LastMap = Map;
                 }
             }
@@ -156,7 +154,7 @@ public class Room : Thing
                     DrawSprite(
                         texture: Library.Textures[$"{CONSTANTS.TILE_SIZE}Grid"],
                         origin: Vector2.Zero,
-                        color: new Color(255, 255, 255, Focused ? 128 : 16),
+                        color: new Color(255, 255, 255, Focused ? 100 : 2),
                         position: TopLeft + new Vector2(r * CONSTANTS.TILE_SIZE, c * CONSTANTS.TILE_SIZE)
                     );
                 }
@@ -171,7 +169,7 @@ public class Room : Thing
                     DrawSprite(
                         texture: Library.Textures[$"{(CONSTANTS.TILE_SIZE)}ObliqueGrid"],
                         origin: Vector2.Zero,
-                        color: new Color(255, 255, 255, Focused ? 128 : 16),
+                        color: new Color(255, 255, 255, Focused ? 100 : 2),
                         position: TopLeft + new Vector2(
                             r * (CONSTANTS.TILE_SIZE_OBLIQUE), 
                             c * (CONSTANTS.TILE_SIZE_OBLIQUE)
@@ -189,7 +187,7 @@ public class Room : Thing
                     DrawSprite(
                         texture: Library.Textures[$"{CONSTANTS.TILE_SIZE_HALF}x{CONSTANTS.TILE_SIZE_QUARTER}Grid"],
                         origin: Vector2.Zero,
-                        color: new Color(255, 255, 255, Focused ? 128 : 16),
+                        color: new Color(255, 255, 255, Focused ? 100 : 2),
                         position: TopLeft + new Vector2(r * CONSTANTS.TILE_SIZE_HALF, c * CONSTANTS.TILE_SIZE_QUARTER)
                     );
                 }
@@ -220,13 +218,5 @@ public class Room : Thing
             color: PaletteBasic.LightGray,
             outlineColor: PaletteBasic.Black
         );
-
-        // DrawText(
-        //     text: Game.GetThing<BakedTilemap>()?.TokenGrid?.Select(r => r.Join(", ")).Join("\n"),
-        //     position: GlobalPosition + new Vector2(-400, -120),
-        //     color: PaletteBasic.LightGray,
-        //     outlineColor: PaletteBasic.Black,
-        //     font: Library.FontSmall
-        // );
     }
 }

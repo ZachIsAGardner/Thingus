@@ -40,8 +40,8 @@ public static class Game
     public static bool Mute = true;
 
     public static Map LastMap = null;
-    public static Map LastFocusedMap = null;
-    public static Map EditingMap = null;
+    public static string LastFocusedMap = null;
+    public static string EditingMap = null;
 
     public static PlatformType Platform;
 

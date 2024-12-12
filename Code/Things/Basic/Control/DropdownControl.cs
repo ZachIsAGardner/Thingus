@@ -116,8 +116,12 @@ public class DropdownControl : Control
 
 
         string title = Title;
-        int length = title.Width(Font.Value);
-        if (Title?.HasValue() == true) title += " ";
+        int length = 0; 
+        if (title?.HasValue() == true)
+        {
+            length = title.Width(Font.Value);
+            title += " ";
+        }
 
         DrawNineSlice(
             texture: Texture,

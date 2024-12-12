@@ -68,7 +68,7 @@ public class Root : Thing
         Dynamic.Clear();
         Thing thing = map.Load(Dynamic);
         Game.LastMap = map;
-        if (Game.EditingMap == null) Game.EditingMap = map;
+        if (Game.EditingMap == null) Game.EditingMap = map?.Name;
         Game.Mode = GameMode.Play;
 
         Room = Game.GetThing<Room>();

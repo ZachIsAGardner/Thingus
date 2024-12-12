@@ -15,8 +15,7 @@ public class Light : Thing
     bool remove = false;
 
 
-    public Light() : this(null) { }
-    public Light(int? radius = null, Color? color = null)
+    public Light(int? radius = null, Color? color = null, Vector2? position = null) : base(position: position)
     {
         if (radius != null) Radius = radius.Value;
         if (color != null) Color = color.Value;

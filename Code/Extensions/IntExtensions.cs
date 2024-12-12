@@ -12,4 +12,19 @@ public static class IntExtensions
     {
         return (int)(MathF.Round(i / nearest) * nearest);
     }
+
+    public static string ToMoney(this int num)
+    {
+        string result = num.ToString();
+        if (!result.Contains(".")) result += ".00";
+        while (result.Split(".").Last().Count() < 2)
+        {
+            result += "0";
+        }
+        bool minus = result.Contains("-");
+        result = result.Replace("-", "");
+
+
+        return  (minus ? "-" : "") + "$" + result;
+    }
 }

@@ -119,9 +119,8 @@ public class Editor : Thing
 
     void TilesetUi()
     {
-
         HorizontalFlexControl horizontalFlexControl = new HorizontalFlexControl();
-        horizontalFlexControl.Bounds = new Vector2(width, 16);
+        horizontalFlexControl.Bounds = new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 16);
         horizontalFlexControl.Texture = Library.Textures["BoxThinSlice"];
         horizontalFlexControl.Padding = new Vector2(3);
 
@@ -136,14 +135,14 @@ public class Editor : Thing
 
         DropdownControl categoryControl = new DropdownControl("", Categories.ToList());
         categoryControl.DrawMode = DrawMode.Absolute;
-        categoryControl.Bounds.X = width;
+        categoryControl.Bounds.X = width + ScrollableControl.ScrollBarWidth + 1;
         categoryControl.Bounds.Y = 16;
-        categoryControl.Texture = Library.Textures["BoxInsideSlice"];
+        categoryControl.Texture = Library.Textures["BoxThinSlice"];
         categoryControl.DrawOrder = 20;
         categoryControl.HighlightColor = Theme.Dark;
         categoryControl.Color = PaletteBasic.White;
         // categoryControl.TextPadding.X = 3;
-        categoryControl.Padding = new Vector2(2);
+        categoryControl.Padding = new Vector2(3);
         categoryControl.TextHighlightColor = PaletteBasic.White;
         categoryControl.Text = Categories.FirstOrDefault();
         verticalFlex.AddChild(categoryControl);
@@ -227,7 +226,7 @@ public class Editor : Thing
 
     void LayersUi()
     {
-        ScrollableControl scrollable = new ScrollableControl(new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 64), new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 160));
+        ScrollableControl scrollable = new ScrollableControl(new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 80), new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 160));
         scrollable.DrawMode = DrawMode.Absolute;
         scrollable.Texture = Library.Textures["BoxThinSlice"];
         scrollable.TileSize = 5;
@@ -412,7 +411,7 @@ public class Editor : Thing
 
     public void Focus()
     {
-        if (Room == null) Room = Game.GetThings<Room>().Find(r => r.Map?.Name == Game.LastFocusedMap?.Name);
+        if (Room == null) Room = Game.GetThings<Room>().Find(r => r.Map?.Name == Game.LastFocusedMap);
         if (Room == null) Room = Game.GetThing<Room>();
         if (Room != null)
         {
@@ -566,11 +565,32 @@ public class Editor : Thing
         }
     }
 
+    Vector2 lastPickPosition;
     public void PickCell(Vector2 position)
     {
         position -= Room.Position;
 
         MapCell cell = Room.Map.GetCell(position, LayerControl.CurrentLayer);
+
+        if (cell == null || lastPickPosition == position)
+        {
+            List<MapCell> cells = Room.Map.Cells.Where(c => c.Position == position).ToList();
+            if (cells.Count == 1)
+            {
+                cell = cells.First();
+            }
+            else if (cells.Count > 1)
+            {
+                List<string> layers = cells.Select(c => c.Import.Layer).Distinct().OrderByDescending(c => c).ToList();
+                int index = layers.IndexOf(LayerControl.CurrentLayer);
+                index++;
+                if (index >= layers.Count) index = 0;
+                string layer = layers[index];
+                cell = cells.Find(c => c.Import.Layer == layer);
+            }
+            
+        }
+        lastPickPosition = position;
         if (cell == null) return;
 
         SelectStamp(stamps.Find(s => s.Name == cell.Name));
