@@ -14,9 +14,12 @@ public class SongManager : Thing
             Raylib.SeekMusicStream(t, 0);
         });
         Tracks.Clear();
-        Music song = Library.Songs[name];
-        Raylib.PlayMusicStream(song);
-        Tracks.Add(song);
+        if (Library.Songs.ContainsKey(name))
+        {
+            Music song = Library.Songs[name];
+            Raylib.PlayMusicStream(song);
+            Tracks.Add(song);
+        }
     }
 
     public void Stop()

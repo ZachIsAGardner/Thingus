@@ -34,13 +34,25 @@ public class TextControl : Control
             color: ShouldShowHighlight ? HighlightColor : PaletteBasic.Blank
         );
 
+        char? lastChar = null;
         if (Font != null && Text != null)
         {
             int x = 0;
             int y = 0;
             foreach (char character in Text)
             {
-                if (x == 0 && character == ' ') continue;
+                if (lastChar == '\\' && character == 'n')
+                {
+                    x = 0;
+                    y += Font.Value.BaseSize;
+                    lastChar = character;
+                    continue;
+                }
+                if ((x == 0 && character == ' ') || character == '\\')
+                {
+                    lastChar = character;
+                    continue;
+                }
 
                 DrawText(
                     text: character,
@@ -54,6 +66,7 @@ public class TextControl : Control
                     x = 0;
                     y += Font.Value.BaseSize;
                 }
+                lastChar = character;
             }
         }
     }

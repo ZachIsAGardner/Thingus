@@ -298,7 +298,7 @@ public class Thing
                 - ((0.5f - ((GlobalPosition.Y - Viewport.CameraPosition.Y) / CONSTANTS.VIRTUAL_HEIGHT)).Abs() * 0.5f)
             ) + Chance.Range(-0.125f, 0.125f);
         }
-        if (pitch < 1) pitch = 1;
+        if (pitch < 0) pitch = 0;
         if (pitch > 20) pitch = 20;
 
         if (volume == null)
@@ -335,5 +335,18 @@ public class Thing
     public void DrawNineSlice(Texture2D? texture, Vector2? position = null, int tileSize = 5, int width = 15, int height = 15, Vector2? origin = null, Color? color = null)
     {
         Shapes.DrawNineSlice(texture, position ?? GlobalPosition, tileSize, width, height, origin, DrawMode, color);
+    }
+
+    public bool IsOnScreen()
+    {
+        Vector2 p = Utility.WorldToScreenPosition(GlobalPosition);
+        if (p.X > 0 && p.X < CONSTANTS.VIRTUAL_WIDTH && p.Y > 0 && p.Y < CONSTANTS.VIRTUAL_HEIGHT)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

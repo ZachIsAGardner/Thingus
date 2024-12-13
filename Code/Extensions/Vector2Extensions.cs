@@ -38,6 +38,10 @@ public static class Vector2Extensions
         return (other - v2).Normalized();
     }
 
+    public static Vector2 DirectionFrom(this Vector2 v2, Vector2 other)
+    {
+        return (v2 - other).Normalized();
+    }
 
     public static float DistanceFrom(this Vector2 vector2, Vector2 other)
     {

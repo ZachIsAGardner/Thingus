@@ -58,7 +58,7 @@ public class EditTool : Tool
 
     void Normal()
     {
-        Thing thing = editor.Room.Children.Find(c => c.GlobalPosition == editor.GridPosition);
+        Thing thing = editor.Room.Children.Find(c => c.GlobalPosition == editor.GridPosition && c.Import.Layer == LayerControl.CurrentLayer);
         if (thing != lastThing && lastThing != null)
         {
             Sprite sprite = lastThing.GetThing<Sprite>();

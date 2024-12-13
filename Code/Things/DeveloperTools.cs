@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using Reform;
 
 namespace Thingus;
 
@@ -180,7 +181,8 @@ public class DeveloperTools : Thing
         TokenGrid.Reset();
         Log.Clear();
         Library.Refresh();
-        Game.Root.Load(Library.Maps[Game.LastFocusedMap]);
+        Game.Root.Load(Library.Maps[Game.LastFocusedMap ?? CONSTANTS.START_MAP]);
+        PlayerStatus.Reset();
         
         if (Input.ShiftIsHeld)
         {
@@ -249,13 +251,13 @@ public class DeveloperTools : Thing
     {
         base.Draw();
 
-        if (Game.FrameAdvance) DrawText(
-            "FRAME ADVANCE", 
-            position: new Vector2((CONSTANTS.VIRTUAL_WIDTH / 2f) - (Raylib.MeasureText("FRAME ADVANCE", Library.FontSmall.BaseSize) / 2f), 4), 
-            color: PaletteBasic.Red, 
-            outlineColor: PaletteBasic.Black,
-            font: Library.FontSmall
-        );
+        // if (Game.FrameAdvance) DrawText(
+        //     "FRAME ADVANCE", 
+        //     position: new Vector2((CONSTANTS.VIRTUAL_WIDTH / 2f) - (Raylib.MeasureText("FRAME ADVANCE", Library.FontSmall.BaseSize) / 2f), 4), 
+        //     color: PaletteBasic.Red, 
+        //     outlineColor: PaletteBasic.Black,
+        //     font: Library.FontSmall
+        // );
 
         // DrawText(
         //     Raylib.GetFPS(), 

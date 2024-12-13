@@ -34,6 +34,7 @@ public class Editor : Thing
     public List<Tool> Tools = new List<Tool>() { };
     Tool tool = null;
     public Stamp Stamp = null;
+    public List<ThingProperty> StampProperties = null;
     bool hoveringControl = false;
     bool focusedControl = false;
 
@@ -147,7 +148,7 @@ public class Editor : Thing
         categoryControl.Text = Categories.FirstOrDefault();
         verticalFlex.AddChild(categoryControl);
  
-        ScrollableControl scrollable = new ScrollableControl(new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 80), new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 160));
+        ScrollableControl scrollable = new ScrollableControl(new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 80), new Vector2(width + ScrollableControl.ScrollBarWidth + 1, 320));
         scrollable.DrawMode = DrawMode.Absolute;
         scrollable.Texture = Library.Textures["BoxThinSlice"];
         scrollable.TileSize = 5;
@@ -450,7 +451,7 @@ public class Editor : Thing
     {
         if (Room == null) return;
         
-        Room.Map.Cells.Where(c => c.Import != null && c.Import.Layer == LayerControl.CurrentLayer).ToList().ForEach(cell =>
+        Room.Map.Cells.Where(c => c.Import != null && c.Import.Layer == LayerControl.CurrentLayer && (c.Import.StampType.Contains("Auto") || c.Import.StampType.Contains("Random"))).ToList().ForEach(cell =>
         {
             if (positions != null && !positions.Contains(cell.Position)) return;
 
@@ -462,9 +463,11 @@ public class Editor : Thing
         });
     }
 
-    public void AddCell(MapCell cell, bool changeHistory = true, Room room = null) => AddCell(cell.Position + (room ?? Room).Position, cell.Name, cell.Import.Layer, changeHistory, room, cell.TileNumber ?? 0);
-    public void AddCell(Vector2 position, bool changeHistory = true, Room room = null, int tileNumber = 0) => AddCell(position, Stamp.Name, Stamp.Import.Layer, changeHistory, room, tileNumber);
-    public void AddCell(Vector2 position, string name, string layer, bool changeHistory = true, Room room = null, int tileNumber = 0)
+    public void AddCell(MapCell cell, bool changeHistory = true, Room room = null) 
+        => AddCell(cell.Position + (room ?? Room).Position, cell.Name, cell.Import.Layer, changeHistory, room, cell.TileNumber ?? 0);
+    public void AddCell(Vector2 position, bool changeHistory = true, Room room = null, int tileNumber = 0) 
+        => AddCell(position, Stamp.Name, Stamp.Import.Layer, changeHistory, room, tileNumber, StampProperties);
+    public void AddCell(Vector2 position, string name, string layer, bool changeHistory = true, Room room = null, int tileNumber = 0, List<ThingProperty> properties = null)
     {
         if (layer == null) layer = LayerControl.CurrentLayer;
         if (room == null) room = Room;
@@ -490,6 +493,23 @@ public class Editor : Thing
             tileNumber: tileNumber,
             parent: room.Name
         );
+        if (properties != null)
+        {
+            properties.ForEach(p =>
+            {
+                ThingProperty option = cell.Options.Find(o => o.Name == p.Name);
+                if (option == null)
+                {
+                    option = new ThingProperty() { Name = p.Name, Value = p.Value };
+                    cell.Options.Add(option);
+                }
+                else
+                { 
+                    option.Value = p.Value;
+                }
+            });
+        }
+        Log.Write(cell.Options.Count);
         room.Map.AddCell(cell);
         // cell.TileNumber = GetTileNumber(cell);
         cell.Create(room);
@@ -593,7 +613,7 @@ public class Editor : Thing
         lastPickPosition = position;
         if (cell == null) return;
 
-        SelectStamp(stamps.Find(s => s.Name == cell.Name));
+        SelectStamp(stamps.Find(s => s.Name == cell.Name), cell.Options);
     }
 
     public void SelectTool(Tool tool)
@@ -603,9 +623,10 @@ public class Editor : Thing
         // Mouse.TileNumber = tool.TileNumber;
     }
 
-    public void SelectStamp(Stamp stamp)
+    public void SelectStamp(Stamp stamp, List<ThingProperty> properties = null)
     {
         Stamp = stamp;
+        StampProperties = properties;
 
         LayerControl.CurrentLayer = stamp?.Import?.Layer ?? "Main";
 

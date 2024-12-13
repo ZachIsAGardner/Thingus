@@ -137,8 +137,19 @@ public static class Game
         Raylib.CloseWindow();
     }
 
+    public static void Shortcuts()
+    {
+        if ((Input.CtrlIsHeld && Input.IsPressed(KeyboardKey.F)) || (Input.AltIsHeld && Input.IsPressed(KeyboardKey.Enter)))
+        {
+            Raylib.ToggleBorderlessWindowed();
+            Viewport.RefreshProjection();
+        }
+    }
+
     public static void Update()
     {
+        Shortcuts();
+
         if (CONSTANTS.IS_DEBUG)
         {
             if (Input.IsPressed(KeyboardKey.F1)) FrameAdvance = !FrameAdvance;

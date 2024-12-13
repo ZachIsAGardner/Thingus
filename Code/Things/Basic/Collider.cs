@@ -99,7 +99,7 @@ public class Collider : Thing
         if (!Info.Up && !Info.Down) Position.Y += Velocity.Y * Time.ModifiedDelta;
     }
 
-    public virtual void LandedHit()
+    public virtual void LandedHit(Collider other)
     {
         Destroy();
     }
@@ -410,7 +410,7 @@ public class Collider : Thing
         // Log.Clear();
         // Log.Write($"{c}, {r}");
 
-        if (r < 0 || c < 0 || r > TokenGrid.Bounds.Y - 1 || c > TokenGrid.Bounds.X - 1) return null;
+        // if (r < 0 || c < 0 || r > TokenGrid.Bounds.Y - 1 || c > TokenGrid.Bounds.X - 1) return null;
 
         if (TokenGrid.Get(c, r) == 1)
         {

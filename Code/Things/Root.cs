@@ -36,17 +36,6 @@ public class Root : Thing
     public override void Update()
     {
         base.Update();
-
-        Shortcuts();
-    }
-
-    public void Shortcuts()
-    {
-        if ((Input.CtrlIsHeld && Input.IsPressed(KeyboardKey.F)) || (Input.AltIsHeld && Input.IsPressed(KeyboardKey.Enter)))
-        {
-            Raylib.ToggleBorderlessWindowed();
-            Viewport.RefreshProjection();
-        }
     }
 
     public void Load(string name)

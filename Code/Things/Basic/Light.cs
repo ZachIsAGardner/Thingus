@@ -8,6 +8,7 @@ public class Light : Thing
     public float Radius = 80;
     public float Flicker = 0;
     public Color Color = PaletteBasic.White;
+    public float Strength = 1f;
     float flickerOffset = 0;
 
     float decay = 2f;
@@ -15,7 +16,7 @@ public class Light : Thing
     bool remove = false;
 
 
-    public Light(int? radius = null, Color? color = null, Vector2? position = null) : base(position: position)
+    public Light(int? radius = null, Color? color = null, Vector2? position = null, float strength = 1f) : base(position: position)
     {
         if (radius != null) Radius = radius.Value;
         if (color != null) Color = color.Value;
