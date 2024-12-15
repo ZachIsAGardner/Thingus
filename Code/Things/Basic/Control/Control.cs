@@ -78,7 +78,7 @@ public class Control : Thing
         if (CheckMouse) Mouse();
     }
 
-    public virtual bool ShouldShowHighlight => OnPressed != null && (IsHovered || IsHeld || IsHighlighted);
+    public virtual bool ShouldShowHighlight => OnPressed != null && ((IsHovered && !Input.IsGamepadFocused) || IsHeld || (IsHighlighted && Input.IsGamepadFocused));
     
     void Mouse()
     {

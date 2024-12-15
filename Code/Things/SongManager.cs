@@ -4,21 +4,24 @@ namespace Thingus;
 
 public class SongManager : Thing
 {
-    public List<Music> Tracks = new List<Music>() { };
+    public List<(string Name, Music Music)> Tracks = new List<(string Name, Music Music)>() { };
     public static float Pitch = 1f;
 
     public void Play(string name)
     {
+        if (Tracks.Any(t => t.Name == name)) return;
+
         Tracks.ForEach(t =>
         {
-            Raylib.SeekMusicStream(t, 0);
+            Raylib.SeekMusicStream(t.Music, 0);
         });
         Tracks.Clear();
+        if (name?.HasValue() != true) return;
         if (Library.Songs.ContainsKey(name))
         {
             Music song = Library.Songs[name];
             Raylib.PlayMusicStream(song);
-            Tracks.Add(song);
+            Tracks.Add((name, song));
         }
     }
 
@@ -35,8 +38,8 @@ public class SongManager : Thing
 
         Tracks.ForEach(t =>
         {
-            Raylib.SetMusicPitch(t, Pitch);
-            Raylib.UpdateMusicStream(t);
+            Raylib.SetMusicPitch(t.Music, Pitch);
+            Raylib.UpdateMusicStream(t.Music);
         });
     }
 }

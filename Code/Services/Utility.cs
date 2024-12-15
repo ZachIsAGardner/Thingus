@@ -157,6 +157,6 @@ public static class Utility
 
     public static Vector2 WorldToScreenPosition(Vector2 position)
     {
-        return position - Viewport.CameraPosition;
+        return position - Viewport.CameraPosition + (Viewport.Margin * Viewport.VirtualRatio.Value);
     }
 }

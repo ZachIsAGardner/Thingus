@@ -16,9 +16,9 @@ public static class StringExtensions
         return Vector2.Zero;
     }
 
-    public static int Width(this string str, Font font)
+    public static int Width(this string str, Font? font = null)
     {
-        return Raylib.MeasureText(str, font.BaseSize);
+        return Raylib.MeasureText(str, (font ?? Library.Font).BaseSize);
     }
     public static bool HasValue(this string str)
     {

@@ -37,7 +37,7 @@ public static class Game
     public static bool FrameAdvance = false;
     public static bool FrameStep = false;
 
-    public static bool Mute = true;
+    public static bool Mute = false;
 
     public static Map LastMap = null;
     public static string LastFocusedMap = null;
@@ -239,7 +239,7 @@ public static class Game
         Raylib.PlaySound(sound);
     }
 
-    public static void PlaySong(string name)
+    public static void PlaySong(string name = null)
     {
         Root.SongManager.Play(name);
     }
@@ -247,5 +247,10 @@ public static class Game
     public static void StopSong()
     {
         Root.SongManager.Stop();
+    }
+
+    public static void Quit()
+    {
+        Raylib.CloseWindow();
     }
 }

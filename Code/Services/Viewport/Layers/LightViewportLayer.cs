@@ -51,8 +51,8 @@ public class LightViewportLayer : ViewportLayer
                 centerX: (tileSize / 2) + (tileSize * x),
                 centerY: (tileSize / 2) + (tileSize * y),
                 radius: radius,
-                color1: l.Color.WithAlpha(l.Strength).ToRaylib(),
-                color2: PaletteBasic.Blank.ToRaylib()
+                inner: l.Color.WithAlpha(l.Strength).ToRaylib(),
+                outer: PaletteBasic.Blank.ToRaylib()
             );
             x++;
             if (x >= size)
@@ -74,9 +74,10 @@ public class LightViewportLayer : ViewportLayer
         y = 0;
         lights.ForEach(l =>
         {
-            Vector2 position = Utility.WorldToScreenPosition(l.GlobalPosition);
-                // - new Vector2(l.GlobalOffset.X, l.GlobalOffset.Y)
-                // + new Vector2(Viewport.CameraPosition.X, Viewport.CameraPosition.Y);
+            Vector2 position = l.GlobalPosition;
+            if (l.DrawMode == DrawMode.Relative) position -= Viewport.CameraPosition;
+            if (l.DrawMode == DrawMode.Absolute) position -= (Viewport.Margin * Viewport.VirtualRatio.Value);
+            // - new Vector2(l.GlobalOffset.X, l.GlobalOffset.Y)
             Shapes.DrawSprite(
                 texture: lightTextureSheet.Texture,
                 position: position,

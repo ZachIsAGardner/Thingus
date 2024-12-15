@@ -26,12 +26,12 @@ public class TextControl : Control
         base.Draw();
 
         DrawNineSlice(
-            texture: Library.Textures["WhiteSlice"],
+            texture: Texture,
             tileSize: 5,
             position: GlobalPosition - Padding,
             width: (int)(Bounds.X + (Padding.X * 2)),
             height: (int)(Bounds.Y + (Padding.Y * 2)),
-            color: ShouldShowHighlight ? HighlightColor : PaletteBasic.Blank
+            color: ShouldShowHighlight ? HighlightColor : Color
         );
 
         char? lastChar = null;
@@ -53,6 +53,7 @@ public class TextControl : Control
                     lastChar = character;
                     continue;
                 }
+
 
                 DrawText(
                     text: character,

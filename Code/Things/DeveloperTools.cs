@@ -180,12 +180,12 @@ public class DeveloperTools : Thing
     {
         TokenGrid.Reset();
         Log.Clear();
-        Library.Refresh();
         Game.Root.Load(Library.Maps[Game.LastFocusedMap ?? CONSTANTS.START_MAP]);
         PlayerStatus.Reset();
         
         if (Input.ShiftIsHeld)
         {
+            Library.Refresh();
             if (Editor != null)
             {
                 Editor.Destroy();

@@ -43,7 +43,26 @@ public static class Input
     static Vector2 lastAbsoluteMousePosition;
     static float mouseSwitchSensitivity = 7.5f;
 
+    class RepeatingButton
+    {
+        public int Input;
+        public int Index = -1;
+        public float Time = -0.5f;
+        public bool Activated = false;
+
+        public RepeatingButton(int input, int index = -1)
+        {
+            Input = input;
+            Index = index;
+        }
+    }
+
     static KeyboardKey currentKey = KeyboardKey.Null;
+    static List<RepeatingButton> repeatingGamepadAxises = new List<RepeatingButton>() { };
+    static List<RepeatingButton> repeatingGamepadButtons = new List<RepeatingButton>() { };
+    static List<RepeatingButton> repeatingMouseButtons = new List<RepeatingButton>() { };
+    static List<(GamepadAxisDirection Button, int Index)> axisDirectionsHeld = new List<(GamepadAxisDirection Button, int Index)>() { };
+    static List<(GamepadAxisDirection Button, int Index)> axisDirectionsReleased = new List<(GamepadAxisDirection Button, int Index)>() { };
     
     public static void Update()
     {
@@ -52,6 +71,7 @@ public static class Input
         if (newKey != KeyboardKey.Null)
         {
             currentKey = newKey;
+            IsGamepadFocused = false;
         }
         else
         {
@@ -60,6 +80,8 @@ public static class Input
                 currentKey = KeyboardKey.Null;
             }
         }
+
+        if (Raylib.GetGamepadButtonPressed() > 0) IsGamepadFocused = true;
 
         if (!LeftMouseButtonIsHeld)
         {
@@ -73,46 +95,65 @@ public static class Input
             lastAbsoluteMousePosition = MousePositionAbsolute();
         }
 
-        axisDirectionHeld.ToList().ForEach(b =>
+        axisDirectionsHeld.ToList().ForEach(b =>
         {
             if (!IsHeld(b.Button))
             {
-                axisDirectionReleased.Add(b);
-                axisDirectionHeld.Remove(b);
+                axisDirectionsReleased.Add(b);
+                axisDirectionsHeld.Remove(b);
             }
         });
+
+        repeatingMouseButtons.ForEach(b =>
+        {
+            b.Time += Time.Delta;
+            if (b.Time > 0)
+            {
+                b.Time = -0.05f;
+                b.Activated = true;
+            }
+        });
+
+        repeatingGamepadButtons.ForEach(b =>
+        {
+            b.Time += Time.Delta;
+            if (b.Time > 0)
+            {
+                b.Time = -0.05f;
+                b.Activated = true;
+            }
+        });
+
+        repeatingGamepadAxises.ForEach(b =>
+        {
+            b.Time += Time.Delta;
+            if (b.Time > 0)
+            {
+                b.Time = -0.05f;
+                b.Activated = true;
+            }
+        });    
     }
 
     public static void LateUpdate()
     {
-        axisDirectionReleased.Clear();
+        axisDirectionsReleased.Clear();
+
+        repeatingMouseButtons = repeatingMouseButtons.Where(b => IsHeld((MouseButton)b.Input)).ToList();
+        repeatingMouseButtons.ForEach(r => r.Activated = false);
+
+        repeatingGamepadButtons = repeatingGamepadButtons.Where(b => IsHeld((GamepadButton)b.Input, b.Index)).ToList();
+        repeatingGamepadButtons.ForEach(r => r.Activated = false);
+
+        repeatingGamepadAxises = repeatingGamepadAxises.Where(b => IsHeld((GamepadAxisDirection)b.Input, b.Index)).ToList();
+        repeatingGamepadAxises.ForEach(r => r.Activated = false);
     }
 
-    public static Vector2 MousePosition(DrawMode drawMode = DrawMode.Relative)
-    {
-        Vector2 mouse = Vector2.Zero;
-        if (drawMode == DrawMode.Relative) mouse = MousePositionRelative();
-        if (drawMode == DrawMode.Absolute) mouse = MousePositionAbsolute();
-        return mouse;
-    }
+    // Gamepad
 
-    public static Vector2 MousePositionRelative()
+    public static string GetGamepadName(int index = 0)
     {
-        return Raylib.GetScreenToWorld2D(
-            Viewport.ScalePixels
-                ? Raylib.GetMousePosition() - ((Viewport.Margin * Viewport.VirtualRatio.Value) * (1 + Viewport.RelativeLayer.Camera.Zoom))
-                : (Raylib.GetMousePosition() / Viewport.VirtualRatio.Value) - (Viewport.Margin * (1 + Viewport.VirtualRatio.Value)),
-            Viewport.RelativeLayer.Camera
-        );
-    }
-
-    public static Vector2 MousePositionAbsolute()
-    {
-        return (Raylib.GetMousePosition() / Viewport.VirtualRatio.Value) 
-            - new Vector2(
-                Viewport.Margin.X, 
-                Viewport.Margin.Y
-            );
+        return Raylib.GetGamepadName_(index);
     }
 
     public static bool IsPressed(GamepadButton button, int index = -1)
@@ -125,7 +166,7 @@ public static class Input
                 if (Raylib.IsGamepadAvailable(i) && Raylib.IsGamepadButtonPressed(i, (Raylib_cs.GamepadButton)button)) value = true;
                 if (value)
                 {
-                    IsGamepadFocused = true;
+                    if (repeatingGamepadButtons.None(b => b.Input == (int)button && b.Index == index)) repeatingGamepadButtons.Add(new RepeatingButton((int)button, index));
                     return true;
                 }
             }
@@ -137,7 +178,10 @@ public static class Input
             if (Raylib.IsGamepadAvailable(index))
             {
                 bool value = Raylib.IsGamepadButtonPressed(index, (Raylib_cs.GamepadButton)button);
-                if (value) IsGamepadFocused = true;
+                if (value)
+                {
+                    if (repeatingGamepadButtons.None(b => b.Input == (int)button && b.Index == index)) repeatingGamepadButtons.Add(new RepeatingButton((int)button, index));
+                }
                 return value;
             }
             else
@@ -157,7 +201,6 @@ public static class Input
                 if (Raylib.IsGamepadAvailable(i) && Raylib.IsGamepadButtonDown(i, (Raylib_cs.GamepadButton)button)) value = true;
                 if (value)
                 {
-                    IsGamepadFocused = true;
                     return true;
                 }
             }
@@ -169,7 +212,6 @@ public static class Input
             if (Raylib.IsGamepadAvailable(index))
             {
                 bool value = Raylib.IsGamepadButtonDown(index, (Raylib_cs.GamepadButton)button);
-                if (value) IsGamepadFocused = true;
                 return value;
             }
             else
@@ -197,6 +239,13 @@ public static class Input
         }
     }
 
+    public static bool IsRepeating(GamepadButton button, int index = -1)
+    {
+        return IsPressed(button, index) || repeatingGamepadButtons.Any(b => b.Input == (int)button && b.Activated && b.Index == index);
+    }
+
+    // Axis
+
     public static float Axis(GamepadAxis axis, int index = -1)
     {
         if (index == -1)
@@ -209,7 +258,6 @@ public static class Input
                     if (result.Abs() < Deadzone) result = 0;
                     if (result != 0)
                     {
-                        IsGamepadFocused = true;
                         return result;
                     }
                 } 
@@ -223,7 +271,6 @@ public static class Input
             {
                 float result = Raylib.GetGamepadAxisMovement(index, (Raylib_cs.GamepadAxis)axis);
                 if (result.Abs() < Deadzone) result = 0;
-                if (result != 0) IsGamepadFocused = true;
                 return result;
             }
 
@@ -260,7 +307,6 @@ public static class Input
                     if (result.X.Abs() < Deadzone && result.Y.Abs() < Deadzone) result = Vector2.Zero;
                     if (result != Vector2.Zero)
                     {
-                        IsGamepadFocused = true;
                         return result;
                     }
                 } 
@@ -279,8 +325,6 @@ public static class Input
 
                 if (result.X.Abs() < Deadzone && result.Y.Abs() < Deadzone) result = Vector2.Zero;
 
-                if (result != Vector2.Zero) IsGamepadFocused = true;
-
                 return result;
             }
             else
@@ -289,9 +333,6 @@ public static class Input
             } 
         }
     }
-
-    static List<(GamepadAxisDirection Button, int Index)> axisDirectionHeld = new List<(GamepadAxisDirection Button, int Index)>() { };
-    static List<(GamepadAxisDirection Button, int Index)> axisDirectionReleased = new List<(GamepadAxisDirection Button, int Index)>() { };
 
     static (GamepadAxis? Axis, int Direction) SplitGamePadAxisDirection(GamepadAxisDirection button)
     {
@@ -347,7 +388,7 @@ public static class Input
         var split = SplitGamePadAxisDirection(button);
         
         if (split.Axis == null) return false;
-        if (axisDirectionHeld.Any(b => b.Button == button)) return false;
+        if (axisDirectionsHeld.Any(b => b.Button == button)) return false;
 
         if (index == -1)
         {
@@ -361,8 +402,8 @@ public static class Input
                 } 
                 if (value != 0)
                 {
-                    axisDirectionHeld.Add((button, index));
-                    IsGamepadFocused = true;
+                    axisDirectionsHeld.Add((button, index));
+                    if (repeatingGamepadAxises.None(x => x.Input == (int)button && x.Index == index)) repeatingGamepadAxises.Add(new RepeatingButton((int)button, index));
                     return true;
                 }
             }
@@ -377,8 +418,8 @@ public static class Input
                 if (value.Sign() != split.Direction) value = 0;
                 if (value != 0)
                 {
-                    axisDirectionHeld.Add((button, index));
-                    IsGamepadFocused = true;
+                    axisDirectionsHeld.Add((button, index));
+                    if (repeatingGamepadAxises.None(x => x.Input == (int)button && x.Index == index)) repeatingGamepadAxises.Add(new RepeatingButton((int)button, index));
                 }
                 return value != 0;
             }
@@ -407,7 +448,6 @@ public static class Input
                 } 
                 if (value != 0)
                 {
-                    IsGamepadFocused = true;
                     return true;
                 }
             }
@@ -420,10 +460,6 @@ public static class Input
             {
                 float value = Axis(split.Axis.Value);
                 if (value.Sign() != split.Direction) value = 0;
-                if (value != 0)
-                {
-                    IsGamepadFocused = true;
-                }
                 return value != 0;
             }
             else
@@ -435,13 +471,24 @@ public static class Input
 
     public static bool IsReleased(GamepadAxisDirection button, int index = -1)
     {
-        return axisDirectionReleased.Any(b => b.Button == button && index == -1 || b.Index == index);
+        return axisDirectionsReleased.Any(b => b.Button == button && index == -1 || b.Index == index);
     }
+
+    public static bool IsRepeating(GamepadAxisDirection button, int index = -1)
+    {
+        return IsPressed(button, index) || repeatingGamepadAxises.Any(b => b.Input == (int)button && b.Activated && b.Index == index);
+    }
+
+    public static void Rumble(int index = 0, float leftMotar = 0.25f, float rightMotar = 0.25f, float duration = 0.125f)
+    {
+        Raylib.SetGamepadVibration(index, leftMotar, rightMotar, duration);
+    }
+
+    // Keyboard
 
     public static bool IsPressed(KeyboardKey key)
     {
         bool value = Raylib.IsKeyPressed((Raylib_cs.KeyboardKey)key);
-        if (value) IsGamepadFocused = false;
         return value;
     }
 
@@ -455,10 +502,48 @@ public static class Input
         return Raylib.IsKeyReleased((Raylib_cs.KeyboardKey)key);
     }
 
+    public static bool IsRepeating(KeyboardKey key)
+    {
+        return Raylib.IsKeyPressed((Raylib_cs.KeyboardKey)key) || Raylib.IsKeyPressedRepeat((Raylib_cs.KeyboardKey)key);
+    }
+
+    // Mouse
+
+    public static Vector2 MousePosition(DrawMode drawMode = DrawMode.Relative)
+    {
+        Vector2 mouse = Vector2.Zero;
+        if (drawMode == DrawMode.Relative) mouse = MousePositionRelative();
+        if (drawMode == DrawMode.Absolute) mouse = MousePositionAbsolute();
+        return mouse;
+    }
+
+    public static Vector2 MousePositionRelative()
+    {
+        return Raylib.GetScreenToWorld2D(
+            Viewport.ScalePixels
+                ? Raylib.GetMousePosition() - ((Viewport.Margin * Viewport.VirtualRatio.Value) * (1 + Viewport.RelativeLayer.Camera.Zoom))
+                : (Raylib.GetMousePosition() / Viewport.VirtualRatio.Value) - (Viewport.Margin * (1 + Viewport.VirtualRatio.Value)),
+            Viewport.RelativeLayer.Camera
+        );
+    }
+
+    public static Vector2 MousePositionAbsolute()
+    {
+        return (Raylib.GetMousePosition() / Viewport.VirtualRatio.Value) 
+            - new Vector2(
+                Viewport.Margin.X, 
+                Viewport.Margin.Y
+            );
+    }
+
+
     public static bool IsPressed(MouseButton button)
     {
         bool value = Raylib.IsMouseButtonPressed((Raylib_cs.MouseButton)button);
-        if (value) IsGamepadFocused = false;
+        if (value)
+        {
+            if (repeatingMouseButtons.None(b => b.Input == (int)button)) repeatingMouseButtons.Add(new RepeatingButton((int)button));
+        }
         return value;
     }
 
@@ -472,10 +557,12 @@ public static class Input
         return Raylib.IsMouseButtonReleased((Raylib_cs.MouseButton)button);
     }
 
-    public static bool IsRepeating(KeyboardKey key)
+    public static bool IsRepeating(MouseButton button)
     {
-        return Raylib.IsKeyPressed((Raylib_cs.KeyboardKey)key) || Raylib.IsKeyPressedRepeat((Raylib_cs.KeyboardKey)key);
+        return IsPressed(button) || repeatingMouseButtons.Any(b => b.Input == (int)button && b.Activated);
     }
+
+    // Cursor
 
     public static void ToggleCursor(bool show)
     {
@@ -487,6 +574,8 @@ public static class Input
     {
         return Raylib.IsCursorOnScreen();
     }
+
+    // Keyboard
 
     public static KeyboardKey GetKeyboardKey()
     {
@@ -740,5 +829,42 @@ public static class Input
         // { KeyboardKey.Menu, "" },
         { KeyboardKey.VolumeUp, "" },
         { KeyboardKey.VolumeDown, "" }
+    };
+
+    // Prompts
+
+
+    public static string GetGamepadPrompt(string key, int index = 0) 
+    {
+        var prompts = GetGamepadPrompts(index);
+        return prompts[key];
+    }
+
+    public static Dictionary<string, string> GetGamepadPrompts(int index = 0)
+    {
+        string gamepad = GetGamepadName(index).ToLower();
+        Log.Write(gamepad);
+
+        // if (new List<string>() { "GameCube" }.Any(x => gamepad.Contains(x))) return GameCubePrompts;
+        // if (new List<string>() { "Steam" }.Any(x => gamepad.Contains(x))) return SteamDeckPrompts;
+        if (new List<string>() { "playstation", "ps" }.Any(x => gamepad.Contains(x))) return PlaystationPrompts;
+        if (new List<string>() { "pc", "xbox", "xinput" }.Any(x => gamepad.Contains(x))) return XboxOnePrompts;
+        // if (new List<string>() { "nintendo", "pro" }.Any(x => gamepad.Contains(x))) return SwitchPrompts;
+        return XboxOnePrompts;
+    }
+
+    public static Dictionary<string, string> XboxOnePrompts = new Dictionary<string, string>()
+    {
+        { "RightFaceUp", "Y" }
+    };
+
+    public static Dictionary<string, string> PlaystationPrompts = new Dictionary<string, string>()
+    {
+        { "RightFaceUp", "Triangle" }
+    };
+
+    public static Dictionary<string, string> Switch = new Dictionary<string, string>()
+    {
+        { "RightFaceUp", "X" }
     };
 }
