@@ -38,6 +38,8 @@ public static class Game
     public static bool FrameStep = false;
 
     public static bool Mute = false;
+    public static float MusicVolume = 1f;
+    public static float SoundEffectsVolume = 1f;
 
     public static Map LastMap = null;
     public static string LastFocusedMap = null;
@@ -233,7 +235,7 @@ public static class Game
     {
         if (Mute) return;
         Sound sound = Library.SoundEffects[name];
-        Raylib.SetSoundVolume(sound, volume);
+        Raylib.SetSoundVolume(sound, volume * SoundEffectsVolume);
         Raylib.SetSoundPitch(sound, pitch);
         Raylib.SetSoundPan(sound, pan);
         Raylib.PlaySound(sound);

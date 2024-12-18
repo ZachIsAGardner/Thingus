@@ -38,6 +38,7 @@ public class SongManager : Thing
 
         Tracks.ForEach(t =>
         {
+            Raylib.SetMusicVolume(t.Music, Game.MusicVolume);
             Raylib.SetMusicPitch(t.Music, Pitch);
             Raylib.UpdateMusicStream(t.Music);
         });

@@ -3,7 +3,7 @@ const fs = require('fs');
 const moment = require("./moment.js");
 const format = "YYYY-MM-DD.HH_mm_ss";
 
-var architecture = 32;
+var architecture = 64;
 
 var date = moment().format(format);
 
@@ -149,7 +149,12 @@ async function exportForMac() {
 }
 
 async function execute() {
-    console.log("🔨 Exporting...");
+    var platforms = '';
+    if (target == 'all') platforms = '🪟🐧🍎';
+    if (target == 'win') platforms = '🪟';
+    if (target == 'lin') platforms = '🐧';
+    if (target == 'apple') platforms = '🍎';
+    console.log(`🔨 Exporting for ${platforms}...`);
     if (target == "all" || target == "win") await exportForWindows();
     if (target == "all" || target == "lin") await exportForLinux();
     if (target == "all" || target == "mac") await exportForMac();
