@@ -15,8 +15,10 @@ public class TextControl : Control
         Refresh();
     }
 
-    public void Refresh()
+    public override void Refresh()
     {
+        base.Refresh();
+        
         if (Font == null) Font = Library.Font;
         // Bounds = new Vector2(Raylib.MeasureText(Text, Font.Value.BaseSize), Font.Value.BaseSize);
     }

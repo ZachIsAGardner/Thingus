@@ -255,4 +255,10 @@ public static class Game
     {
         Raylib.CloseWindow();
     }
+
+    public static void ToggleCursor(bool? show = null)
+    {
+        if (show == true || (show == null && Raylib.IsCursorHidden())) Raylib.ShowCursor();
+        if (show == false || (show == null && !Raylib.IsCursorHidden())) Raylib.HideCursor();
+    }
 }

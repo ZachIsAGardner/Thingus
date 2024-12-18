@@ -74,8 +74,13 @@ public class Control : Thing
     {
         base.Update();
 
-        if (IsHighlighted) Highlighting();
+        if (IsHighlighted && Highlighting != null) Highlighting();
         if (CheckMouse) Mouse();
+    }
+
+    public virtual void Refresh()
+    {
+
     }
 
     public virtual bool ShouldShowHighlight => OnPressed != null && ((IsHovered && !Input.IsGamepadFocused) || IsHeld || (IsHighlighted && Input.IsGamepadFocused));
@@ -114,8 +119,8 @@ public class Control : Thing
         IsHovered = Utility.CheckRectangleOverlap(
             mouse,
             mouse,
-            GlobalPosition,
-            GlobalPosition + Bounds
+            GlobalPosition - (Padding / 2),
+            GlobalPosition + Bounds + (Padding / 2)
         );
 
         if (IsHovered)

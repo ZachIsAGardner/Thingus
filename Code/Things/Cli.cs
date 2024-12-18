@@ -151,6 +151,7 @@ public class Cli : Thing
         else if (command == "newm") NewMap(arguments);
         else if (command == "help") Help();
         else if (command == "clear") Clear();
+        else if (command == "quit") Quit();
         else NoCommand();
     }
 
@@ -219,6 +220,11 @@ public class Cli : Thing
     void Clear()
     {
         lines.Clear();
+    }
+
+    void Quit()
+    {
+        Game.Quit();
     }
 
     void NoCommand()
