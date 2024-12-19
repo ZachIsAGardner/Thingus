@@ -91,12 +91,13 @@ public class Collider : Thing
         if (CheckForCollisions)
         {
             possibleCollisions = Game.GetThings<Collider>().Where(c => c.Tags.Contains("Collision") && c != this).ToList();
+            GetRoomCollisions();
             GetBakedTilemapCollisions();
             GetColliderCollisions();
         }
 
-        if (!Info.Left && !Info.Right) Position.X += Velocity.X * Time.ModifiedDelta;
-        if (!Info.Up && !Info.Down) Position.Y += Velocity.Y * Time.ModifiedDelta;
+        if (!Info.Left && !Info.Right) Position.X += Velocity.X * Delta();
+        if (!Info.Up && !Info.Down) Position.Y += Velocity.Y * Delta();
     }
 
     public virtual void LandedHit(Collider other)
@@ -109,6 +110,63 @@ public class Collider : Thing
         base.LateUpdate();
 
         Info.Reset();
+    }
+
+    void GetRoomCollisions()
+    {
+        Room room = Game.Root.Room;
+        if (room == null) return;
+        Vector2? hit = null;
+
+        // Vertical
+
+        foreach (Vector2 raycast in BuildVerticalRaycasts())
+        {
+            if (hit != null) break;
+            if (raycast.Y > room.Bottom.Y) hit = room.Bottom;
+            if (raycast.Y < room.Top.Y) hit = room.Top;
+        }
+
+        if (hit != null)
+        {
+            if (Velocity.Y < 0)
+            {
+                Position.Y = hit.Value.Y + (Bounds.Y / 2f) + (Position.Y - GlobalPosition.Y);
+                Info.Up = true;
+            }
+            else
+            {
+                Position.Y = hit.Value.Y - (Bounds.Y / 2f) + (Position.Y - GlobalPosition.Y);
+                Info.Down = true;
+            }
+        }
+        hit = null;
+
+        // Horizontal
+
+        if (Velocity.X != 0)
+        {
+            foreach (var raycast in BuildHorizontalRaycasts())
+            {
+                if (hit != null) break;
+                if (raycast.X > room.Right.X) hit = room.Right;
+                if (raycast.X < room.Left.X) hit = room.Left;
+            }
+
+            if (hit != null)
+            {
+                if (Velocity.X < 0)
+                {
+                    Position.X = hit.Value.X + (Bounds.X / 2f) + (Position.X - GlobalPosition.X);
+                    Info.Left = true;
+                }
+                else
+                {
+                    Position.X = hit.Value.X - (Bounds.X / 2f) + (Position.X - GlobalPosition.X);
+                    Info.Right = true;
+                }
+            }
+        }
     }
 
     void GetBakedTilemapCollisions()
@@ -272,7 +330,7 @@ public class Collider : Thing
         // Up (-1), Down (1)
         int dir = (Velocity.Y < 0) ? -1 : 1;
 
-        float yTarget = (Velocity.Y < 0 ? GlobalTop.Y : GlobalBottom.Y) + (Velocity.Y * Time.ModifiedDelta);
+        float yTarget = (Velocity.Y < 0 ? GlobalTop.Y : GlobalBottom.Y) + (Velocity.Y * Delta());
 
         List<float> yPositions = new List<float>() { yTarget };
 
@@ -319,7 +377,7 @@ public class Collider : Thing
 
         int dir = (Velocity.X < 0) ? -1 : 1;
 
-        float xTarget = (Velocity.X < 0 ? GlobalLeft.X : GlobalRight.X) + (Velocity.X * Time.ModifiedDelta);
+        float xTarget = (Velocity.X < 0 ? GlobalLeft.X : GlobalRight.X) + (Velocity.X * Delta());
 
         List<float> xPositions = new List<float>() { xTarget };
 

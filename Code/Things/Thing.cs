@@ -51,6 +51,8 @@ public class Thing
 
     public bool IsAvailable => !GlobalRemoved;
 
+    public Func<float> Delta = () => Time.ModifiedDelta;
+
     // Extra
 
     public Thing Parent;
@@ -327,9 +329,9 @@ public class Thing
         Shapes.DrawSprite(texture, position ?? GlobalPosition, tileNumber, tileSize, rotation, color, scale, DrawMode, origin, flipHorizontally, flipVertically, source, destination);
     }
 
-    public void DrawText(object text, Vector2? position = null, Font? font = null, Color? color = null, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full)
+    public void DrawText(object text, Vector2? position = null, Font? font = null, Color? color = null, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full, TextJustification justification = TextJustification.TopLeft)
     {
-        Shapes.DrawText(text?.ToString() ?? "null", position ?? GlobalPosition, font, color, DrawMode, outlineColor, outlineStyle);
+        Shapes.DrawText(text?.ToString() ?? "null", position ?? GlobalPosition, font, color, DrawMode, outlineColor, outlineStyle, justification);
     }
 
     public void DrawNineSlice(Texture2D? texture, Vector2? position = null, int tileSize = 5, int width = 15, int height = 15, Vector2? origin = null, Color? color = null)

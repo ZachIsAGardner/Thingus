@@ -148,7 +148,9 @@ public class Cli : Thing
         List<string> arguments = words.Slice(1, words.Count - 1);
 
         if (command == "load") Load(arguments);
+        else if (command == "edit") Edit(arguments);
         else if (command == "newm") NewMap(arguments);
+        else if (command == "res") Reset();
         else if (command == "help") Help();
         else if (command == "clear") Clear();
         else if (command == "quit") Quit();
@@ -178,6 +180,30 @@ public class Cli : Thing
         }
     }
 
+    void Edit(List<string> arguments)
+    {
+        if (arguments.Count <= 0)
+        {
+            lines.Add("error: provide the name of a map.");
+            return;
+        }
+
+        string mapName = arguments[0];
+        Map map = Library.Maps.Get(mapName);
+        if (map == null)
+        {
+            lines.Add($"error: no such map.");
+        }
+        else
+        {
+            Game.EditingMap = map?.Name;
+            Game.LastFocusedMap = map?.Name;
+            Game.Root.Load(map);
+            Game.Root.DeveloperTools.ToggleEditor(true);
+            lines.Add($"editing {mapName}.map");
+        }
+    }
+
     void NewMap(List<string> arguments)
     {
         if (arguments.Count <= 0)
@@ -197,6 +223,19 @@ public class Cli : Thing
         Game.EditingMap = map?.Name;
         Game.Root.Load(map);
         lines.Add($"created {mapName}.map");
+    }
+
+    public void Toggle(bool? show = null)
+    {
+        bool v = show ?? !Active;
+        SetActive(v);
+        SetVisible(v);
+    }
+
+    void Reset()
+    {
+        Game.Root.Load(CONSTANTS.START_MAP);
+        Toggle(false);
     }
 
     void Help()

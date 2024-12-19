@@ -1,0 +1,11 @@
+{
+    "Layer": "Gizmos",
+    "Thing": "Target",
+    "Options": [
+        {
+            "Name": "Tag",
+            "Value": "",
+            "Type": "TextInput"
+        }
+    ]
+}

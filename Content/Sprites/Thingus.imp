@@ -1,6 +1,5 @@
 {
     "Thing": "TheThingus",
-    "Category": "Items",
     "Options": [
         {
             "Name": "Flip",

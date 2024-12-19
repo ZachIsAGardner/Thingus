@@ -123,7 +123,7 @@ public class Room : Thing
 
         if (Game.Mode == GameMode.Play)
         {
-            DrawOrder = 0;
+            // DrawOrder = 0;
         }
         else if (Game.Mode == GameMode.Edit)
         {

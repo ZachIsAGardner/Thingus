@@ -6,6 +6,26 @@ namespace Thingus;
 
 public static class Utility
 {
+    public static List<Vector2> ExtraAngles => new List<Vector2>()
+    {
+        new Vector2(-1, -1),
+        new Vector2(-0.425f, -1),
+        new Vector2(0, -1),
+        new Vector2(0.425f, -1),
+        new Vector2(1, -1),
+        new Vector2(1, -0.425f),
+        new Vector2(1, 0),
+        new Vector2(1, 0.425f),
+        new Vector2(1, 1),
+        new Vector2(0.425f, 1),
+        new Vector2(0, 1),
+        new Vector2(-0.425f, 1),
+        new Vector2(-1, 1),
+        new Vector2(-1, 0.425f),
+        new Vector2(-1, 0),
+        new Vector2(-1, -0.425f),
+    };
+    
     public static List<Vector2> Angles => new List<Vector2>()
     {
         new Vector2(-1, -1),

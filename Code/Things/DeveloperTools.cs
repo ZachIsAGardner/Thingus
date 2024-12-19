@@ -50,7 +50,7 @@ public class DeveloperTools : Thing
         Shortcuts();
     }
 
-    void ToggleEditor(bool show)
+    public void ToggleEditor(bool show)
     {
         if (show)
         {
@@ -77,19 +77,16 @@ public class DeveloperTools : Thing
         }
     }
 
-    void ToggleCli(bool show)
+    public void ToggleCli(bool show)
     {
         if (show)
         {
-            Cli.SetActive(true);
-            Cli.SetVisible(true);
-
+            Cli.Toggle(true);
             // Game.Mode = GameMode.Edit;
         }
         else
         {
-            Cli.SetActive(false);
-            Cli.SetVisible(false);
+            Cli.Toggle(false);
         }
     }
 
@@ -259,12 +256,13 @@ public class DeveloperTools : Thing
         //     font: Library.FontSmall
         // );
 
-        // DrawText(
-        //     Raylib.GetFPS(), 
-        //     color: PaletteBasic.White, 
-        //     outlineColor: PaletteBasic.Black,
-        //     position: new Vector2((CONSTANTS.VIRTUAL_WIDTH / 2f), 4)
-        // );
+        int fps = Raylib.GetFPS();
+        DrawText(
+            $"FPS: {fps}", 
+            color: fps < 57 ? PaletteBasic.Gray : PaletteBasic.Red, 
+            outlineColor: PaletteBasic.Black,
+            position: new Vector2(CONSTANTS.VIRTUAL_WIDTH - 64, 8)
+        );
 
         if (display == DeveloperDisplay.Tree) DrawThingTree();
         else if (display == DeveloperDisplay.Log) Log.Draw();

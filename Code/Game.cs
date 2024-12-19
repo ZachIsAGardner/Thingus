@@ -38,7 +38,7 @@ public static class Game
     public static bool FrameStep = false;
 
     public static bool Mute = false;
-    public static float MusicVolume = 1f;
+    public static float MusicVolume = 0f;
     public static float SoundEffectsVolume = 1f;
 
     public static Map LastMap = null;
@@ -143,8 +143,7 @@ public static class Game
     {
         if ((Input.CtrlIsHeld && Input.IsPressed(KeyboardKey.F)) || (Input.AltIsHeld && Input.IsPressed(KeyboardKey.Enter)))
         {
-            Raylib.ToggleBorderlessWindowed();
-            Viewport.RefreshProjection();
+            ToggleFullscreen();
         }
     }
 
@@ -260,5 +259,13 @@ public static class Game
     {
         if (show == true || (show == null && Raylib.IsCursorHidden())) Raylib.ShowCursor();
         if (show == false || (show == null && !Raylib.IsCursorHidden())) Raylib.HideCursor();
+    }
+
+    public static bool IsFullscreen => Raylib.IsWindowFullscreen();
+
+    public static void ToggleFullscreen(bool? show = null)
+    {
+        Raylib.ToggleBorderlessWindowed();
+        Viewport.RefreshProjection();
     }
 }

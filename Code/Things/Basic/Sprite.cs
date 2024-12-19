@@ -190,7 +190,7 @@ public class Sprite : Thing
             }
             lastState = State.Name;
 
-            TileNumber += State.Speed * Time.Delta;
+            TileNumber += State.Speed * Delta();
             if (TileNumber >= State.End + 1)
             {
                 if (State.Loop) TileNumber = State.Start;

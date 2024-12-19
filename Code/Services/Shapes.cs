@@ -9,6 +9,12 @@ public enum OutlineStyle
     Drop
 }
 
+public enum TextJustification
+{
+    TopLeft,
+    Center
+}
+
 public static class Shapes
 {
     public static Vector2 CoordinatesFromNumber(int tileNumber, Texture2D texture, int tileSize = 0)
@@ -70,7 +76,7 @@ public static class Shapes
         );
     }
 
-    public static void DrawText(string text, Vector2? position = null, Font? font = null, Color? color = null, DrawMode drawMode = DrawMode.Relative, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full)
+    public static void DrawText(string text, Vector2? position = null, Font? font = null, Color? color = null, DrawMode drawMode = DrawMode.Relative, Color? outlineColor = null, OutlineStyle outlineStyle = OutlineStyle.Full, TextJustification justification = TextJustification.TopLeft)
     {
         if (font == null) font = Library.Font;
 
@@ -79,6 +85,14 @@ public static class Shapes
         if (drawMode == DrawMode.Relative)
         {
             position += Viewport.Position;
+        }
+
+        Vector2 offset = Vector2.Zero;
+
+        if (justification == TextJustification.Center)
+        {
+            offset.X = (text.Width(font) - font.Value.BaseSize) * -0.5f;
+            offset.Y = -font.Value.BaseSize / 2f;
         }
 
         if (outlineColor != null)
@@ -104,7 +118,7 @@ public static class Shapes
                 Raylib.DrawTextPro(
                     font: font.Value.ToRaylib(),
                     text: text,
-                    position: position.Value + a,
+                    position: position.Value + offset + a,
                     origin: new Vector2(0),
                     rotation: 0,
                     fontSize: font.Value.BaseSize,
@@ -117,7 +131,7 @@ public static class Shapes
         Raylib.DrawTextPro(
             font: font.Value.ToRaylib(),
             text: text,
-            position: position.Value,
+            position: position.Value + offset,
             origin: new Vector2(0),
             rotation: 0,
             fontSize: font.Value.BaseSize,
