@@ -11,6 +11,6 @@ public static class Lang
 
     public static string Key(string key)
     {
-        return import.Keys[key];
+        return import.Keys.Get(key) ?? key;
     }
 }

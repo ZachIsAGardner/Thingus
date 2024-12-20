@@ -8,6 +8,7 @@ public class Text : Thing
     public Font Font;
     public Color Color;
     public Color? OutlineColor;
+    public TextJustification Justification = TextJustification.TopLeft;
 
     RenderTexture2D? texture;
     Rectangle rectangle;
@@ -31,13 +32,14 @@ public class Text : Thing
     float shakeStepDuration = 0.01f;
 
     public Text() { }
-    public Text(string content, Vector2 position, Font? font = null, DrawMode drawMode = DrawMode.Relative, Color? color = null, Color? outlineColor = null, int drawOrder = 0)
+    public Text(string content, Vector2 position, Font? font = null, TextJustification justification = TextJustification.TopLeft, DrawMode drawMode = DrawMode.Relative, Color? color = null, Color? outlineColor = null, int drawOrder = 0)
     {
         this.Content = content;
         Position = position;
         Color = color ?? PaletteBasic.Black;
         OutlineColor = outlineColor;
         Font = font ?? Library.Font;
+        Justification = justification;
         DrawMode = drawMode;
         DrawOrder = drawOrder;
     }
@@ -58,12 +60,19 @@ public class Text : Thing
     {
         base.Draw();
 
+        Vector2 offset = Vector2.Zero;
+        if (Justification == TextJustification.Center)
+        {
+            offset.X = -(Content.Width(Font) / 2f) + (Font.BaseSize / 2f);
+        }
+
         DrawText(
             font: Font,
             text: Content,
             position: GlobalPosition
                 + new Vector2(shakeXOffset, shakeYOffset)
-                + GlobalOffset,
+                + GlobalOffset
+                + offset,
             color: Color,
             outlineColor: OutlineColor
         );

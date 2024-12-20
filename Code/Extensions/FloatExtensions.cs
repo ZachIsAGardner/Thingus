@@ -1,8 +1,19 @@
+using System.Numerics;
 using Raylib_cs;
 namespace Thingus;
 
 public static class FloatExtensions
 {
+    public static Vector2 ToVector2FromDegrees(this float degrees)
+    {
+        return new Vector2((float)Math.Cos(degrees.ToRadians()), (float)Math.Sin(degrees.ToRadians())) * -1f;
+    }
+
+    public static Vector2 ToVector2FromRadians(this float radians)
+    {
+        return new Vector2((float)Math.Cos(radians), (float)Math.Sin(radians)) * -1f;
+    }
+    
     public static float ToRadians(this float degrees)
     {
         return degrees * (MathF.PI / 180);
@@ -92,6 +103,14 @@ public static class FloatExtensions
         }
 
         return result;
+    }
 
+    public static float MoveWithSpeed(this float num, float destination, float speed, bool useModifiedDelta = true)
+    {
+        float direction = (destination - num).Sign();
+        float change = (direction * speed) * (useModifiedDelta ? Time.ModifiedDelta : Time.Delta);
+        float position = num + change;
+        if ((num - destination).Abs() <= change.Abs()) position = destination;
+        return position;
     }
 }

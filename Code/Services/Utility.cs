@@ -179,4 +179,9 @@ public static class Utility
     {
         return position - Viewport.CameraPosition + (Viewport.Margin * Viewport.VirtualRatio.Value);
     }
+
+    public static Vector2 ScreenToWorldPosition(Vector2 position)
+    {
+        return position + Viewport.CameraPosition - (Viewport.Margin * Viewport.VirtualRatio.Value);
+    }
 }
