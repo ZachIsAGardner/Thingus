@@ -91,7 +91,8 @@ public static class Shapes
 
         if (justification == TextJustification.Center)
         {
-            offset.X = (text.Width(font) - font.Value.BaseSize) * -0.5f;
+            string line = text.Split("\n").OrderBy(l => l.Length).Last();
+            offset.X = (line.Width(font) - font.Value.Width) * -0.5f;
             offset.Y = -font.Value.BaseSize / 2f;
         }
 
@@ -272,5 +273,15 @@ public static class Shapes
             drawMode: drawMode,
             origin: new Vector2(0)
         );
+    }
+
+    public static void DrawLine(Vector2 start, Vector2 end, Color color, DrawMode drawMode = DrawMode.Relative)
+    {
+        if (drawMode == DrawMode.Relative)
+        {
+            start += Viewport.Position;
+            end += Viewport.Position;
+        }
+        Raylib.DrawLine((int)start.X, (int)start.Y, (int)end.X, (int)end.Y, color.ToRaylib());
     }
 }

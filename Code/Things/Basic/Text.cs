@@ -63,7 +63,7 @@ public class Text : Thing
         Vector2 offset = Vector2.Zero;
         if (Justification == TextJustification.Center)
         {
-            offset.X = -(Content.Width(Font) / 2f) + (Font.BaseSize / 2f);
+            offset.X = -(Content.Width(Font) / 2f);
         }
 
         DrawText(

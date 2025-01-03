@@ -8,6 +8,8 @@ public struct Font
 
     public Texture2D Texture => font.Texture;
     public int BaseSize => font.BaseSize;
+    public int Height;
+    public int Width;
 
     public Font(Raylib_cs.Font font)
     {

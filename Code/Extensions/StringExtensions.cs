@@ -49,7 +49,7 @@ public static class StringExtensions
 
     public static int Width(this string str, Font? font = null)
     {
-        return Raylib.MeasureText(str, (font ?? Library.Font).BaseSize);
+        return str.Length * (font?.Width ?? 1);
     }
     public static bool HasValue(this string str)
     {

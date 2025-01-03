@@ -20,7 +20,7 @@ const winPath = architecture == 32 ? win32Path : win64Path;
 const linPath = `${binPath}/linux-x64/publish`;
 const macPath = `${binPath}/osx-x64/publish`;
 
-const target = "all";
+const target = "win";
 
 var buildNumber = 0;
 if (fs.existsSync(`${__dirname}/../../build.txt`)) {

@@ -50,7 +50,13 @@ public static class Library
         Import("_Thingus/Content");
         Import("Content");
         Font = Fonts["MonogramExtended"];
+        // +1
+        Font.Width = 6;
+        Font.Height = 7;
         FontSmall = Fonts["Pico8"];
+        // +1
+        Font.Width = 4;
+        Font.Height = 5;
     }
 
     static void Import(string path)
@@ -77,7 +83,21 @@ public static class Library
             }
             else if ((file.EndsWith(".ogg") || file.EndsWith(".wav")) && file.Contains("/Songs"))
             {
-                Songs[name] = Raylib.LoadMusicStream(file);
+                Music song = Raylib.LoadMusicStream(file);
+                song.Looping = false;
+                string loopFile = files.Find(f => f.EndsWith($"{name}.loop"));
+                if (loopFile != null)
+                {
+                    string[] loop = File.ReadAllLines(loopFile);
+                    if (loop.Count() >= 1) song.LoopStart = loop[0].ToFloat();
+                    if (loop.Count() >= 2) song.LoopEnd = loop[1].ToFloat();
+                    else song.LoopEnd = Raylib.GetMusicTimeLength(song);
+                }
+                else
+                {
+                    song.LoopEnd = Raylib.GetMusicTimeLength(song);
+                }
+                Songs[name] = song;
             }
             else if ((file.EndsWith(".ogg") || file.EndsWith(".wav")) && file.Contains("/SoundEffects"))
             {

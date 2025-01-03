@@ -38,7 +38,7 @@ public static class Game
     public static bool FrameStep = false;
 
     public static bool Mute = false;
-    public static float MusicVolume = 0f;
+    public static float MusicVolume = 1f;
     public static float SoundEffectsVolume = 1f;
 
     public static Map LastMap = null;
@@ -240,9 +240,29 @@ public static class Game
         Raylib.PlaySound(sound);
     }
 
-    public static void PlaySong(string name = null)
+    public static void PlaySong(string name)
     {
         Root.SongManager.Play(name);
+    }
+
+    public static void PlaySong(List<string> names)
+    {
+        Root.SongManager.Play(names);
+    }
+
+    public static void SwitchSong(string name)
+    {
+        Root.SongManager.Switch(name);
+    }
+
+    public static void SeekSong(string name, float position)
+    {
+        Root.SongManager.Seek(name, position);
+    }
+
+    public static void SeekSong(float position)
+    {
+        Root.SongManager.Seek(position);
     }
 
     public static void StopSong()
