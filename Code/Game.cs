@@ -41,10 +41,6 @@ public static class Game
     public static float MusicVolume = 1f;
     public static float SoundEffectsVolume = 1f;
 
-    public static Map LastMap = null;
-    public static string LastFocusedMap = null;
-    public static string EditingMap = null;
-
     public static PlatformType Platform;
 
     public static List<T> GetThingsWithName<T>(string name) where T : Thing
@@ -230,14 +226,16 @@ public static class Game
         queueUpdateReorder = true;
     }
 
-    public static void PlaySound(string name, float volume = 1f, float pitch = 1f, float pan = 0.5f)
+    public static Sound? PlaySound(string name, float volume = 1f, float pitch = 1f, float pan = 0.5f)
     {
-        if (Mute) return;
-        Sound sound = Library.SoundEffects[name];
-        Raylib.SetSoundVolume(sound, volume * SoundEffectsVolume);
-        Raylib.SetSoundPitch(sound, pitch);
-        Raylib.SetSoundPan(sound, pan);
-        Raylib.PlaySound(sound);
+        if (Mute) return null;
+        return Root.SoundEffectManager.Play(name, volume, pitch, pan);
+    }
+
+    public static SongTrack PlaySoundLooped(string name, float volume = 1f, float pitch = 1f, float pan = 0.5f)
+    {
+        if (Mute) return null;
+        return Root.SoundEffectManager.PlayLooped(name, volume, pitch, pan);
     }
 
     public static void PlaySong(string name)

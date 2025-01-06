@@ -1,0 +1,17 @@
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\bin\Release\net8.0\win-x86\runtimes\linux-x64\native\.keep
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\bin\Release\net8.0\win-x86\runtimes\osx-arm64\native\.keep
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\bin\Release\net8.0\win-x86\runtimes\osx-x64\native\.keep
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\bin\Release\net8.0\win-x86\runtimes\win-x64\native\.keep
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\bin\Release\net8.0\win-x86\runtimes\win-x86\native\.keep
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\bin\Release\net8.0\win-x86\Raylib-cs.deps.json
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\bin\Release\net8.0\win-x86\Raylib-cs.dll
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\bin\Release\net8.0\win-x86\Raylib-cs.pdb
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\bin\Release\net8.0\win-x86\Raylib-cs.xml
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\obj\Release\net8.0\win-x86\Raylib-cs.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\obj\Release\net8.0\win-x86\Raylib-cs.csproj.CoreCompileInputs.cache
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\obj\Release\net8.0\win-x86\Raylib-cs.sourcelink.json
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\obj\Release\net8.0\win-x86\Raylib-cs.dll
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\obj\Release\net8.0\win-x86\refint\Raylib-cs.dll
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\obj\Release\net8.0\win-x86\Raylib-cs.xml
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\obj\Release\net8.0\win-x86\Raylib-cs.pdb
+C:\Users\zachi\Creative\GameDevelopment\Reform\_Raylib-cs\obj\Release\net8.0\win-x86\ref\Raylib-cs.dll

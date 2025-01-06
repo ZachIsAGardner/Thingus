@@ -173,8 +173,9 @@ public class Cli : Thing
         }
         else
         {
-            Game.EditingMap = map?.Name;
-            Game.LastFocusedMap = map?.Name;
+            DeveloperStorage.Map = map?.Name;
+            DeveloperStorage.Room = map?.Name;
+            DeveloperStorage.Save();
             Game.Root.Load(map);
             lines.Add($"loaded {mapName}.map");
         }
@@ -196,8 +197,9 @@ public class Cli : Thing
         }
         else
         {
-            Game.EditingMap = map?.Name;
-            Game.LastFocusedMap = map?.Name;
+            DeveloperStorage.Map = map?.Name;
+            DeveloperStorage.Room = map?.Name;
+            DeveloperStorage.Save();
             Game.Root.Load(map);
             Game.Root.DeveloperTools.ToggleEditor(true);
             lines.Add($"editing {mapName}.map");
@@ -220,8 +222,10 @@ public class Cli : Thing
         map.Cells.Add(root);
         map.Save();
         Library.Maps[mapName] = map;
-        Game.EditingMap = map?.Name;
+        DeveloperStorage.Map = map?.Name;
+        DeveloperStorage.Save();
         Game.Root.Load(map);
+        Game.Root.DeveloperTools.ToggleEditor(false);
         lines.Add($"created {mapName}.map");
     }
 

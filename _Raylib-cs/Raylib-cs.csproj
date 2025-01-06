@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <AssemblyName>Raylib-cs</AssemblyName>
+    <RootNamespace>Raylib_cs</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	  <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+	  <NoWarn>$(NoWarn);1591</NoWarn>
+    <LangVersion>12</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>Raylib-cs</Title>
+    <Description>C# bindings for raylib - A simple and easy-to-use library to learn videogames programming</Description>
+    <RepositoryUrl>https://github.com/chrisdill/raylib-cs/</RepositoryUrl>
+    <Authors>chrisdill</Authors>
+    <PackageLicenseExpression>Zlib</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>raylib-cs_64x64.png</PackageIcon>
+    <PackageTags>raylib csharp gamedev</PackageTags>
+    <PackageProjectUrl>https://www.raylib.com/</PackageProjectUrl>
+    <PackProject>true</PackProject>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <RepositoryType>git</RepositoryType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="logo/raylib-cs_64x64.png" Pack="true" PackagePath="" />
+    <None Include="../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Numerics.Vectors" Version="4.6.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <Import Project="./Build.props" />
+
+  <ItemGroup>
+    <Content Include="runtimes/**" Link="runtimes/%(RecursiveDir)/%(Filename)%(Extension)">
+      <PackagePath>runtimes/</PackagePath>
+      <Pack>true</Pack>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- <ItemGroup>
+    <Compile Include="interop\*.cs" />
+    <Compile Include="types\*.cs" />
+    <Compile Include="types\native\CBool.cs" />
+    <Compile Include="types\native\AnsiBuffer.cs" />
+    <Compile Include="types\native\Utf8Buffer.cs" />
+    <Compile Include="types\native\FilePathList.cs" />
+  </ItemGroup> -->
+</Project>

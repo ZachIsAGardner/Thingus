@@ -5,6 +5,11 @@ namespace Thingus;
 
 public static class Vector2Extensions
 {
+    public static float Force(this Vector2 vector2)
+    {
+        return (vector2.X.Abs() + vector2.Y.Abs()) / 2f;
+    }
+
     public static Vector2 Sign(this Vector2 vector2)
     {
         return new Vector2(MathF.Sign(vector2.X), MathF.Sign(vector2.Y));

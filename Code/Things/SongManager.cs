@@ -14,10 +14,14 @@ public class SongTrack
     public string Name;
     public Music Song;
     public float Volume;
+    public float Pitch;
+    public float Pan;
+
+    public bool Stopped;
 
     public SongTrackState State;
 
-    public SongTrack(string name, Music song, float volume = 1f)
+    public SongTrack(string name, Music song, float volume = 1f, float pitch = 1f, float pan = 0)
     {
         Name = name;
         Song = song;
@@ -58,6 +62,11 @@ public class SongTrack
     public void FadeOut()
     {
         State = SongTrackState.FadeOut;
+    }
+
+    public void Stop()
+    {
+        Stopped = true;
     }
 }
 
@@ -142,6 +151,8 @@ public class SongManager : Thing
         base.Update();
 
         if (Game.Mute) return;
+
+        Tracks = Tracks.Where(t => !t.Stopped).ToList();
 
         Tracks.ForEach(t =>
         {

@@ -412,7 +412,7 @@ public class Editor : Thing
 
     public void Focus()
     {
-        if (Room == null) Room = Game.GetThings<Room>().Find(r => r.Map?.Name == Game.LastFocusedMap);
+        if (Room == null) Room = Game.GetThings<Room>().Find(r => r.Map?.Name == DeveloperStorage.Room);
         if (Room == null) Room = Game.GetThing<Room>();
         if (Room != null)
         {

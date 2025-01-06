@@ -54,7 +54,7 @@ public class DeveloperTools : Thing
     {
         if (show)
         {
-            Game.Root.Load(Library.Maps[Game.EditingMap]);
+            Game.Root.Load(Library.Maps[DeveloperStorage.Map]);
             Game.Mode = GameMode.Edit;
             
             Editor.SetActive(true);
@@ -177,7 +177,7 @@ public class DeveloperTools : Thing
     {
         TokenGrid.Reset();
         Log.Clear();
-        Game.Root.Load(Library.Maps[Game.LastFocusedMap ?? CONSTANTS.START_MAP]);
+        Game.Root.Load(Library.Maps[DeveloperStorage.Room ?? CONSTANTS.START_MAP]);
         PlayerStatus.Reset();
         
         if (Input.ShiftIsHeld)

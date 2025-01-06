@@ -9,6 +9,7 @@ public class Root : Thing
     public Thing Dynamic;
     public Thing Shared;
     public SongManager SongManager;
+    public SoundEffectManager SoundEffectManager;
     public DeveloperTools DeveloperTools;
 
     public Room Room;
@@ -29,6 +30,7 @@ public class Root : Thing
         Shared.Name = "Shared";
 
         SongManager = AddChild(new SongManager()) as SongManager;
+        SoundEffectManager = AddChild(new SoundEffectManager()) as SoundEffectManager;
         if (CONSTANTS.IS_DEBUG) DeveloperTools = AddChild(new DeveloperTools()) as DeveloperTools;
         if (CONSTANTS.START_MAP != null) Load(CONSTANTS.START_MAP);
     }
@@ -55,9 +57,13 @@ public class Root : Thing
         }
 
         Dynamic.Clear();
+        SoundEffectManager.Tracks.Clear();
         Thing thing = map.Load(Dynamic);
-        Game.LastMap = map;
-        if (Game.EditingMap == null) Game.EditingMap = map?.Name;
+        if (DeveloperStorage.Map == null)
+        {
+            DeveloperStorage.Map = map?.Name;
+            DeveloperStorage.Save();
+        }
         Game.Mode = GameMode.Play;
 
         Room = Game.GetThing<Room>();

@@ -287,7 +287,7 @@ public class Thing
         if (oldVisible != Visible) Game.QueueDrawReorder();
     }
 
-    public void PlaySound(string name, float? volume = null, float? pitch = null, float? pan = null)
+    public Sound? PlaySound(string name, float? volume = null, float? pitch = null, float? pan = null)
     {
         if (pan == null) pan = 1 - ((GlobalPosition.X - Viewport.CameraPosition.X) / CONSTANTS.VIRTUAL_WIDTH);
         if (pan < 0) pan = 0;
@@ -314,8 +314,37 @@ public class Thing
         if (volume < 0) volume = 0;
         if (volume > 1) volume = 1;
 
+        return Game.PlaySound(name, volume.Value, pitch.Value, pan.Value);
+    }
 
-        Game.PlaySound(name, volume.Value, pitch.Value, pan.Value);
+    public SongTrack PlaySoundLooped(string name, float? volume = null, float? pitch = null, float? pan = null)
+    {
+        if (pan == null) pan = 1 - ((GlobalPosition.X - Viewport.CameraPosition.X) / CONSTANTS.VIRTUAL_WIDTH);
+        if (pan < 0) pan = 0;
+        if (pan > 1) pan = 1;
+
+        if (pitch == null)
+        {
+            pitch = (1f
+                - ((0.5f - ((GlobalPosition.X - Viewport.CameraPosition.X) / CONSTANTS.VIRTUAL_WIDTH)).Abs() * 0.5f)
+                - ((0.5f - ((GlobalPosition.Y - Viewport.CameraPosition.Y) / CONSTANTS.VIRTUAL_HEIGHT)).Abs() * 0.5f)
+            ) + Chance.Range(-0.125f, 0.125f);
+        }
+        if (pitch < -1) pitch = -1;
+        if (pitch > 20) pitch = 20;
+
+        if (volume == null)
+        {
+            volume = (1f
+                - ((0.5f - ((GlobalPosition.X - Viewport.CameraPosition.X) / CONSTANTS.VIRTUAL_WIDTH)).Abs() * 0.5f)
+                - ((0.5f - ((GlobalPosition.Y - Viewport.CameraPosition.Y) / CONSTANTS.VIRTUAL_HEIGHT)).Abs() * 0.5f)
+            ) + Chance.Range(-0.125f, 0.125f);
+        }
+
+        if (volume < 0) volume = 0;
+        if (volume > 1) volume = 1;
+
+        return Game.PlaySoundLooped(name, volume.Value, pitch.Value, pan.Value);
     }
 
     public void Clear()

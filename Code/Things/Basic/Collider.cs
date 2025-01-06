@@ -9,6 +9,7 @@ public class CollisionInfo
     public bool Right;
     public bool Up;
     public bool Down;
+    public bool Any => Left || Right || Down || Up;
 
     public void Reset()
     {
@@ -417,6 +418,11 @@ public class Collider : Thing
         return raycasts;
     }
 
+    public Collider CheckTag(List<string> tags)
+    {
+        List<Collider> others = Game.GetThings<Collider>().Where(c => tags.Any(t => c.Tags.Contains(t)) && CheckCollider(c)).ToList();
+        return others.FirstOrDefault();
+    }
     public Collider CheckTag(string tag)
     {
         List<Collider> others = Game.GetThings<Collider>().Where(c => c.Tags.Contains(tag) && CheckCollider(c)).ToList();

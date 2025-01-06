@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "jAik+Wp8f2o=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\zachi\\Creative\\GameDevelopment\\Reform\\_Thingus\\_Raylib-cs\\Raylib-cs.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\zachi\\.nuget\\packages\\microsoft.build.tasks.git\\8.0.0\\microsoft.build.tasks.git.8.0.0.nupkg.sha512",
+    "C:\\Users\\zachi\\.nuget\\packages\\microsoft.sourcelink.common\\8.0.0\\microsoft.sourcelink.common.8.0.0.nupkg.sha512",
+    "C:\\Users\\zachi\\.nuget\\packages\\microsoft.sourcelink.github\\8.0.0\\microsoft.sourcelink.github.8.0.0.nupkg.sha512",
+    "C:\\Users\\zachi\\.nuget\\packages\\system.numerics.vectors\\4.6.0\\system.numerics.vectors.4.6.0.nupkg.sha512"
+  ],
+  "logs": []
+}

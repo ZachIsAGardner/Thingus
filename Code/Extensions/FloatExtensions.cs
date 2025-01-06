@@ -59,6 +59,11 @@ public static class FloatExtensions
         return (float)Math.Floor(i);
     }
 
+    public static float Ceiling(this float i)
+    {
+        return (float)Math.Ceiling(i);
+    }
+
     public static bool IsNaN(this float i)
     {
         return float.IsNaN(i);

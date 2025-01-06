@@ -190,12 +190,18 @@ public class Sprite : Thing
             }
             lastState = State.Name;
 
-            TileNumber += State.Speed * Delta();
-            if (TileNumber >= State.End + 1)
+            TileNumber += (State.Speed * Delta()) * (State.Reverse ? -1 : 1);
+            if (!State.Reverse && TileNumber >= State.End + 1)
             {
                 if (State.Loop) TileNumber = State.Start;
                 else TileNumber = State.End;
             }
+            if (State.Reverse && TileNumber <= State.End)
+            {
+                if (State.Loop) TileNumber = State.Start;
+                else TileNumber = State.End;
+            }
+            if (State.Name == "Stand") Log.Write(TileNumber);
 
             int flooredTileNumber = (int)Math.Floor(TileNumber);
 
@@ -226,7 +232,7 @@ public class Sprite : Thing
             position: (DrawMode == DrawMode.Texture ? (Position + GlobalOffset) : (GlobalPosition + GlobalOffset))
                 + new Vector2(shakeXOffset, shakeYOffset),
             tileSize: TileSize,
-            tileNumber: (int)(TileNumber + TileNumberOffset).Floor(),
+            tileNumber: State?.Reverse == true ? (int)(TileNumber + TileNumberOffset).Ceiling() : (int)(TileNumber + TileNumberOffset).Floor(),
             rotation: Rotation,
             scale: Scale,
             color: color,

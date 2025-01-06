@@ -254,6 +254,7 @@ public class RoomTool : Tool
         room.Map.AddCell(room.Cell);
         room.Map.Path = editor.Target.Map.Path;
         room.ParentCell = new MapCell($"={mapName}", position: room.Position, parent: editor.Target.Name);
+        Library.Maps[mapName] = room.Map;
         editor.Target.AddChild(room);
         editor.Target.Map.AddCell(room.ParentCell);
         editor.Room = room;

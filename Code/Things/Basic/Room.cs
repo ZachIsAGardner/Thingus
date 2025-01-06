@@ -110,8 +110,8 @@ public class Room : Thing
                 if (Input.LeftMouseButtonIsPressed)
                 {
                     Click();
-                    Game.LastFocusedMap = Map?.Name;
-                    Game.LastMap = Map;
+                    DeveloperStorage.Room = Map?.Name;
+                    DeveloperStorage.Save();
                 }
             }
         }
