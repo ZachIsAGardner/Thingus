@@ -55,8 +55,8 @@ public static class Library
         Font.Height = 7;
         FontSmall = Fonts["Pico8"];
         // +1
-        Font.Width = 4;
-        Font.Height = 5;
+        FontSmall.Width = 4;
+        FontSmall.Height = 5;
     }
 
     static void Import(string path)

@@ -9,6 +9,9 @@ public class DropdownControl : Control
     public List<string> Options;
     public string Text;
     public Font? Font;
+    public event Action<object> OnChanged;
+
+    public Texture2D WindowTexture;
 
     VerticalFlexControl window;
 
@@ -16,6 +19,7 @@ public class DropdownControl : Control
     {
         Title = title;
         Options = options;
+        WindowTexture = Library.Textures["BoxInsideSlice"];
         Refresh();
     }
 
@@ -32,17 +36,18 @@ public class DropdownControl : Control
         base.Destroy();
     }
 
-    void Window()
+    public VerticalFlexControl Window()
     {
         window = new VerticalFlexControl();
         window.Bounds.X = Bounds.X;
         window.Bounds.Y = Options.Count() * 16;
         window.Padding = new Vector2(1);
-        window.Texture = Library.Textures["BoxInsideSlice"];
+        window.Texture = WindowTexture;
         window.DrawOrder = DrawOrder + 10;
         window.DrawMode = DrawMode;
         window.Position.Y = 16;
 
+        Control lastControl = null;
         foreach (string option in Options)
         {
             TextControl control = new TextControl();
@@ -51,17 +56,31 @@ public class DropdownControl : Control
             control.Text = option;
             control.TextPadding.X = 3;
             control.HighlightColor = Theme.Dark;
-            control.TextHighlightColor = PaletteBasic.White;
+            control.TextHighlightColor = Theme.Primary;
+            control.IgnoreParentHighlight = true;
+            if (lastControl != null)
+            { 
+                control.Up = lastControl;
+                lastControl.Down = control;
+            }
+            lastControl = control;
             control.OnPressed += () =>
             {
-                Input.Holdup = true;
-                Text = option;
-                LoseFocus();
+                Select(control);
             };
             window.AddChild(control);
         }
         window.Refresh();
         AddChild(window);
+        return window;
+    }
+
+    public void Select(TextControl control)
+    {
+        Input.Holdup = true;
+        Text = control.Text;
+        if (OnChanged != null) OnChanged.Invoke(control.Text);
+        LoseFocus();
     }
 
     public override void Focus()

@@ -175,7 +175,7 @@ public class Thing
     public bool VisibleOnlyInDebug = false;
     public bool ExclusiveUpdateInEditMode = false;
     public bool GlobalUpdateInEditMode => (Parent != null && Parent.GlobalUpdateInEditMode) || UpdateInEditMode;
-    public bool ShouldUpdate => IsAvailable && Game.Mode != GameMode.Edit && Game.Root.DeveloperTools?.Cli?.Active != true || GlobalUpdateInEditMode || ExclusiveUpdateInEditMode;
+    public bool ShouldUpdate => GlobalActive && (IsAvailable && Game.Mode != GameMode.Edit && Game.Root.DeveloperTools?.Cli?.Active != true || GlobalUpdateInEditMode || ExclusiveUpdateInEditMode);
 
     public float? AlphaOverride = null;
     public float? GlobalAlphaOverride => (Parent != null ? Parent?.AlphaOverride : null) ?? AlphaOverride;

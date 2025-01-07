@@ -49,7 +49,8 @@ public static class StringExtensions
 
     public static int Width(this string str, Font? font = null)
     {
-        return str.Length * (font?.Width ?? 1);
+        if (font == null) font = Library.Font;
+        return str.Length * (font.Value.Width);
     }
     public static bool HasValue(this string str)
     {

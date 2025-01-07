@@ -373,7 +373,7 @@ public class Editor : Thing
 
                 float scaleFactor = 1.0f + (0.25f * scroll.Abs());
                 if (scroll < 0) scaleFactor = 1.0f / scaleFactor;
-                Viewport.Zoom = Math.Clamp(Viewport.Zoom * scaleFactor, 0.125f, 64.0f);
+                Viewport.Zoom = Math.Clamp(Viewport.Zoom * scaleFactor, 0.075f, 64.0f);
             }
 
         }
@@ -509,7 +509,6 @@ public class Editor : Thing
                 }
             });
         }
-        Log.Write(cell.Options.Count);
         room.Map.AddCell(cell);
         // cell.TileNumber = GetTileNumber(cell);
         cell.Create(room);

@@ -38,7 +38,7 @@ public class SongTrack
         }
         else if (State == SongTrackState.FadeIn)
         {
-            Volume = Volume.MoveOverTime(1, 0.1f);
+            Volume = Volume.MoveOverTime(1f, 0.05f, min: 0);
             if (Volume == 1)
             {
                 State = SongTrackState.Normal;
@@ -46,7 +46,7 @@ public class SongTrack
         }
         else if (State == SongTrackState.FadeOut)
         {
-            Volume = Volume.MoveOverTime(0, 0.1f);
+            Volume = Volume.MoveOverTime(0f, 0.05f, min: 0);
             if (Volume == 0)
             {
                 State = SongTrackState.Normal;
@@ -150,24 +150,30 @@ public class SongManager : Thing
     {
         base.Update();
 
-        if (Game.Mute) return;
-
-        Tracks = Tracks.Where(t => !t.Stopped).ToList();
-
-        Tracks.ForEach(t =>
+        Tracks.ToList().ForEach(t =>
         {
             t.Update();
-            Raylib.SetMusicVolume(t.Song, Game.MusicVolume * t.Volume);
+        });
+    }
+
+    // Updated in Game
+    public void UpdateTracks()
+    {
+        if (Settings.Mute) return;
+
+        Tracks.ToList().ForEach(t =>
+        {
+            Raylib.SetMusicVolume(t.Song, Settings.MusicVolume * t.Volume);
             Raylib.SetMusicPitch(t.Song, Pitch);
             Raylib.UpdateMusicStream(t.Song);
+
+            // Custom Loop
             if (t.Song.LoopStart != null && Raylib.GetMusicTimePlayed(t.Song) >= t.Song.LoopEnd)
             {
                 Raylib.SeekMusicStream(t.Song, t.Song.LoopStart.Value);
             }
-
-            // Raylib.SeekMusicStream(t.Song, 175);
-
-            if (!Raylib.IsMusicStreamPlaying(t.Song))
+            // Regular Loop
+            else if (!Raylib.IsMusicStreamPlaying(t.Song))
             {
                 Raylib.PlayMusicStream(t.Song);
                 Raylib.SeekMusicStream(t.Song, t.Song.LoopStart.Value);

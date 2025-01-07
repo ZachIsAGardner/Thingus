@@ -37,11 +37,10 @@ public static class Game
     public static bool FrameAdvance = false;
     public static bool FrameStep = false;
 
-    public static bool Mute = false;
-    public static float MusicVolume = 1f;
-    public static float SoundEffectsVolume = 1f;
-
     public static PlatformType Platform;
+
+    public static Task AudioTask;
+    public static string AudioError = null;
 
     public static List<T> GetThingsWithName<T>(string name) where T : Thing
     {
@@ -92,7 +91,7 @@ public static class Game
         Raylib.SetConfigFlags(ConfigFlags.VSyncHint);
         Raylib.InitWindow(CONSTANTS.VIRTUAL_WIDTH * CONSTANTS.DEFAULT_SCREEN_MULTIPLIER, CONSTANTS.VIRTUAL_HEIGHT * CONSTANTS.DEFAULT_SCREEN_MULTIPLIER, CONSTANTS.TITLE);
         Raylib.SetWindowIcon(Raylib.LoadImage("Content/Icon.png"));
-        Raylib.SetTargetFPS(60);
+        SetFps(Settings.Fps);
         Raylib.InitAudioDevice();
 
         Library.Refresh();
@@ -104,8 +103,26 @@ public static class Game
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Platform = PlatformType.Windows;
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) Platform = PlatformType.Mac;
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) Platform = PlatformType.Linux;
+        
+        if (Settings.IsFullscreen) ToggleFullscreen(true);
 
         Root = new Root();
+
+        AudioTask = Task.Run(async () =>
+        {
+            while (true)
+            {
+                try
+                {
+                    Root?.SongManager?.UpdateTracks();
+                    Root?.SoundEffectManager?.UpdateTracks();
+                }
+                catch(Exception error)
+                {
+                    AudioError = error.Message;
+                }
+            }
+        });
     }
 
     public static void QueueClear()
@@ -197,7 +214,8 @@ public static class Game
         if (queueUpdateReorder)
         {
             queueUpdateReorder = false;
-            UpdateThings = Things.Where(t => t.GlobalActive).OrderBy(t => t.UpdateOrder + t.UpdateOrderOffset).ToList();
+            UpdateThings = Things.OrderBy(t => t.UpdateOrder + t.UpdateOrderOffset).ToList();
+            // .Where(t => t.GlobalActive)
         }
 
         Input.LateUpdate();
@@ -228,13 +246,13 @@ public static class Game
 
     public static Sound? PlaySound(string name, float volume = 1f, float pitch = 1f, float pan = 0.5f)
     {
-        if (Mute) return null;
+        if (Settings.Mute) return null;
         return Root.SoundEffectManager.Play(name, volume, pitch, pan);
     }
 
     public static SongTrack PlaySoundLooped(string name, float volume = 1f, float pitch = 1f, float pan = 0.5f)
     {
-        if (Mute) return null;
+        if (Settings.Mute) return null;
         return Root.SoundEffectManager.PlayLooped(name, volume, pitch, pan);
     }
 
@@ -279,11 +297,18 @@ public static class Game
         if (show == false || (show == null && !Raylib.IsCursorHidden())) Raylib.HideCursor();
     }
 
-    public static bool IsFullscreen => Raylib.IsWindowFullscreen();
+    public static bool IsFullscreen => Raylib.GetScreenWidth() == Raylib.GetMonitorWidth(Raylib.GetCurrentMonitor()) && Raylib.GetScreenHeight() == Raylib.GetMonitorHeight(Raylib.GetCurrentMonitor());
+    // Raylib.IsWindowFullscreen();
 
     public static void ToggleFullscreen(bool? show = null)
     {
         Raylib.ToggleBorderlessWindowed();
         Viewport.RefreshProjection();
+    }
+
+    public static void SetFps(int fps)
+    {
+        Settings.Fps = fps;
+        Raylib.SetTargetFPS(fps);
     }
 }

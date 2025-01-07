@@ -201,7 +201,6 @@ public class Sprite : Thing
                 if (State.Loop) TileNumber = State.Start;
                 else TileNumber = State.End;
             }
-            if (State.Name == "Stand") Log.Write(TileNumber);
 
             int flooredTileNumber = (int)Math.Floor(TileNumber);
 

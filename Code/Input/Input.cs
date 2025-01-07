@@ -481,6 +481,8 @@ public static class Input
 
     public static void Rumble(int index = 0, float leftMotar = 0.25f, float rightMotar = 0.25f, float duration = 0.125f)
     {
+        if (!IsGamepadFocused) return;
+        
         Raylib.SetGamepadVibration(index, leftMotar, rightMotar, duration);
     }
 
@@ -843,7 +845,6 @@ public static class Input
     public static Dictionary<string, string> GetGamepadPrompts(int index = 0)
     {
         string gamepad = GetGamepadName(index).ToLower();
-        Log.Write(gamepad);
 
         // if (new List<string>() { "GameCube" }.Any(x => gamepad.Contains(x))) return GameCubePrompts;
         // if (new List<string>() { "Steam" }.Any(x => gamepad.Contains(x))) return SteamDeckPrompts;

@@ -124,6 +124,7 @@ public static class Viewport
         if (Target != null)
         {
             CameraPosition = Target.Position
+                + Target.Offset
                 + Position
                 - new Vector2(
                     CONSTANTS.VIRTUAL_WIDTH / 2f,

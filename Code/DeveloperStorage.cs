@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Thingus;
 
-public class DeveloperStorage
+public static class DeveloperStorage
 {
     class DeveloperStorageContents
     {

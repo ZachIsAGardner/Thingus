@@ -131,7 +131,7 @@ public class DeveloperTools : Thing
 
         if (Input.IsPressed(KeyboardKey.M))
         {
-            Game.Mute = !Game.Mute;
+            Settings.Mute = !Settings.Mute;
         }
 
         if (Input.IsPressed(KeyboardKey.Eight))

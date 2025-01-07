@@ -14,6 +14,7 @@ public class Control : Thing
     public Color HighlightColor = Theme.Primary;
     public Color TextColor = PaletteBasic.White;
     public Color TextHighlightColor = Theme.Primary;
+    public bool IgnoreParentHighlight = false;
     public int TileNumber = 0;
     public int TileSize = 0;
 
@@ -21,7 +22,7 @@ public class Control : Thing
 
     public bool IsHovered;
     public bool IsFocused => FocusedControl == this || (Parent as Control)?.IsFocused == true;
-    public bool IsHighlighted => HighlightedControl == this || (Parent as Control)?.IsHighlighted == true;
+    public bool IsHighlighted => HighlightedControl == this || (!IgnoreParentHighlight && (Parent as Control)?.IsHighlighted == true);
     public bool IsHeld;
     public Action Hovered;
     public event Action OnPressed;

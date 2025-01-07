@@ -18,7 +18,7 @@ public class SoundEffectManager : Thing
     public Sound Play(string name, float volume = 1f, float pitch = 1f, float pan = 0.5f)
     {
         Sound sound = Library.SoundEffects[name];
-        Raylib.SetSoundVolume(sound, volume * Game.SoundEffectsVolume);
+        Raylib.SetSoundVolume(sound, volume * Settings.SoundEffectsVolume);
         Raylib.SetSoundPitch(sound, pitch);
         Raylib.SetSoundPan(sound, pan);
         Raylib.PlaySound(sound);
@@ -27,21 +27,33 @@ public class SoundEffectManager : Thing
 
     public override void Update()
     {
-        Tracks = Tracks.Where(t => !t.Stopped).ToList();
-        
-        Tracks.ForEach(t =>
+        Tracks.ToList().ForEach(t =>
         {
             t.Update();
-            Raylib.SetMusicVolume(t.Song, Game.SoundEffectsVolume * t.Volume);
-            Log.Write("V: " + t.Volume);
+        });
+    }
+
+    // Updated in Game
+    public void UpdateTracks()
+    {
+        if (Settings.Mute) return;
+
+        Tracks = Tracks.Where(t => !t.Stopped).ToList();
+
+        Tracks.ToList().ForEach(t =>
+        {
+            if (Game.Root.Dynamic.Active) Raylib.SetMusicVolume(t.Song, Settings.SoundEffectsVolume * t.Volume);
+            else Raylib.SetMusicVolume(t.Song, 0);
             Raylib.SetMusicPitch(t.Song, t.Pitch);
             Raylib.UpdateMusicStream(t.Song);
+
+            // Custom Loop
             if (t.Song.LoopStart != null && Raylib.GetMusicTimePlayed(t.Song) >= t.Song.LoopEnd)
             {
                 Raylib.SeekMusicStream(t.Song, t.Song.LoopStart.Value);
             }
-
-            if (!Raylib.IsMusicStreamPlaying(t.Song))
+            // Regular Loop
+            else if (!Raylib.IsMusicStreamPlaying(t.Song))
             {
                 Raylib.PlayMusicStream(t.Song);
                 Raylib.SeekMusicStream(t.Song, t.Song.LoopStart.Value);

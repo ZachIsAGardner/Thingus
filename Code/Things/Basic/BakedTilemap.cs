@@ -46,7 +46,7 @@ public class BakedTilemap : Thing
     {
         UpdateInEditMode = true;
         Layer = model.Layer;
-        DrawOrder = Game.Layers[Layer];
+        DrawOrder = Game.Layers[Layer] - 30;
         BlendMode = model.BlendMode;
     }
 
